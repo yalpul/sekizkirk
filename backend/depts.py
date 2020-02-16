@@ -87,8 +87,8 @@ class depts:
     # Try to read data from files if they exist. Otherwise get from oibs
     def import_data(self, force_update):
         import os
-        names_path = self.cache_dir + 'course_names'
-        codes_path = self.cache_dir + 'course_codes'
+        names_path = self.cache_dir + 'course_names.json'
+        codes_path = self.cache_dir + 'course_codes.json'
         if os.path.exists(names_path) and os.path.exists(codes_path)\
             and not force_update:
             self.log('Course codes found. Importing...')

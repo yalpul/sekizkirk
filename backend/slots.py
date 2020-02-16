@@ -111,7 +111,7 @@ class slots:
     # Try to read data from files if they exist. Otherwise get from oibs
     def import_data(self, force_update):
         import os
-        slots_path = self.cache_dir + 'course_slots'
+        slots_path = self.cache_dir + 'course_slots.json'
         if os.path.exists(slots_path) and not force_update:
             self.log('Slots found. Importing...')
             with open(slots_path, 'r') as f:
