@@ -7,10 +7,11 @@ import musts
 import slots
 from argparse import ArgumentParser
 
-cache_dir = 'sekizkirk_cache/'
 
 def parse_arguments():
     parser = ArgumentParser()
+    parser.add_argument('--path', help='Relative path to save data', \
+        default='sekizkirk_cache/')
     parser.add_argument('--silent', action='store_true',\
         help='Do not write anything to stdout')
     parser.add_argument('--update-courses', action='store_true',\
@@ -24,20 +25,21 @@ def parse_arguments():
 if __name__ == '__main__':
     args = parse_arguments()
 
-    if not os.path.exists(cache_dir):
-        os.mkdir(cache_dir)
+    data_path = os.path.join(os.getcwd(), args.path)
+    if not os.path.exists(data_path):
+        os.mkdir(data_path)
 
     if args.musts:
         must_data = musts.get_all_musts()
-        with open(cache_dir+'musts', 'w') as f:
+        with open(data_path+'musts', 'w') as f:
             f.write(repr(must_data))
         sys.exit()
 
     dp = depts.depts(update_courses = args.update_courses,\
                      silent = args.silent,\
-                     cache_dir = cache_dir)
+                     cache_dir = data_path)
 
     ts = slots.slots(dp.get_codes(), dp.get_cookie(),\
                      update_slots = args.update_slots,\
                      silent = args.silent,\
-                     cache_dir = cache_dir)
+                     cache_dir = data_path)
