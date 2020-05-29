@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     if args.musts:
         must_data = musts.get_all_musts()
-        with open(data_path+'musts', 'w') as f:
+        with open(data_path+'musts.json', 'w') as f:
             f.write(repr(must_data))
         sys.exit()
 

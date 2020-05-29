@@ -36,7 +36,7 @@ def get_courses(rows):
             elect_i = row.find('ELECTIVE')
             s = row.rfind('>', 0, elect_i)
             elective.append(row[s+1:elect_i+8])
-    return must, selective, elective
+    return [must, selective, elective]
 
 # get catalog data for a given department (all 8 semesters)
 def get_dept_musts(dept):
