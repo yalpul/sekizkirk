@@ -1,8 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
-import courseNames from '../../backend/sekizkirk_cache/course_names.json';
-import courseSlots from '../../backend/sekizkirk_cache/course_slots.json';
-import courseCodes from '../../backend/sekizkirk_cache/course_codes.json';
+const App = ({ courseCodes, courseNames, courseSlots, musts }) => {
+  console.log(courseCodes);
+  console.log(courseNames);
+  console.log(courseSlots);
+  console.log(musts);
+  return <h1>Sekizkirk</h1>;
+};
 
-ReactDOM.render(<h1>Senpai is Awesome!</h1>, document.getElementById('root'));
+export default App;

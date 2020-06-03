@@ -1,25 +1,33 @@
 {
-  "name": "frontend",
+  "name": "sekizkirk",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
-  "scripts": {
-    "dev": "parcel src/index.html",
-    "lint": "eslint \"src/**/*.{js,jsx,html}\" --quiet",
-    "format": "prettier --write \"src/**/*.{js,jsx}\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.10.0",
+    "@babel/core": "^7.10.2",
+    "@babel/plugin-proposal-class-properties": "^7.10.1",
+    "@babel/preset-env": "^7.10.2",
+    "@babel/preset-react": "^7.10.1",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.20.0",
+    "eslint-plugin-react-hooks": "^4.0.4",
     "parcel-bundler": "^1.12.4",
-    "prettier": "^1.19.1"
+    "prettier": "^2.0.5"
   },
   "dependencies": {
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0"
-  }
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "scripts": {
+    "format": "prettier --write src/**/*.{js, jsx}",
+    "lint": "eslint src/**/*.{js, jsx} --quite",
+    "dev": "parcel src/index.html"
+  },
+  "browserlist": [
+    "last 2 Chrome versions"
+  ]
 }
