@@ -91,9 +91,9 @@ class slots:
 
     # Convert constraint data to a standard form
     def normalize_constraints(self, constraints):
-        # TODO: currently there is no policy for the constraint table
-        # We are including the whole table
-        return constraints
+        return [c[:3] for c in constraints if \
+            c[3] == '0.00' and c[4] == '4.00' and \
+            c[1] != c[2]]
 
     # Parse the constraints page
     def parse_constraints(self, html):
