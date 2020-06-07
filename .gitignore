@@ -1,5 +1,4 @@
 __pycache__
-sekizkirk_cache
 node_modules
 .cache/
 dist/
@@ -7,3 +6,6 @@ dist/
 .DS_Store
 coverage/
 .vscode/
+
+course*.json
+musts.json
