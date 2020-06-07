@@ -4,7 +4,6 @@ import urllib.parse as parse
 from dept_codes import dept_codes
 
 class slots:
-    # TODO extract and use surname & dept constraints
     def __init__(self, course_codes, cookie, update_slots=False,\
                  silent=False, cache_dir='sekizkirk_cache/'):
         self.url = \
@@ -14,6 +13,8 @@ class slots:
                             'SubmitCourseInfo' : 'Course Info',
                             'hidden_redir'     : 'Course_List'}
 
+        self.constraint_form = {'submit_section' : None,
+                                'hidden_redir'     : 'Course_Info'}
         self.silent = silent
         self.cache_dir = cache_dir
         self.course_codes = course_codes
@@ -69,6 +70,9 @@ class slots:
         while True:
             idx = html.find(section_str(section), idx)
             if idx == -1: break
+            constraints_html = self.get_constraints_html(section)
+            constraints = self.parse_constraints(constraints_html)
+            standard_constraints = self.normalize_constraints(constraints)
             idx = html.find('<TABLE>', idx)
             time_slots= []
             for i in range(5):
@@ -81,9 +85,44 @@ class slots:
                     idx = idx2
                 if len(record) > 1:
                     time_slots += self.to_standard_form(record)
-            slots.append(time_slots)
+            slots.append([time_slots, standard_constraints])
             section += 1
         return slots
+
+    # Convert constraint data to a standard form
+    def normalize_constraints(self, constraints):
+        return [c[:3] for c in constraints if \
+            c[3] == '0.00' and c[4] == '4.00' and \
+            c[1] != c[2]]
+
+    # Parse the constraints page
+    def parse_constraints(self, html):
+        if 'There is no section criteria' in html:
+            return []
+        table_begin = html.find('Given Dept')
+        table_end = html.find('</TABLE>', table_begin)
+        table = html[table_begin:table_end]
+        idx = table.find('</TR>')
+        constraints = []
+        while True:
+            idx = table.find('<TR>', idx)
+            if idx == -1: break
+            tokens = []
+            for i in range(9):
+                token = table.find('ARIAL>', idx)
+                end_token = table.find('</', token)
+                tokens.append(table[token+6:end_token])
+                idx = end_token
+            constraints.append(tokens)
+        return constraints
+
+    # Get name/surname/dept constraints for the given section
+    def get_constraints_html(self, section):
+        request = req.Request(self.url, headers={'Cookie':self.cookie})
+        self.constraint_form['submit_section'] = section
+        encoded_form = bytes(parse.urlencode(self.constraint_form), 'ascii')
+        constraint_data = req.urlopen(request, encoded_form).read()
+        return constraint_data.decode('utf-8')
 
     # Get course page for the given course code
     def request_course(self, course):
