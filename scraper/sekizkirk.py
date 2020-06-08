@@ -5,6 +5,7 @@ import sys
 import depts
 import musts
 import slots
+import json
 from argparse import ArgumentParser
 
 
@@ -32,7 +33,7 @@ if __name__ == '__main__':
     if args.musts:
         must_data = musts.get_all_musts()
         with open(data_path+'musts.json', 'w') as f:
-            f.write(repr(must_data))
+            f.write(json.dumps(must_data))
         sys.exit()
 
     dp = depts.depts(update_courses = args.update_courses,\
@@ -42,4 +43,4 @@ if __name__ == '__main__':
     ts = slots.slots(dp.get_codes(), dp.get_cookie(),\
                      update_slots = args.update_slots,\
                      silent = args.silent,\
-                     cache_dir = data_path)
+                     cache_dir = data_path) 

@@ -1,5 +1,6 @@
 import urllib.request as req
 import urllib.parse as parse
+import json
 
 from dept_codes import dept_codes
 
@@ -99,9 +100,9 @@ class depts:
         else:
             self.collect_courses()
             with open(names_path, 'w') as f:
-                f.write(repr(self.course_names))
+                f.write(json.dumps(self.course_names))
             with open(codes_path, 'w') as f:
-                f.write(repr(self.course_codes))
+                f.write(json.dumps(self.course_codes))
 
     def get_codes(self):
         return self.course_codes
