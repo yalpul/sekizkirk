@@ -1,5 +1,6 @@
 import urllib.request as req
 import urllib.parse as parse
+import json
 
 from dept_codes import dept_codes
 
@@ -158,4 +159,4 @@ class slots:
         else:
             self.collect_course_slots()
             with open(slots_path, 'w') as f:
-                f.write(repr(self.course_slots))
+                f.write(json.dumps(self.course_slots))
