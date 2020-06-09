@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import json
 import urllib.request as req
 from dept_codes import dept_codes
 
@@ -64,4 +65,4 @@ def get_all_musts():
 if __name__ == '__main__':
     musts = get_all_musts()
     with open('musts', 'w') as f:
-        f.write(repr(musts))
+        f.write(json.dumps(musts))
