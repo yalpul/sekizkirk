@@ -7,13 +7,20 @@ import courseSlots from '../data/course_slots.json';
 import musts from '../data/musts.json';
 
 import App from './App';
+import DataContext from './components/DataContext';
+
+const data = {
+    courseCodes,
+    courseNames,
+    courseSlots,
+    musts,
+};
 
 render(
-  <App
-    courseCodes={courseCodes}
-    courseNames={courseNames}
-    courseSlots={courseSlots}
-    musts={musts}
-  />,
-  document.getElementById('root')
+    <React.StrictMode>
+        <DataContext.Provider value={data}>
+            <App />
+        </DataContext.Provider>
+    </React.StrictMode>,
+    document.getElementById('root')
 );
