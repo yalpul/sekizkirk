@@ -1,5 +1,6 @@
 import urllib.request as req
 import urllib.parse as parse
+import sys
 import json
 
 from dept_codes import dept_codes
@@ -25,6 +26,7 @@ class slots:
             self.import_data(update_slots)
         except KeyboardInterrupt:
             print('\nAbort.')
+            sys.exit()
 
     # Convert day-hour format to indexed format
     # ['Monday', '8:40', '10:30', <classroom>] to

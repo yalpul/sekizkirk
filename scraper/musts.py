@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import sys
 import json
 import urllib.request as req
 from dept_codes import dept_codes
@@ -19,6 +20,10 @@ def get_rows(html):
         rows.append(html[idx+4:idx2])
         idx = idx2
     return rows[1:]
+
+def log(msg, progress=False, silent=False):
+    if not silent:
+        print(msg, end='\r' if progress else '\n')
 
 # parse must and elective courses from table rows
 def get_courses(rows):
@@ -54,13 +59,23 @@ def get_dept_musts(dept):
     return musts
 
 # get all catalog data for all departments
-def get_all_musts():
-    musts = {}
-    for dept in dept_codes.keys():
-        dept_musts = get_dept_musts(dept)
-        if dept_musts:
-            musts[dept] = dept_musts
-    return musts
+def get_all_musts(silent=False):
+    try:
+        musts = {}
+        i = 1
+        lim = len(dept_codes)
+        log('Collecting must courses...', silent=silent)
+        for dept in dept_codes.keys():
+            dept_musts = get_dept_musts(dept)
+            log(f'{i:3}/{lim:3}', progress=True, silent=silent)
+            if dept_musts:
+                musts[dept] = dept_musts
+            i += 1
+        log('Must courses collected.', silent)
+        return musts
+    except KeyboardInterrupt:
+        print('\nAbort.')
+        sys.exit()
 
 if __name__ == '__main__':
     musts = get_all_musts()

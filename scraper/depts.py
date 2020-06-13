@@ -1,5 +1,6 @@
 import urllib.request as req
 import urllib.parse as parse
+import sys
 import json
 
 from dept_codes import dept_codes
@@ -25,6 +26,7 @@ class depts:
             self.import_data(update_courses)
         except KeyboardInterrupt:
             print('\nAbort.')
+            sys.exit()
 
     def log(self, msg, progress=False):
         if not self.silent:

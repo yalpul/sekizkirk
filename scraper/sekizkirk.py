@@ -31,7 +31,7 @@ if __name__ == '__main__':
         os.mkdir(data_path)
 
     if args.musts:
-        must_data = musts.get_all_musts()
+        must_data = musts.get_all_musts(args.silent)
         with open(os.path.join(data_path, 'musts.json'), 'w') as f:
             f.write(json.dumps(must_data))
         sys.exit()
