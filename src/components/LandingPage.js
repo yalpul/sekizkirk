@@ -50,6 +50,10 @@ const useStyles = makeStyles((theme) => ({
 const LandingPage = () => {
     const classes = useStyles();
 
+    const handleClick = (event) => {
+        document.getElementById('main-page').scrollIntoView();
+    }
+
     return (
         <article className={classes.root}>
             <figure className={classes.svgWrapper}>
@@ -65,7 +69,7 @@ const LandingPage = () => {
             <Typography color="primary" variant="subtitle1" className={classes.caption}>
                 Proper scheduler for METU*
             </Typography>
-            <Button variant="contained" className={classes.button} disableElevation component="a" href="#main-page">
+            <Button variant="contained" className={classes.button} disableElevation onClick={handleClick}>
                 Get Started
             </Button>
 
