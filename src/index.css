@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'agrandir';
+    src: local('agrandir'), url('./fonts/Agrandir-GrandHeavy.woff') format('woff')
+}
+
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
