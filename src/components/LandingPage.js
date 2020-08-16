@@ -1,15 +1,16 @@
 import React, { useContext } from 'react';
 
-import { makeStyles, Button } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
-
-import DataContext from './DataContext';
+import Button from '@material-ui/core/Button';
 
 import Background from '../assets/landing-background'
 
 import '../index.css'
 
 
+// NOTE: maybe use relative units instead of pixels.
+// can this result in better responsive UI?
 const useStyles = makeStyles((theme) => ({
     root: {
         backgroundColor: theme.palette.common.black,
@@ -32,6 +33,17 @@ const useStyles = makeStyles((theme) => ({
         // positioning absolute for using svg as background.
         // NOTE: better practice might exist here.
         position: 'absolute',
+    },
+    caption: {
+        fontFamily: 'Agrandir',
+        fontSize: '1.4rem',
+        position: "relative",
+        bottom: '70px'
+    },
+    button: {
+        backgroundColor: theme.palette.common.sekizkirkGrey,
+        color: theme.palette.common.sekizkirkUltramarine
+
     }
 }))
 
@@ -50,6 +62,13 @@ const LandingPage = () => {
             <Typography variant="h1" className={classes.bottomOffset}>
                 kırk
             </Typography>
+            <Typography color="primary" variant="subtitle1" className={classes.caption}>
+                Proper scheduler for METU*
+            </Typography>
+            <Button variant="contained" className={classes.button} disableElevation component="a" href="#main-page">
+                Get Started
+            </Button>
+
         </article >
     )
 };

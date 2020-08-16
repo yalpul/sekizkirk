@@ -20,11 +20,11 @@ export default createMuiTheme({
     },
     typography: {
         h1: {
-            fontFamily: 'agrandir',
+            fontFamily: 'Agrandir',
             fontSize: '12rem',
             textTransform: 'uppercase',
             margin: 0,
             letterSpacing: '-10px',
-        }
+        },
     }
 })

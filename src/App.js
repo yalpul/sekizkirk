@@ -14,9 +14,9 @@ const App = () => {
             <CssBaseline />
             <main>
                 <LandingPage />
-                <div>
+                <section id="main-page">
                     User forms will be here
-                </div>
+                </section>
             </main>
         </ThemeProvider>
     )
