@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 
 import { makeStyles } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
@@ -7,12 +7,12 @@ import Grid from '@material-ui/core/Grid';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
 
-// import Background from '../assets/landing-background';
-
 import '../index.css';
 
-// NOTE: maybe use relative units instead of pixels.
-// can this result in better responsive UI?
+import Arrow from '../assets/arrow.svg';
+
+// Note: Positining with relative involved many trial-errors.
+// These can be change.
 const useStyles = makeStyles((theme) => ({
     root: {
         height: '100vh',
@@ -63,15 +63,19 @@ const useStyles = makeStyles((theme) => ({
             bottom: '70px',
         },
     },
-    // svgWrapper: {
-    //     width: '120vmax',
-    //     margin: '0',
-    //     padding: '0',
-    //     border: '0',
-    //     // positioning absolute for using svg as background.
-    //     // NOTE: better practice might exist here.
-    //     position: 'absolute',
-    // },
+    '@keyframes bounce': {
+        '0%, 100%': {
+            transform: 'translate3d(0, -100%, 0)',
+        },
+        '50%': {
+            transform: 'translate3d(0, 0, 0)',
+        },
+    },
+    arrow: {
+        animation: '$bounce 1s ease-in-out infinite',
+        position: 'fixed',
+        bottom: '20px',
+    },
 }));
 
 const LandingPage = () => {
@@ -85,10 +89,6 @@ const LandingPage = () => {
 
     return (
         <article className={classes.root}>
-            {/* <figure className={classes.svgWrapper}>
-                {/* TODO: change this way importing of the svg with more proper practice */}
-            {/* <Background /> */}
-            {/* </figure> */}
             <Grid
                 container
                 direction="column"
@@ -129,6 +129,15 @@ const LandingPage = () => {
                     >
                         Get Started
                     </Button>
+                </Grid>
+                <Grid item>
+                    <img
+                        src={Arrow}
+                        alt="bouncing arrow"
+                        width="18"
+                        height="30"
+                        className={classes.arrow}
+                    />
                 </Grid>
             </Grid>
         </article>
