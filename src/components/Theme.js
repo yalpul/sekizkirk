@@ -9,14 +9,14 @@ export default createMuiTheme({
         common: {
             sekizkirkOrange,
             sekizkirkGrey,
-            sekizkirkUltramarine
+            sekizkirkUltramarine,
         },
         primary: {
-            main: sekizkirkOrange
+            main: sekizkirkOrange,
         },
         secondary: {
-            main: sekizkirkUltramarine
-        }
+            main: sekizkirkUltramarine,
+        },
     },
     typography: {
         h1: {
@@ -24,7 +24,6 @@ export default createMuiTheme({
             fontSize: '12rem',
             textTransform: 'uppercase',
             margin: 0,
-            letterSpacing: '-10px',
         },
-    }
-})
+    },
+});
