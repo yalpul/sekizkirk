@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { makeStyles } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
@@ -75,6 +75,7 @@ const useStyles = makeStyles((theme) => ({
         animation: '$bounce 1s ease-in-out infinite',
         position: 'fixed',
         bottom: '20px',
+        transition: 'opacity 0.75s',
     },
 }));
 
@@ -82,6 +83,20 @@ const LandingPage = () => {
     const classes = useStyles();
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('xs'));
+
+    const [hideArrow, setHideArrow] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 50) {
+                setHideArrow(true);
+            } else {
+                setHideArrow(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+    }, []);
 
     const handleClick = () => {
         document.getElementById('main-page').scrollIntoView();
@@ -137,6 +152,7 @@ const LandingPage = () => {
                         width="18"
                         height="30"
                         className={classes.arrow}
+                        style={hideArrow ? { opacity: 0 } : {}}
                     />
                 </Grid>
             </Grid>
