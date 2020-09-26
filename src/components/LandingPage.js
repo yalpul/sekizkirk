@@ -1,88 +1,88 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
-import { makeStyles } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { useTheme } from '@material-ui/core/styles';
+import { makeStyles } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { useTheme } from "@material-ui/core/styles";
 
-import '../index.css';
+import "../index.css";
 
-import Arrow from '../assets/arrow.svg';
+import Arrow from "../assets/arrow.svg";
 
 // Note: Positining with relative involved many trial-errors.
 // These can be change.
 const useStyles = makeStyles((theme) => ({
     root: {
-        height: '100vh',
-        overflowX: 'hidden',
+        height: "100vh",
+        overflowX: "hidden",
         backgroundColor: theme.palette.common.black,
         color: theme.palette.common.white,
     },
     gridContainer: {
-        height: '100%',
+        height: "100%",
     },
     header: {
-        [theme.breakpoints.up('sm')]: {
-            fontSize: '12rem',
-            letterSpacing: '-10px',
+        [theme.breakpoints.up("sm")]: {
+            fontSize: "12rem",
+            letterSpacing: "-10px",
         },
-        [theme.breakpoints.down('xs')]: {
-            fontSize: '5.5rem',
-            letterSpacing: '-5px',
+        [theme.breakpoints.down("xs")]: {
+            fontSize: "5.5rem",
+            letterSpacing: "-5px",
         },
     },
     bottomHeaderOffset: {
-        position: 'relative',
-        [theme.breakpoints.up('sm')]: {
-            bottom: '80px',
+        position: "relative",
+        [theme.breakpoints.up("sm")]: {
+            bottom: "80px",
         },
-        [theme.breakpoints.down('xs')]: {
-            bottom: '35px',
+        [theme.breakpoints.down("xs")]: {
+            bottom: "35px",
         },
     },
     caption: {
-        fontFamily: 'Agrandir',
-        position: 'relative',
-        [theme.breakpoints.up('sm')]: {
+        fontFamily: "Agrandir",
+        position: "relative",
+        [theme.breakpoints.up("sm")]: {
             // position for large screens
-            fontSize: '1.4rem',
-            bottom: '100px',
+            fontSize: "1.4rem",
+            bottom: "100px",
         },
-        [theme.breakpoints.down('xs')]: {
-            fontSize: '0.75rem',
-            bottom: '25px',
+        [theme.breakpoints.down("xs")]: {
+            fontSize: "0.75rem",
+            bottom: "25px",
         },
     },
     button: {
         backgroundColor: theme.palette.common.sekizkirkGrey,
         color: theme.palette.common.sekizkirkUltramarine,
-        [theme.breakpoints.up('sm')]: {
-            position: 'relative',
-            bottom: '70px',
+        [theme.breakpoints.up("sm")]: {
+            position: "relative",
+            bottom: "70px",
         },
     },
-    '@keyframes bounce': {
-        '0%, 100%': {
-            transform: 'translate3d(0, -100%, 0)',
+    "@keyframes bounce": {
+        "0%, 100%": {
+            transform: "translate3d(0, -100%, 0)",
         },
-        '50%': {
-            transform: 'translate3d(0, 0, 0)',
+        "50%": {
+            transform: "translate3d(0, 0, 0)",
         },
     },
     arrow: {
-        animation: '$bounce 1s ease-in-out infinite',
-        position: 'fixed',
-        bottom: '20px',
-        transition: 'opacity 0.75s',
+        animation: "$bounce 1s ease-in-out infinite",
+        position: "fixed",
+        bottom: "20px",
+        transition: "opacity 0.75s",
     },
 }));
 
 const LandingPage = () => {
     const classes = useStyles();
     const theme = useTheme();
-    const matches = useMediaQuery(theme.breakpoints.down('xs'));
+    const matches = useMediaQuery(theme.breakpoints.down("xs"));
 
     const [hideArrow, setHideArrow] = useState(false);
 
@@ -95,11 +95,11 @@ const LandingPage = () => {
             }
         };
 
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener("scroll", handleScroll);
     }, []);
 
     const handleClick = () => {
-        document.getElementById('form-container').scrollIntoView();
+        document.getElementById("form-container").scrollIntoView();
     };
 
     return (
@@ -120,7 +120,7 @@ const LandingPage = () => {
                 <Grid item>
                     <Typography
                         variant="h1"
-                        className={[classes.header, classes.bottomHeaderOffset]}
+                        className={`${classes.header} ${classes.bottomHeaderOffset}`}
                     >
                         kırk
                     </Typography>
@@ -140,7 +140,7 @@ const LandingPage = () => {
                         className={classes.button}
                         disableElevation
                         onClick={handleClick}
-                        size={matches ? 'small' : 'medium'}
+                        size={matches ? "small" : "medium"}
                     >
                         Get Started
                     </Button>
