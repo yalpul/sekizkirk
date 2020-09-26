@@ -3,10 +3,9 @@ import React from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core';
 
-
 import LandingPage from './components/LandingPage';
-import theme from './components/Theme'
-
+import Form from './components/Form';
+import theme from './components/Theme';
 
 const App = () => {
     return (
@@ -14,12 +13,10 @@ const App = () => {
             <CssBaseline />
             <main>
                 <LandingPage />
-                <section id="main-page">
-                    User forms will be here
-                </section>
+                <Form />
             </main>
         </ThemeProvider>
-    )
+    );
 };
 
 export default App;

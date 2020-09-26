@@ -99,7 +99,7 @@ const LandingPage = () => {
     }, []);
 
     const handleClick = () => {
-        document.getElementById('main-page').scrollIntoView();
+        document.getElementById('form-container').scrollIntoView();
     };
 
     return (
