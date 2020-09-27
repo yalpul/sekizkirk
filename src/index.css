@@ -1,24 +1,17 @@
 @font-face {
-    font-family: 'Agrandir';
-    src: local('Agrandir'),
-        url('./fonts/Agrandir-GrandHeavy.woff') format('woff');
+    font-family: "Agrandir";
+    src: local("Agrandir"),
+        url("./fonts/Agrandir-GrandHeavy.woff") format("woff");
 }
 
 @font-face {
-    font-family: 'CashMarket';
-    src: local('CashMarket'),
-        url('./fonts/CashMarket-RegularRounded.woff2') format('woff');
+    font-family: "CashMarket";
+    src: local("CashMarket"),
+        url("./fonts/CashMarket-RegularRounded.woff2") format("woff");
 }
 
 html,
 body {
     max-width: 100%;
-    /* overflow-x: hidden; */
     scroll-behavior: smooth;
-}
-
-/* fake main page for development */
-section {
-    height: 100vh;
-    background-color: yellow;
 }

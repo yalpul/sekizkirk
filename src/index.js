@@ -25,7 +25,7 @@ const courses = courseNames.map((course, index) => {
 
     // some course names finishes with the `()`, just empty paranthesis
     // remove them
-    const nameModified = course.replace("()", "");
+    const nameModified = course.replace(" ()", "");
 
     return `${deptName}${courseCode} - ${nameModified}`;
 });
