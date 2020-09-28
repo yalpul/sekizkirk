@@ -8,6 +8,14 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import Typography from "@material-ui/core/Typography";
 import Fab from "@material-ui/core/Fab";
 import AddIcon from "@material-ui/icons/Add";
+import Accordion from "@material-ui/core/Accordion";
+import AccordionDetails from "@material-ui/core/AccordionDetails";
+import AccordionSummary from "@material-ui/core/AccordionSummary";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
@@ -25,6 +33,23 @@ const useStyles = makeStyles((theme) => ({
     addButton: {
         marginLeft: "1em",
     },
+    accordionContainer: {
+        marginTop: "2em",
+    },
+    accordion: {
+        backgroundColor: "inherit",
+        width: "35em",
+        border: `1px solid ${theme.palette.common.black}`,
+    },
+    accordionSummary: {
+        "& .MuiAccordionSummary-content": {
+            alignItems: "center",
+            flexGrow: 0,
+        },
+    },
+    mustSelect: {
+        minWidth: "200px",
+    },
 }));
 
 const Form = () => {
@@ -34,6 +59,8 @@ const Form = () => {
     const [courseInput, setCourseInput] = useState("");
     const [courseValue, setCourseValue] = useState(null);
     const [courses, setCourses] = useState([]);
+    const [dept, setDept] = useState(null);
+    const [semester, setSemester] = useState("");
 
     const handleCourseAdd = () => {
         if (courseValue !== null && !courses.includes(courseValue)) {
@@ -53,7 +80,7 @@ const Form = () => {
                 <Typography variant="h2">Select Your Courses</Typography>
             </Grid>
             <Grid item container direction="row" justify="center">
-                <Grid item className={classes.courseSelect}>
+                <Grid item>
                     <Autocomplete
                         options={data.courses}
                         open={courseInput.length > 2}
@@ -74,6 +101,7 @@ const Form = () => {
                         blurOnSelect
                         autoHighlight
                         noOptionsText="Course not found."
+                        className={classes.courseSelect}
                     />
                 </Grid>
                 <Grid item>
@@ -86,6 +114,76 @@ const Form = () => {
                         <AddIcon />
                     </Fab>
                 </Grid>
+            </Grid>
+            <Grid item className={classes.accordionContainer}>
+                <Accordion className={classes.accordion}>
+                    <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1a-content"
+                        id="panel1a-header"
+                        className={classes.accordionSummary}
+                    >
+                        <Typography variant="body1">
+                            Add Must Courses
+                        </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <Grid
+                            container
+                            justify="space-around"
+                            alignItems="center"
+                        >
+                            <Grid item>
+                                <Autocomplete
+                                    options={data.departments}
+                                    getOptionLabel={(department) =>
+                                        department.title
+                                    }
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Department"
+                                            variant="outlined"
+                                        />
+                                    )}
+                                    onChange={(event, value) => setDept(value)}
+                                    popupIcon={<></>} // no icon
+                                    fullWidth
+                                    clearOnEscape
+                                    autoSelect
+                                    blurOnSelect
+                                    autoHighlight
+                                    noOptionsText="Not found."
+                                    className={classes.mustSelect}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <FormControl
+                                    variant="outlined"
+                                    className={classes.mustSelect}
+                                >
+                                    <InputLabel id="semester-select">
+                                        Semester
+                                    </InputLabel>
+                                    <Select
+                                        labelId="semester-select"
+                                        value={semester}
+                                        onChange={(event) =>
+                                            setSemester(event.target.value)
+                                        }
+                                        label="semester"
+                                    >
+                                        {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                                            <MenuItem key={sem} value={sem}>
+                                                {sem}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        </Grid>
+                    </AccordionDetails>
+                </Accordion>
             </Grid>
             <Grid item container direction="column" alignItems="center">
                 {courses.map((course) => (

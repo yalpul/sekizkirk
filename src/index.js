@@ -30,6 +30,11 @@ const courses = courseNames.map((course, index) => {
     return `${deptName}${courseCode} - ${nameModified}`;
 });
 
+const departments = Object.entries(deptCodes).map(([code, title]) => ({
+    code,
+    title,
+}));
+
 const data = {
     // courseCodes,
     // courseNames,
@@ -37,6 +42,7 @@ const data = {
     // deptCodes,
     // musts,
     courses,
+    departments,
 };
 
 render(
