@@ -10,7 +10,7 @@ import musts from "../data/musts.json";
 import App from "./App";
 import DataContext from "./components/DataContext";
 
-// append coursecodes to course names
+// append coursecodes to course names as object
 // NOTE: this feature can be moved to backend logic.
 const courses = courseNames.map((course, index) => {
     const code = courseCodes[index];
@@ -27,7 +27,7 @@ const courses = courseNames.map((course, index) => {
     // remove them
     const nameModified = course.replace(" ()", "");
 
-    return `${deptName}${courseCode} - ${nameModified}`;
+    return { title: `${deptName}${courseCode} - ${nameModified}`, code };
 });
 
 const departments = Object.entries(deptCodes).map(([code, title]) => ({

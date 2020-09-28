@@ -83,6 +83,7 @@ const Form = () => {
                 <Grid item>
                     <Autocomplete
                         options={data.courses}
+                        getOptionLabel={(course) => course.title}
                         open={courseInput.length > 2}
                         popupIcon={<></>} // no icon
                         onInputChange={(event, value) => setCourseInput(value)}
@@ -188,7 +189,7 @@ const Form = () => {
             <Grid item container direction="column" alignItems="center">
                 {courses.map((course) => (
                     <Grid item key={course} style={{ marginBottom: "2px" }}>
-                        <p>{course}</p>
+                        <p>{course.title}</p>
                     </Grid>
                 ))}
             </Grid>
