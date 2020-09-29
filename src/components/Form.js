@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import DataContext from "./DataContext";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
         textAlign: "center",
     },
     courseSelect: {
-        width: 500,
+        width: "35em",
     },
     addButton: {
         marginLeft: "1em",
@@ -58,15 +58,44 @@ const Form = () => {
 
     const [courseInput, setCourseInput] = useState("");
     const [courseValue, setCourseValue] = useState(null);
-    const [courses, setCourses] = useState([]);
     const [dept, setDept] = useState(null);
     const [semester, setSemester] = useState("");
+    const [manualCourses, setManualCourses] = useState([]);
+    const [mustCourses, setMustCourses] = useState([]);
+    const [courses, setCourses] = useState([]);
 
     const handleCourseAdd = () => {
         if (courseValue !== null && !courses.includes(courseValue)) {
-            setCourses(courses.concat(courseValue));
+            setManualCourses(manualCourses.concat(courseValue));
         }
     };
+
+    const handleDepartmentChange = (event, value) => {
+        setDept(value);
+    };
+
+    const handleSemesterChange = (event) => {
+        setSemester(event.target.value);
+    };
+
+    // set the must courses when user select different
+    // dept or semester options
+    useEffect(() => {
+        if (dept !== null && semester !== "") {
+            // see musts data to understand its structure
+            const mustCodes = data.musts[dept.code][semester - 1][0];
+
+            setMustCourses(mustCodes.map((code) => data.courses[code]));
+        } else {
+            setMustCourses([]);
+        }
+    }, [dept, semester]);
+
+    useEffect(() => {
+        // deduplicate manually added courses and must courses
+        const uniqCourses = [...new Set([...mustCourses, ...manualCourses])];
+        setCourses(uniqCourses);
+    }, [mustCourses, manualCourses]);
 
     return (
         <Grid
@@ -82,7 +111,7 @@ const Form = () => {
             <Grid item container direction="row" justify="center">
                 <Grid item>
                     <Autocomplete
-                        options={data.courses}
+                        options={Object.values(data.courses)} // NOTE: put this computation out of component?
                         getOptionLabel={(course) => course.title}
                         open={courseInput.length > 2}
                         popupIcon={<></>} // no icon
@@ -147,7 +176,7 @@ const Form = () => {
                                             variant="outlined"
                                         />
                                     )}
-                                    onChange={(event, value) => setDept(value)}
+                                    onChange={handleDepartmentChange}
                                     popupIcon={<></>} // no icon
                                     fullWidth
                                     clearOnEscape
@@ -169,9 +198,7 @@ const Form = () => {
                                     <Select
                                         labelId="semester-select"
                                         value={semester}
-                                        onChange={(event) =>
-                                            setSemester(event.target.value)
-                                        }
+                                        onChange={handleSemesterChange}
                                         label="semester"
                                     >
                                         {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
@@ -187,11 +214,27 @@ const Form = () => {
                 </Accordion>
             </Grid>
             <Grid item container direction="column" alignItems="center">
-                {courses.map((course) => (
-                    <Grid item key={course} style={{ marginBottom: "2px" }}>
-                        <p>{course.title}</p>
+                {courses.length > 0 && (
+                    <Grid item style={{ marginTop: "25px" }}>
+                        <Typography variant="h3">To be Scheduled</Typography>
                     </Grid>
-                ))}
+                )}
+                {courses.map((course) => {
+                    return course !== undefined ? (
+                        <Grid
+                            item
+                            key={course.code}
+                            style={{
+                                marginBottom: "2px",
+                                background: mustCourses.includes(course)
+                                    ? "yellow"
+                                    : "red",
+                            }}
+                        >
+                            <p>{course.title}</p>
+                        </Grid>
+                    ) : null;
+                })}
             </Grid>
         </Grid>
     );

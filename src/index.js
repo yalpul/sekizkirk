@@ -10,9 +10,10 @@ import musts from "../data/musts.json";
 import App from "./App";
 import DataContext from "./components/DataContext";
 
-// append coursecodes to course names as object
-// NOTE: this feature can be moved to backend logic.
-const courses = courseNames.map((course, index) => {
+/*TODO: carry these data modification parts to the back-end. */
+const courses = {};
+
+courseNames.forEach((course, index) => {
     const code = courseCodes[index];
     // get departmant code, its the first 3 numbers in courseCodes
     const deptCode = code.substr(0, 3);
@@ -27,7 +28,10 @@ const courses = courseNames.map((course, index) => {
     // remove them
     const nameModified = course.replace(" ()", "");
 
-    return { title: `${deptName}${courseCode} - ${nameModified}`, code };
+    courses[code] = {
+        title: `${deptName}${courseCode} - ${nameModified}`,
+        code,
+    };
 });
 
 const departments = Object.entries(deptCodes).map(([code, title]) => ({
@@ -35,12 +39,14 @@ const departments = Object.entries(deptCodes).map(([code, title]) => ({
     title,
 }));
 
+/* */
+
 const data = {
     // courseCodes,
     // courseNames,
     // courseSlots,
     // deptCodes,
-    // musts,
+    musts,
     courses,
     departments,
 };
