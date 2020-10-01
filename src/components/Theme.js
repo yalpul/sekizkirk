@@ -29,6 +29,12 @@ export default createMuiTheme({
             fontFamily: "Agrandir",
             color: sekizkirkUltramarine,
         },
+        h6: {
+            fontFamily: "Agrandir",
+            fontWeight: 700,
+            lineHeight: 3,
+            color: sekizkirkUltramarine,
+        },
         fontFamily: ["CashMarket"],
     },
 });

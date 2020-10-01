@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import DataContext from "./DataContext";
+
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 
 import Grid from "@material-ui/core/Grid";
@@ -16,11 +17,21 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import IconButton from "@material-ui/core/IconButton";
+import DeleteIcon from "@material-ui/icons/Delete";
+import Divider from "@material-ui/core/Divider";
+import Button from "@material-ui/core/Button";
+import ClearAllIcon from "@material-ui/icons/ClearAll";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
         minHeight: "100vh",
         backgroundColor: theme.palette.common.sekizkirkGrey,
+        paddingBottom: "5em",
     },
     heading: {
         marginTop: "5em",
@@ -50,6 +61,15 @@ const useStyles = makeStyles((theme) => ({
     mustSelect: {
         minWidth: "200px",
     },
+    courseListContainer: {
+        width: "100%",
+        maxWidth: "35em",
+        marginTop: "2em",
+        backgroundColor: "#d4d4d4",
+    },
+    coursesHeader: {
+        paddingLeft: theme.spacing(2),
+    },
 }));
 
 const Form = () => {
@@ -76,6 +96,21 @@ const Form = () => {
 
     const handleSemesterChange = (event) => {
         setSemester(event.target.value);
+    };
+
+    const handleClearAll = () => {
+        setManualCourses([]);
+        setMustCourses([]);
+        setSemester("");
+    };
+
+    const handleDeleteCourse = (course) => {
+        // remember, course might be included in both of the arrays
+        const newMust = mustCourses.filter((item) => item !== course);
+        setMustCourses(newMust);
+
+        const newManual = manualCourses.filter((item) => item !== course);
+        setManualCourses(newManual);
     };
 
     // set the must courses when user select different
@@ -213,28 +248,54 @@ const Form = () => {
                     </AccordionDetails>
                 </Accordion>
             </Grid>
-            <Grid item container direction="column" alignItems="center">
+            <Grid item className={classes.courseListContainer}>
                 {courses.length > 0 && (
-                    <Grid item style={{ marginTop: "25px" }}>
-                        <Typography variant="h3">To be Scheduled</Typography>
-                    </Grid>
-                )}
-                {courses.map((course) => {
-                    return course !== undefined ? (
+                    <>
                         <Grid
-                            item
-                            key={course.code}
-                            style={{
-                                marginBottom: "2px",
-                                background: mustCourses.includes(course)
-                                    ? "yellow"
-                                    : "red",
-                            }}
+                            container
+                            className={classes.coursesHeader}
+                            alignItems="center"
+                            justify="space-between"
                         >
-                            <p>{course.title}</p>
+                            <Typography variant="h6">
+                                To be scheduled..
+                            </Typography>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                endIcon={<ClearAllIcon />}
+                                size="small"
+                                style={{ marginRight: "1em" }}
+                                onClick={handleClearAll}
+                            >
+                                Clear
+                            </Button>
                         </Grid>
-                    ) : null;
-                })}
+                        <Divider />
+                        <List>
+                            {courses.map((course) => {
+                                return course ? (
+                                    <ListItem
+                                        key={`${course.title}+${course.code}`}
+                                        button
+                                    >
+                                        <ListItemText primary={course.title} />
+                                        <ListItemSecondaryAction>
+                                            <IconButton
+                                                edge="end"
+                                                onClick={() =>
+                                                    handleDeleteCourse(course)
+                                                }
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </ListItemSecondaryAction>
+                                    </ListItem>
+                                ) : null;
+                            })}
+                        </List>
+                    </>
+                )}
             </Grid>
         </Grid>
     );
