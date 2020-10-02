@@ -29,6 +29,7 @@ import ClearAllIcon from "@material-ui/icons/ClearAll";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
+import ListSubheader from "@material-ui/core/ListSubheader";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
@@ -291,8 +292,27 @@ const Form = () => {
                                         onChange={handleSemesterChange}
                                         label="semester"
                                     >
-                                        {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                                        <ListSubheader
+                                            style={{ fontWeight: 700 }}
+                                        >
+                                            Spring
+                                        </ListSubheader>
+                                        {[1, 3, 5, 7].map((sem) => (
                                             <MenuItem key={sem} value={sem}>
+                                                {sem}
+                                            </MenuItem>
+                                        ))}
+                                        <ListSubheader
+                                            style={{ fontWeight: 700 }}
+                                        >
+                                            Winter
+                                        </ListSubheader>
+                                        {[2, 4, 6, 8].map((sem) => (
+                                            <MenuItem
+                                                key={sem}
+                                                value={sem}
+                                                disabled
+                                            >
                                                 {sem}
                                             </MenuItem>
                                         ))}
