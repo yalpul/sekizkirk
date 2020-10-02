@@ -47,6 +47,9 @@ const useStyles = makeStyles((theme) => ({
     },
     addButton: {
         marginLeft: "1em",
+        "&:hover": {
+            backgroundColor: theme.palette.primary.light,
+        },
     },
     accordionContainer: {
         marginTop: "2em",
@@ -91,6 +94,18 @@ const useStyles = makeStyles((theme) => ({
         "&:hover .list-icon": {
             color: theme.palette.primary.dark,
         },
+    },
+    buttonContainer: {
+        marginTop: "3em",
+    },
+    scheduleButton: {
+        "&:hover": {
+            backgroundColor: theme.palette.primary.light,
+        },
+        color: "white",
+        fontFamily: "Agrandir",
+        fontWeight: 400,
+        backgroundColor: theme.palette.primary.dark,
     },
 }));
 
@@ -423,6 +438,19 @@ const Form = () => {
                             })}
                         </List>
                     </>
+                )}
+            </Grid>
+            <Grid item className={classes.buttonContainer}>
+                {courses.length > 0 && (
+                    <Button
+                        variant="contained"
+                        // color="primary"
+                        disableRipple
+                        className={classes.scheduleButton}
+                        textAlign="center"
+                    >
+                        schedule
+                    </Button>
                 )}
             </Grid>
         </Grid>
