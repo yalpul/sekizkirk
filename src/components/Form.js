@@ -180,6 +180,12 @@ const Form = () => {
         setCourses(uniqCourses);
     }, [mustCourses, manualCourses]);
 
+    useEffect(() => {
+        if (courses.length === 0) {
+            setSelectiveCourses([]);
+        }
+    }, [courses]);
+
     return (
         <Grid
             container
