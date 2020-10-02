@@ -37,13 +37,30 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: theme.palette.common.sekizkirkGrey,
         paddingBottom: "5em",
     },
-    heading: {
+    headingContainer: {
+        [theme.breakpoints.down("xs")]: {
+            marginTop: "2em",
+        },
         marginTop: "5em",
         marginBottom: "3em",
         textAlign: "center",
     },
+    heading: {
+        [theme.breakpoints.down("xs")]: {
+            fontSize: "2.5em",
+        },
+    },
     courseSelect: {
-        width: "35em",
+        [theme.breakpoints.up("sm")]: {
+            width: "35em",
+        },
+        [theme.breakpoints.down("xs")]: {
+            width: "25em",
+            paddingLeft: theme.spacing(2),
+            paddingRight: theme.spacing(2),
+            // pushes the add button a little bit
+            marginBottom: theme.spacing(3),
+        },
     },
     addButton: {
         marginLeft: "1em",
@@ -56,13 +73,23 @@ const useStyles = makeStyles((theme) => ({
     },
     accordion: {
         backgroundColor: "inherit",
-        width: "35em",
         border: `1px solid ${theme.palette.common.black}`,
+        [theme.breakpoints.up("sm")]: {
+            width: "35em",
+        },
+        [theme.breakpoints.down("xs")]: {
+            width: "20em",
+        },
     },
     accordionSummary: {
         "& .MuiAccordionSummary-content": {
             alignItems: "center",
             flexGrow: 0,
+        },
+    },
+    deptSelect: {
+        [theme.breakpoints.down("xs")]: {
+            marginBottom: theme.spacing(2),
         },
     },
     mustSelect: {
@@ -72,7 +99,7 @@ const useStyles = makeStyles((theme) => ({
         width: "100%",
         maxWidth: "35em",
         marginTop: "2em",
-        backgroundColor: "#d4d4d4",
+        backgroundColor: theme.palette.common.listBackground,
     },
     coursesHeader: {
         paddingLeft: theme.spacing(2),
@@ -81,7 +108,7 @@ const useStyles = makeStyles((theme) => ({
         width: "100%",
         maxWidth: "35em",
         marginTop: "1em",
-        backgroundColor: "#d4d4d4",
+        backgroundColor: theme.palette.common.listBackground,
     },
     selectiveHeader: {
         fontWeight: 700,
@@ -210,8 +237,10 @@ const Form = () => {
             id="form-container"
             alignItems="center"
         >
-            <Grid item className={classes.heading}>
-                <Typography variant="h2">Select Your Courses</Typography>
+            <Grid item className={classes.headingContainer}>
+                <Typography variant="h2" className={classes.heading}>
+                    Select Your Courses
+                </Typography>
             </Grid>
             <Grid item container direction="row" justify="center">
                 <Grid item>
@@ -269,7 +298,7 @@ const Form = () => {
                             justify="space-around"
                             alignItems="center"
                         >
-                            <Grid item>
+                            <Grid item className={classes.deptSelect}>
                                 <Autocomplete
                                     options={data.departments}
                                     getOptionLabel={(department) =>

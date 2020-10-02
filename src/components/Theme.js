@@ -3,6 +3,7 @@ import { createMuiTheme } from "@material-ui/core/styles";
 const sekizkirkOrange = "#fca311";
 const sekizkirkGrey = "#e5e5e5";
 const sekizkirkUltramarine = "#14213d";
+const listBackground = "#d6d6d6";
 
 export default createMuiTheme({
     palette: {
@@ -10,6 +11,7 @@ export default createMuiTheme({
             sekizkirkOrange,
             sekizkirkGrey,
             sekizkirkUltramarine,
+            listBackground,
         },
         primary: {
             main: sekizkirkOrange,
