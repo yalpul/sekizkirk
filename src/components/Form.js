@@ -26,6 +26,9 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
 import ClearAllIcon from "@material-ui/icons/ClearAll";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListSubheader from "@material-ui/core/ListSubheader";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
@@ -70,6 +73,24 @@ const useStyles = makeStyles((theme) => ({
     coursesHeader: {
         paddingLeft: theme.spacing(2),
     },
+    selectiveContainer: {
+        width: "100%",
+        maxWidth: "35em",
+        marginTop: "1em",
+        backgroundColor: "#d4d4d4",
+    },
+    selectiveHeader: {
+        fontWeight: 700,
+        fontFamily: "Agrandir",
+        paddingLeft: theme.spacing(2),
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1),
+    },
+    listItem: {
+        "&:hover .list-icon": {
+            color: theme.palette.primary.dark,
+        },
+    },
 }));
 
 const Form = () => {
@@ -82,6 +103,7 @@ const Form = () => {
     const [semester, setSemester] = useState("");
     const [manualCourses, setManualCourses] = useState([]);
     const [mustCourses, setMustCourses] = useState([]);
+    const [selectiveCourses, setSelectiveCourses] = useState([]);
     const [courses, setCourses] = useState([]);
 
     const handleCourseAdd = () => {
@@ -101,6 +123,7 @@ const Form = () => {
     const handleClearAll = () => {
         setManualCourses([]);
         setMustCourses([]);
+        setSelectiveCourses([]);
         setSemester("");
     };
 
@@ -113,14 +136,24 @@ const Form = () => {
         setManualCourses(newManual);
     };
 
+    const handleSelectiveClick = (course) => {
+        setMustCourses([...mustCourses].concat(course));
+        setSelectiveCourses([]);
+    };
+
     // set the must courses when user select different
     // dept or semester options
     useEffect(() => {
         if (dept !== null && semester !== "") {
             // see musts data to understand its structure
-            const mustCodes = data.musts[dept.code][semester - 1][0];
 
+            const mustCodes = data.musts[dept.code][semester - 1][0];
             setMustCourses(mustCodes.map((code) => data.courses[code]));
+
+            const selectiveCodes = data.musts[dept.code][semester - 1][1];
+            setSelectiveCourses(
+                selectiveCodes.map((code) => data.courses[code])
+            );
         } else {
             setMustCourses([]);
         }
@@ -290,6 +323,39 @@ const Form = () => {
                                                 <DeleteIcon />
                                             </IconButton>
                                         </ListItemSecondaryAction>
+                                    </ListItem>
+                                ) : null;
+                            })}
+                        </List>
+                    </>
+                )}
+            </Grid>
+            <Grid item className={classes.selectiveContainer}>
+                {selectiveCourses.length > 0 && (
+                    <>
+                        <Typography
+                            variant="subtitle1"
+                            className={classes.selectiveHeader}
+                            color="secondary"
+                        >
+                            Selectives for this semester
+                        </Typography>
+                        <Divider />
+                        <List dense>
+                            {selectiveCourses.map((course) => {
+                                return course ? (
+                                    <ListItem
+                                        key={`${course.title}+${course.code}`}
+                                        button
+                                        onClick={() =>
+                                            handleSelectiveClick(course)
+                                        }
+                                        className={classes.listItem}
+                                    >
+                                        <ListItemIcon>
+                                            <CheckCircleIcon className="list-icon" />
+                                        </ListItemIcon>
+                                        <ListItemText primary={course.title} />
                                     </ListItem>
                                 ) : null;
                             })}
