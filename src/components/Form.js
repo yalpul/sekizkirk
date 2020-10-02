@@ -28,7 +28,7 @@ import Button from "@material-ui/core/Button";
 import ClearAllIcon from "@material-ui/icons/ClearAll";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListSubheader from "@material-ui/core/ListSubheader";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
@@ -104,6 +104,7 @@ const Form = () => {
     const [manualCourses, setManualCourses] = useState([]);
     const [mustCourses, setMustCourses] = useState([]);
     const [selectiveCourses, setSelectiveCourses] = useState([]);
+    const [electiveCourses, setElectiveCourses] = useState([]);
     const [courses, setCourses] = useState([]);
 
     const handleCourseAdd = () => {
@@ -122,8 +123,9 @@ const Form = () => {
 
     const handleClearAll = () => {
         setManualCourses([]);
-        setMustCourses([]);
-        setSelectiveCourses([]);
+        // setMustCourses([]);
+        // setSelectiveCourses([]);
+        // setting semester to unselected, deletes all must courses
         setSemester("");
     };
 
@@ -141,6 +143,14 @@ const Form = () => {
         setSelectiveCourses([]);
     };
 
+    const handleElectiveClick = (index) => {
+        document.getElementById("course-select").focus();
+
+        const tempElectives = [...electiveCourses];
+        tempElectives.splice(index, 1);
+        setElectiveCourses(tempElectives);
+    };
+
     // set the must courses when user select different
     // dept or semester options
     useEffect(() => {
@@ -154,8 +164,13 @@ const Form = () => {
             setSelectiveCourses(
                 selectiveCodes.map((code) => data.courses[code])
             );
+
+            const electives = data.musts[dept.code][semester - 1][2];
+            setElectiveCourses(electives);
         } else {
             setMustCourses([]);
+            setSelectiveCourses([]);
+            setElectiveCourses([]);
         }
     }, [dept, semester]);
 
@@ -200,6 +215,7 @@ const Form = () => {
                         autoHighlight
                         noOptionsText="Course not found."
                         className={classes.courseSelect}
+                        id="course-select"
                     />
                 </Grid>
                 <Grid item>
@@ -326,6 +342,26 @@ const Form = () => {
                                     </ListItem>
                                 ) : null;
                             })}
+                            {electiveCourses.map((type, index) => (
+                                <ListItem
+                                    key={`${type}+${index}`}
+                                    button
+                                    justify="space-between"
+                                    className={classes.listItem}
+                                    onClick={(index) =>
+                                        handleElectiveClick(index)
+                                    }
+                                >
+                                    <ListItemText
+                                        primary={`Add your ${type}`}
+                                    />
+                                    <ListItemIcon
+                                        style={{ paddingLeft: "2.5em" }}
+                                    >
+                                        <AddCircleIcon className="list-icon" />
+                                    </ListItemIcon>
+                                </ListItem>
+                            ))}
                         </List>
                     </>
                 )}
