@@ -133,6 +133,7 @@ const useStyles = makeStyles((theme) => ({
         fontFamily: "Agrandir",
         fontWeight: 400,
         backgroundColor: theme.palette.primary.dark,
+        borderRadius: "50px",
     },
 }));
 
