@@ -10,7 +10,7 @@ import ScheduleTable from "./components/ScheduleTable";
 
 const App = () => {
     const [courses, setCourses] = useState([]);
-    const [tableDisplay, setTableDisplay] = useState("none");
+    const [tableDisplay, setTableDisplay] = useState("flex");
 
     return (
         <ThemeProvider theme={theme}>

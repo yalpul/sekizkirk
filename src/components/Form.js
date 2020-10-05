@@ -196,9 +196,9 @@ const Form = ({ courses, setCourses, display, setDisplay }) => {
     };
 
     const handleScheduleClick = () => {
-        setDisplay("block");
+        setDisplay("flex");
 
-        if (display === "block") {
+        if (display === "flex") {
             document.getElementById("schedule-table").scrollIntoView();
         }
     };
@@ -352,7 +352,7 @@ const Form = ({ courses, setCourses, display, setDisplay }) => {
                                         <ListSubheader
                                             style={{ fontWeight: 700 }}
                                         >
-                                            Spring
+                                            Fall
                                         </ListSubheader>
                                         {[1, 3, 5, 7].map((sem) => (
                                             <MenuItem key={sem} value={sem}>
@@ -362,7 +362,7 @@ const Form = ({ courses, setCourses, display, setDisplay }) => {
                                         <ListSubheader
                                             style={{ fontWeight: 700 }}
                                         >
-                                            Winter
+                                            Spring
                                         </ListSubheader>
                                         {[2, 4, 6, 8].map((sem) => (
                                             <MenuItem
