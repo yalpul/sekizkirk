@@ -30,6 +30,7 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import ListSubheader from "@material-ui/core/ListSubheader";
+import SchoolIcon from "@material-ui/icons/School";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
@@ -478,6 +479,7 @@ const Form = () => {
                         disableRipple
                         className={classes.scheduleButton}
                         textAlign="center"
+                        endIcon={<SchoolIcon />}
                     >
                         schedule
                     </Button>
