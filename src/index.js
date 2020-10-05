@@ -49,6 +49,7 @@ const data = {
     musts,
     courses,
     departments,
+    courseSlots,
 };
 
 render(

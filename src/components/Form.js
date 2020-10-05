@@ -138,7 +138,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Form = ({ courses, setCourses }) => {
+const Form = ({ courses, setCourses, display, setDisplay }) => {
     const data = useContext(DataContext);
     const classes = useStyles();
 
@@ -194,6 +194,18 @@ const Form = ({ courses, setCourses }) => {
         tempElectives.splice(index, 1);
         setElectiveCourses(tempElectives);
     };
+
+    const handleScheduleClick = () => {
+        setDisplay("block");
+
+        if (display === "block") {
+            document.getElementById("schedule-table").scrollIntoView();
+        }
+    };
+
+    useEffect(() => {
+        document.getElementById("schedule-table").scrollIntoView();
+    }, [display]);
 
     // set the must courses when user select different
     // dept or semester options
@@ -478,6 +490,7 @@ const Form = ({ courses, setCourses }) => {
                         disableRipple
                         className={classes.scheduleButton}
                         endIcon={<SchoolIcon />}
+                        onClick={handleScheduleClick}
                     >
                         schedule
                     </Button>

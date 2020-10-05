@@ -11,12 +11,20 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function ScheduleTable() {
+export default function ScheduleTable({ courses, display }) {
     const data = useContext(DataContext);
     const classes = useStyles();
 
+    const slots = data.courseSlots;
+    console.log(slots);
+
     return (
-        <Grid container className={classes.mainContainer}>
+        <Grid
+            container
+            className={classes.mainContainer}
+            style={{ display: display }}
+            id="schedule-table"
+        >
             bra
         </Grid>
     );

@@ -10,14 +10,20 @@ import ScheduleTable from "./components/ScheduleTable";
 
 const App = () => {
     const [courses, setCourses] = useState([]);
+    const [tableDisplay, setTableDisplay] = useState("none");
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <main>
                 <LandingPage />
-                <Form courses={courses} setCourses={setCourses} />
-                <ScheduleTable />
+                <Form
+                    courses={courses}
+                    setCourses={setCourses}
+                    display={tableDisplay}
+                    setDisplay={setTableDisplay}
+                />
+                <ScheduleTable courses={courses} display={tableDisplay} />
             </main>
         </ThemeProvider>
     );
