@@ -138,7 +138,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Form = () => {
+const Form = ({ courses, setCourses }) => {
     const data = useContext(DataContext);
     const classes = useStyles();
 
@@ -150,7 +150,6 @@ const Form = () => {
     const [mustCourses, setMustCourses] = useState([]);
     const [selectiveCourses, setSelectiveCourses] = useState([]);
     const [electiveCourses, setElectiveCourses] = useState([]);
-    const [courses, setCourses] = useState([]);
 
     const handleCourseAdd = () => {
         if (courseValue !== null && !courses.includes(courseValue)) {
@@ -478,7 +477,6 @@ const Form = () => {
                         // color="primary"
                         disableRipple
                         className={classes.scheduleButton}
-                        textAlign="center"
                         endIcon={<SchoolIcon />}
                     >
                         schedule
