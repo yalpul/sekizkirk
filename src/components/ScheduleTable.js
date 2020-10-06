@@ -47,7 +47,7 @@ export default function ScheduleTable({ courses, display }) {
         "13:40-14:40",
         "14:40-15:40",
         "15:40-16:40",
-        "17:40-18:40",
+        "16:40-17:40",
     ];
 
     const [displayedSlot, setDisplayedSlot] = useState(
