@@ -55,19 +55,17 @@ export default function ScheduleTable({ courses, display }) {
     );
     const [possibleSchedules, setPossibleSchedules] = useState([]); // [schedule1->[[{course}, sectionID]] ,]
     const [currentSchedule, setCurrentSchedule] = useState(null);
-    const [isTableClear, setIsTableClear] = useState(false);
 
     // helper functions
-    const updateTableForSection = (course, sectionID) => {
+    const updateTempTable = (course, sectionID, tempTable) => {
         const section = slotsData[course.code][sectionID];
         const [sectionSlots, _] = section;
+
         sectionSlots.forEach((slot) => {
             const [day, hour] = slot;
 
             // update table slot for this section
-            const temp = [...displayedSlot];
-            temp[hour][day] = `${course.code}/${sectionID + 1}`;
-            setDisplayedSlot(temp);
+            tempTable[hour][day] = `${course.code}/${sectionID + 1}`;
         });
     };
 
@@ -84,19 +82,15 @@ export default function ScheduleTable({ courses, display }) {
     }, [courses]);
 
     useEffect(() => {
-        setDisplayedSlot(hours.map(() => days.map(() => ""))); // clears table
-        setIsTableClear(true);
-    }, [currentSchedule]);
+        const tempTable = hours.map(() => days.map(() => ""));
 
-    useEffect(() => {
-        if (isTableClear) {
-            const schedule = possibleSchedules[currentSchedule] || [];
-            schedule.forEach(([course, sectionID]) => {
-                updateTableForSection(course, sectionID);
-            });
-            setIsTableClear(false);
-        }
-    }, [isTableClear]);
+        const schedule = possibleSchedules[currentSchedule] || [];
+        schedule.forEach(([course, sectionID]) => {
+            updateTempTable(course, sectionID, tempTable);
+        });
+
+        setDisplayedSlot(tempTable);
+    }, [currentSchedule]);
 
     // handlers
     const handleNavigateClick = (direction) => {
