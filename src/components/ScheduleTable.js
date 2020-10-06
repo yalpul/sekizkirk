@@ -72,15 +72,18 @@ export default function ScheduleTable({ courses, display }) {
     };
 
     useEffect(() => {
-        //find possible schedules
-        if (courses.length > 0) {
-            const temp = [];
-            for (let i = 0; i < slotsData[courses[0].code].length; i++) {
-                temp.push([[courses[0], i]]);
-            }
-            setPossibleSchedules(temp);
-            setCurrentSchedule(0);
-        }
+        const candidateCourseSections = [];
+        courses.forEach((course, index) => {
+            // each course has its own array of sections
+            const sections = slotsData[course.code];
+            candidateCourseSections[index] = sections.map((_, index) => [
+                course,
+                index,
+            ]);
+        });
+        // sort courses as their section number, descending order
+        candidateCourseSections.sort((a, b) => b.length - a.length);
+        console.log(candidateCourseSections);
     }, [courses]);
 
     useEffect(() => {
