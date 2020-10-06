@@ -46,10 +46,9 @@ export default function ScheduleTable({ courses, display }) {
         "17:40-18:40",
     ];
 
-    // currently displayed slots
-    // array of array for the slots,
-    // outer arrays are the hours, inner arrays contains the day
-    const [slots, setSlots] = useState(hours.map(() => days.map(() => "")));
+    const [displayedSlot, setDisplayedSlot] = useState(
+        hours.map(() => days.map(() => ""))
+    );
 
     // helper functions
     const updateTableForSection = (course, sectionID) => {
@@ -59,9 +58,9 @@ export default function ScheduleTable({ courses, display }) {
             const [day, hour] = slot;
 
             // update table slot for this section
-            const temp = [...slots];
+            const temp = [...displayedSlot];
             temp[hour][day] = `${course.code}/${sectionID + 1}`;
-            setSlots(temp);
+            setDisplayedSlot(temp);
         });
     };
 
@@ -96,7 +95,7 @@ export default function ScheduleTable({ courses, display }) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {slots.map((hour, index) => (
+                            {displayedSlot.map((hour, index) => (
                                 <TableRow key={`${hour}+${index}`}>
                                     <TableCell
                                         component="th"
