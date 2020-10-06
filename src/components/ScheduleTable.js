@@ -54,7 +54,8 @@ export default function ScheduleTable({ courses, display }) {
         hours.map(() => days.map(() => ""))
     );
     const [possibleSchedules, setPossibleSchedules] = useState([]); // [schedule1->[[{course}, sectionID]] ,]
-    const [currentSchedule, setCurrentSchedule] = useState(0);
+    const [currentSchedule, setCurrentSchedule] = useState(null);
+    const [isTableClear, setIsTableClear] = useState(false);
 
     // helper functions
     const updateTableForSection = (course, sectionID) => {
@@ -75,12 +76,29 @@ export default function ScheduleTable({ courses, display }) {
         if (courses.length > 0) {
             const temp = [];
             for (let i = 0; i < slotsData[courses[0].code].length; i++) {
-                temp.push([courses[0], i]);
+                temp.push([[courses[0], i]]);
             }
             setPossibleSchedules(temp);
+            setCurrentSchedule(0);
         }
     }, [courses]);
 
+    useEffect(() => {
+        setDisplayedSlot(hours.map(() => days.map(() => ""))); // clears table
+        setIsTableClear(true);
+    }, [currentSchedule]);
+
+    useEffect(() => {
+        if (isTableClear) {
+            const schedule = possibleSchedules[currentSchedule] || [];
+            schedule.forEach(([course, sectionID]) => {
+                updateTableForSection(course, sectionID);
+            });
+            setIsTableClear(false);
+        }
+    }, [isTableClear]);
+
+    // handlers
     const handleNavigateClick = (direction) => {
         if (direction === "next") {
             currentSchedule === possibleSchedules.length - 1
@@ -123,7 +141,9 @@ export default function ScheduleTable({ courses, display }) {
                                 </Grid>
                                 <Grid item>
                                     <Typography variantion="body1">{`${
-                                        currentSchedule + 1
+                                        currentSchedule === null
+                                            ? 0
+                                            : currentSchedule + 1
                                     }/${possibleSchedules.length}`}</Typography>
                                 </Grid>
                                 <Grid item>
