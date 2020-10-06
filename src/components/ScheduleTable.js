@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 
@@ -10,9 +10,9 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
+import Button from "@material-ui/core/Button";
 
 import DataContext from "./DataContext";
-import { Typography } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
@@ -31,6 +31,7 @@ export default function ScheduleTable({ courses, display }) {
     const classes = useStyles();
 
     const slotsData = data.courseSlots;
+    const courseData = data.courses;
 
     const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
     const hours = [
@@ -45,9 +46,31 @@ export default function ScheduleTable({ courses, display }) {
         "17:40-18:40",
     ];
 
+    // currently displayed slots
     // array of array for the slots,
     // outer arrays are the hours, inner arrays contains the day
     const [slots, setSlots] = useState(hours.map(() => days.map(() => "")));
+
+    // helper functions
+    const updateTableForSection = (course, sectionID) => {
+        const section = slotsData[course.code][sectionID];
+        const [sectionSlots, _] = section;
+        sectionSlots.forEach((slot) => {
+            const [day, hour] = slot;
+
+            // update table slot for this section
+            const temp = [...slots];
+            temp[hour][day] = `${course.code}/${sectionID + 1}`;
+            setSlots(temp);
+        });
+    };
+
+    useEffect(() => {
+        if (courses.length > 0) {
+            const testCourse = courses[0];
+            updateTableForSection(testCourse, 0);
+        }
+    }, [courses]);
 
     return (
         <Grid
@@ -66,7 +89,9 @@ export default function ScheduleTable({ courses, display }) {
                             <TableRow>
                                 <TableCell align="center">Hours</TableCell>
                                 {days.map((day) => (
-                                    <TableCell key={day}>{day}</TableCell>
+                                    <TableCell key={day} align="center">
+                                        {day}
+                                    </TableCell>
                                 ))}
                             </TableRow>
                         </TableHead>
@@ -81,7 +106,10 @@ export default function ScheduleTable({ courses, display }) {
                                         {hours[index]}
                                     </TableCell>
                                     {hour.map((day, index) => (
-                                        <TableCell key={`${day}+${index}`}>
+                                        <TableCell
+                                            key={`${day}+${index}`}
+                                            align="center"
+                                        >
                                             {day}
                                         </TableCell>
                                     ))}
