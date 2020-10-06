@@ -11,6 +11,10 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import NavigateNextIcon from "@material-ui/icons/NavigateNext";
+import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
+import Typography from "@material-ui/core/Typography";
 
 import DataContext from "./DataContext";
 
@@ -49,6 +53,8 @@ export default function ScheduleTable({ courses, display }) {
     const [displayedSlot, setDisplayedSlot] = useState(
         hours.map(() => days.map(() => ""))
     );
+    const [possibleSchedules, setPossibleSchedules] = useState([]); // [schedule1->[[{course}, sectionID]] ,]
+    const [currentSchedule, setCurrentSchedule] = useState(0);
 
     // helper functions
     const updateTableForSection = (course, sectionID) => {
@@ -65,11 +71,27 @@ export default function ScheduleTable({ courses, display }) {
     };
 
     useEffect(() => {
+        //find possible schedules
         if (courses.length > 0) {
-            const testCourse = courses[0];
-            updateTableForSection(testCourse, 0);
+            const temp = [];
+            for (let i = 0; i < slotsData[courses[0].code].length; i++) {
+                temp.push([courses[0], i]);
+            }
+            setPossibleSchedules(temp);
         }
     }, [courses]);
+
+    const handleNavigateClick = (direction) => {
+        if (direction === "next") {
+            currentSchedule === possibleSchedules.length - 1
+                ? setCurrentSchedule(0)
+                : setCurrentSchedule(currentSchedule + 1);
+        } else if (direction === "prev") {
+            currentSchedule === 0
+                ? setCurrentSchedule(possibleSchedules.length - 1)
+                : setCurrentSchedule(currentSchedule - 1);
+        }
+    };
 
     return (
         <Grid
@@ -84,9 +106,40 @@ export default function ScheduleTable({ courses, display }) {
             <Grid item className={classes.tableContainer}>
                 <TableContainer component={Paper}>
                     <Table>
+                        <caption>
+                            <Grid
+                                container
+                                justify="center"
+                                alignItems="center"
+                            >
+                                <Grid item>
+                                    <IconButton
+                                        onClick={() =>
+                                            handleNavigateClick("prev")
+                                        }
+                                    >
+                                        <NavigateBeforeIcon />
+                                    </IconButton>
+                                </Grid>
+                                <Grid item>
+                                    <Typography variantion="body1">{`${
+                                        currentSchedule + 1
+                                    }/${possibleSchedules.length}`}</Typography>
+                                </Grid>
+                                <Grid item>
+                                    <IconButton
+                                        onClick={() =>
+                                            handleNavigateClick("next")
+                                        }
+                                    >
+                                        <NavigateNextIcon />
+                                    </IconButton>
+                                </Grid>
+                            </Grid>
+                        </caption>
                         <TableHead>
                             <TableRow>
-                                <TableCell align="center">Hours</TableCell>
+                                <TableCell></TableCell>
                                 {days.map((day) => (
                                     <TableCell key={day} align="center">
                                         {day}
@@ -115,6 +168,7 @@ export default function ScheduleTable({ courses, display }) {
                                 </TableRow>
                             ))}
                         </TableBody>
+                        {/* <TableFooter component="div"></TableFooter> */}
                     </Table>
                 </TableContainer>
             </Grid>
