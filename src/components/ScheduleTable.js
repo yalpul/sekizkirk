@@ -96,11 +96,11 @@ export default function ScheduleTable({ courses, display }) {
 
     // handlers
     const handleNavigateClick = (direction) => {
-        if (direction === "next") {
+        if (direction === "next" && possibleSchedules.length > 0) {
             currentSchedule === possibleSchedules.length - 1
                 ? setCurrentSchedule(0)
                 : setCurrentSchedule(currentSchedule + 1);
-        } else if (direction === "prev") {
+        } else if (direction === "prev" && possibleSchedules.length > 0) {
             currentSchedule === 0
                 ? setCurrentSchedule(possibleSchedules.length - 1)
                 : setCurrentSchedule(currentSchedule - 1);
