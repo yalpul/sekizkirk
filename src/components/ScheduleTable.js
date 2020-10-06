@@ -65,7 +65,9 @@ export default function ScheduleTable({ courses, display }) {
             const [day, hour] = slot;
 
             // update table slot for this section
-            tempTable[hour][day] = `${course.code}/${sectionID + 1}`;
+            tempTable[hour][day] = `${
+                courseData[course.code].title.split(" ", 1)[0] // only show plain code
+            }/${sectionID + 1}`;
         });
     };
 
@@ -182,7 +184,6 @@ export default function ScheduleTable({ courses, display }) {
                                 </TableRow>
                             ))}
                         </TableBody>
-                        {/* <TableFooter component="div"></TableFooter> */}
                     </Table>
                 </TableContainer>
             </Grid>
