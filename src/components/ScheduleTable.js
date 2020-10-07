@@ -71,19 +71,61 @@ export default function ScheduleTable({ courses, display }) {
         });
     };
 
+    const findPossibleSchedules = (candidateCourseSections) => {
+        const schedules = [];
+        const possibleSchedule = [];
+
+        function fillPossibleSchedule(section) {
+            possibleSchedule.push([...section]);
+
+            // const occupiedSlots = [];
+            // possibleSchedule.forEach(([course, sectionID]) => {
+            //     const section = slotsData[course.code][sectionID];
+            //     const [sectionSlots, _] = section;
+            //     sectionSlots.forEach((slot) => {
+            //         const [day, hour] = slot;
+            //         occupiedSlots.push([day, hour]);
+            //     });
+            // });
+            return true;
+        }
+
+        (function runner(candidateCourseSections) {
+            // base case, combination is a valid schedule, save it to the state
+            if (candidateCourseSections.length === 0) {
+                schedules.push([...possibleSchedule]);
+                return;
+            }
+
+            const courseSections = candidateCourseSections[0];
+            courseSections.forEach((section) => {
+                if (fillPossibleSchedule(section)) {
+                    runner(candidateCourseSections.slice(1));
+                }
+                possibleSchedule.pop();
+            });
+        })(candidateCourseSections);
+
+        return schedules;
+    };
+
     useEffect(() => {
-        const candidateCourseSections = [];
-        courses.forEach((course, index) => {
-            // each course has its own array of sections
-            const sections = slotsData[course.code];
-            candidateCourseSections[index] = sections.map((_, index) => [
-                course,
-                index,
-            ]);
-        });
-        // sort courses as their section number, descending order
-        candidateCourseSections.sort((a, b) => b.length - a.length);
-        console.log(candidateCourseSections);
+        if (courses.length > 0) {
+            const candidateCourseSections = [];
+            courses.forEach((course, index) => {
+                // each course has its own array of sections
+                const sections = slotsData[course.code];
+                candidateCourseSections[index] = sections.map((_, index) => [
+                    course,
+                    index,
+                ]);
+            });
+            // sort courses as their section number, descending order
+            candidateCourseSections.sort((a, b) => b.length - a.length);
+
+            const schedules = findPossibleSchedules(candidateCourseSections);
+            setPossibleSchedules(schedules);
+        }
     }, [courses]);
 
     useEffect(() => {
@@ -95,7 +137,13 @@ export default function ScheduleTable({ courses, display }) {
         });
 
         setDisplayedSlot(tempTable);
-    }, [currentSchedule]);
+    }, [currentSchedule, possibleSchedules]);
+
+    useEffect(() => {
+        if (possibleSchedules.length > 0) {
+            setCurrentSchedule(0);
+        }
+    }, [possibleSchedules]);
 
     // handlers
     const handleNavigateClick = (direction) => {
