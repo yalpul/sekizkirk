@@ -72,41 +72,59 @@ export default function ScheduleTable({ courses, display }) {
     };
 
     const findPossibleSchedules = (candidateCourseSections) => {
-        const schedules = [];
+        const validSchedules = [];
         const possibleSchedule = [];
+        let lookup = {};
 
-        function fillPossibleSchedule(section) {
+        function modifyLookUp([course, sectionID], action) {
+            const section = slotsData[course.code][sectionID];
+            const [sectionSlots, _] = section;
+            sectionSlots.forEach((slot) => {
+                const [day, hour] = slot;
+                if (action === "update") {
+                    lookup[[day, hour]] = 1;
+                } else if (action === "delete") {
+                    delete lookup[[day, hour]];
+                }
+            });
+        }
+
+        function checkCollision(section) {
             possibleSchedule.push([...section]);
 
-            // const occupiedSlots = [];
-            // possibleSchedule.forEach(([course, sectionID]) => {
-            //     const section = slotsData[course.code][sectionID];
-            //     const [sectionSlots, _] = section;
-            //     sectionSlots.forEach((slot) => {
-            //         const [day, hour] = slot;
-            //         occupiedSlots.push([day, hour]);
-            //     });
-            // });
+            const [course, sectionID] = section;
+            const slots = slotsData[course.code][sectionID];
+            const [sectionSlots, _] = slots;
+            for (let slot of sectionSlots) {
+                const [day, hour] = slot;
+
+                // collison of slots occured
+                if (lookup[[day, hour]] === 1) {
+                    return false;
+                }
+            }
             return true;
         }
 
         (function runner(candidateCourseSections) {
             // base case, combination is a valid schedule, save it to the state
             if (candidateCourseSections.length === 0) {
-                schedules.push([...possibleSchedule]);
+                validSchedules.push([...possibleSchedule]);
                 return;
             }
 
             const courseSections = candidateCourseSections[0];
             courseSections.forEach((section) => {
-                if (fillPossibleSchedule(section)) {
+                if (checkCollision(section)) {
+                    modifyLookUp(section, "update");
                     runner(candidateCourseSections.slice(1));
+                    modifyLookUp(section, "delete");
                 }
                 possibleSchedule.pop();
             });
         })(candidateCourseSections);
 
-        return schedules;
+        return validSchedules;
     };
 
     useEffect(() => {
