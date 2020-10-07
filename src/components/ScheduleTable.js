@@ -10,7 +10,6 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
-import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
@@ -143,6 +142,8 @@ export default function ScheduleTable({ courses, display }) {
 
             const schedules = findPossibleSchedules(candidateCourseSections);
             setPossibleSchedules(schedules);
+        } else {
+            setPossibleSchedules([]);
         }
     }, [courses]);
 
@@ -160,6 +161,8 @@ export default function ScheduleTable({ courses, display }) {
     useEffect(() => {
         if (possibleSchedules.length > 0) {
             setCurrentSchedule(0);
+        } else {
+            setCurrentSchedule(null);
         }
     }, [possibleSchedules]);
 
