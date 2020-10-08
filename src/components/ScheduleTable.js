@@ -94,6 +94,7 @@ export default function ScheduleTable({ courses, display }) {
             const [course, sectionID] = section;
             const slots = slotsData[course.code][sectionID];
             const [sectionSlots, _] = slots;
+
             for (let slot of sectionSlots) {
                 const [day, hour] = slot;
 
@@ -112,7 +113,13 @@ export default function ScheduleTable({ courses, display }) {
                 return;
             }
 
-            const courseSections = candidateCourseSections[0];
+            let courseSections = candidateCourseSections[0];
+
+            if (courseSections.length === 0) {
+                // current course lack slots information,
+                runner(candidateCourseSections.slice(1));
+            }
+
             courseSections.forEach((section) => {
                 if (checkCollision(section)) {
                     modifyLookUp(section, "update");
@@ -132,13 +139,18 @@ export default function ScheduleTable({ courses, display }) {
             courses.forEach((course, index) => {
                 // each course has its own array of sections
                 const sections = slotsData[course.code];
-                candidateCourseSections[index] = sections.map((_, index) => [
-                    course,
-                    index,
-                ]);
+                candidateCourseSections[index] = sections
+                    .map((section, index) => {
+                        const [sectionSlots, _] = section;
+
+                        return sectionSlots.length !== 0
+                            ? [course, index]
+                            : null;
+                    })
+                    .filter((slots) => slots !== null);
             });
-            // sort courses as their section number, descending order
-            candidateCourseSections.sort((a, b) => b.length - a.length);
+            // sort courses as their section number, ascending order
+            candidateCourseSections.sort((a, b) => a.length - b.length);
 
             const schedules = findPossibleSchedules(candidateCourseSections);
             setPossibleSchedules(schedules);
