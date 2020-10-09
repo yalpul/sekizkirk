@@ -14,6 +14,10 @@ import IconButton from "@material-ui/core/IconButton";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
 import Typography from "@material-ui/core/Typography";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Checkbox from "@material-ui/core/Checkbox";
+import Collapse from "@material-ui/core/Collapse";
+import TextField from "@material-ui/core/TextField";
 
 import DataContext from "./DataContext";
 
@@ -24,8 +28,11 @@ const useStyles = makeStyles((theme) => ({
     },
     tableContainer: {
         width: "80%",
-        marginTop: "5em",
-        marginBottom: "5em",
+        marginTop: "1.5em",
+        marginBottom: "1em",
+    },
+    restristionsContainer: {
+        marginBottom: "1.5em",
     },
 }));
 
@@ -54,6 +61,10 @@ export default function ScheduleTable({ courses, display }) {
     );
     const [possibleSchedules, setPossibleSchedules] = useState([]); // [schedule1->[[{course}, sectionID]] ,]
     const [currentSchedule, setCurrentSchedule] = useState(null);
+
+    const [surnameCheck, setSurnameCheck] = useState(false);
+    const [surname, setSurname] = useState("");
+    const [firstTwoLetters, setFirstTwoLetters] = useState("");
 
     // helper functions
     const updateTempTable = (course, sectionID, tempTable) => {
@@ -133,31 +144,70 @@ export default function ScheduleTable({ courses, display }) {
         return validSchedules;
     };
 
+    function updateTable() {
+        const candidateCourseSections = [];
+        console.log("update");
+        courses.forEach((course, index) => {
+            // each course has its own array of sections
+            const sections = slotsData[course.code];
+            candidateCourseSections[index] = sections
+                .map((section, index) => {
+                    const [sectionSlots, constraints] = section;
+
+                    if (sectionSlots.length === 0) {
+                        // slots data not avaliable
+                        return null;
+                    } else if (surnameCheck && firstTwoLetters.length === 2) {
+                        // surname constraint applied
+                        try {
+                            const [[_, surStart, surEnd]] = constraints;
+                            const letters = firstTwoLetters.toUpperCase();
+                            if (!(surStart <= letters && letters <= surEnd)) {
+                                return null;
+                            }
+                        } catch (err) {
+                            // constraint data not avaliable
+                            // don't apply to this section.
+                            // TODO: change this behavior?
+                        }
+                    }
+                    return [course, index];
+                })
+                .filter((slots) => slots !== null);
+        });
+        // sort courses as their section number, ascending order
+        candidateCourseSections.sort((a, b) => a.length - b.length);
+
+        const schedules = findPossibleSchedules(candidateCourseSections);
+        setPossibleSchedules(schedules);
+    }
+
     useEffect(() => {
         if (courses.length > 0) {
-            const candidateCourseSections = [];
-            courses.forEach((course, index) => {
-                // each course has its own array of sections
-                const sections = slotsData[course.code];
-                candidateCourseSections[index] = sections
-                    .map((section, index) => {
-                        const [sectionSlots, _] = section;
-
-                        return sectionSlots.length !== 0
-                            ? [course, index]
-                            : null;
-                    })
-                    .filter((slots) => slots !== null);
-            });
-            // sort courses as their section number, ascending order
-            candidateCourseSections.sort((a, b) => a.length - b.length);
-
-            const schedules = findPossibleSchedules(candidateCourseSections);
-            setPossibleSchedules(schedules);
+            updateTable();
         } else {
             setPossibleSchedules([]);
         }
     }, [courses]);
+
+    useEffect(() => {
+        setFirstTwoLetters(surname.substr(0, 2));
+    }, [surname]);
+
+    useEffect(() => {
+        // update table when user complete entering first two letters.
+        if (firstTwoLetters.length == 2) {
+            updateTable();
+        }
+    }, [firstTwoLetters]);
+
+    useEffect(() => {
+        if (surnameCheck === false) {
+            // TODO: maybe apply this only if the table's previous state was surname constrained.
+            updateTable();
+            setSurname("");
+        }
+    }, [surnameCheck]);
 
     useEffect(() => {
         const tempTable = hours.map(() => days.map(() => ""));
@@ -270,6 +320,46 @@ export default function ScheduleTable({ courses, display }) {
                         </TableBody>
                     </Table>
                 </TableContainer>
+            </Grid>
+
+            {/* restristions */}
+            <Grid
+                item
+                container
+                justify="center"
+                className={classes.restristionsContainer}
+            >
+                <Grid item container direction="column" alignItems="center">
+                    <Grid item>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={surnameCheck}
+                                    onChange={() => {
+                                        setSurnameCheck(!surnameCheck);
+                                    }}
+                                    name="checkedB"
+                                    color="secondary"
+                                />
+                            }
+                            label="Check Surname"
+                        />
+                    </Grid>
+                    <Grid item>
+                        <Collapse in={surnameCheck} timeout={0}>
+                            <TextField
+                                label="Surname"
+                                size="small"
+                                margin="dense"
+                                value={surname}
+                                onChange={(event) => {
+                                    setSurname(event.target.value);
+                                }}
+                                style={{ marginTop: "-10px", width: "90%" }}
+                            />
+                        </Collapse>
+                    </Grid>
+                </Grid>
             </Grid>
         </Grid>
     );
