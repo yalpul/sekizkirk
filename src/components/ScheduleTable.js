@@ -18,6 +18,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import Collapse from "@material-ui/core/Collapse";
 import TextField from "@material-ui/core/TextField";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 
 import DataContext from "./DataContext";
 
@@ -36,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function ScheduleTable({ courses, display }) {
+export default function ScheduleTable({ courses, display, mustDept }) {
     const data = useContext(DataContext);
     const classes = useStyles();
 
@@ -65,6 +66,9 @@ export default function ScheduleTable({ courses, display }) {
     const [surnameCheck, setSurnameCheck] = useState(false);
     const [surname, setSurname] = useState("");
     const [firstTwoLetters, setFirstTwoLetters] = useState("");
+
+    const [deptCheck, setDeptCheck] = useState(false);
+    const [dept, setDept] = useState(null);
 
     // helper functions
     const updateTempTable = (course, sectionID, tempTable) => {
@@ -157,6 +161,21 @@ export default function ScheduleTable({ courses, display }) {
                     if (sectionSlots.length === 0) {
                         // slots data not avaliable
                         return null;
+                    } else if (deptCheck && dept !== null) {
+                        //  dept constraint applied
+                        try {
+                            const [[deptConstraint]] = constraints;
+                            if (
+                                deptConstraint !== "ALL" &&
+                                deptConstraint !== dept.title
+                            ) {
+                                return null;
+                            }
+                        } catch (err) {
+                            // constraint data not avaliable
+                            // don't apply to this section.
+                            // TODO: change this behavior?
+                        }
                     } else if (surnameCheck && firstTwoLetters.length === 2) {
                         // surname constraint applied
                         try {
@@ -231,6 +250,25 @@ export default function ScheduleTable({ courses, display }) {
             setCurrentSchedule(null);
         }
     }, [possibleSchedules]);
+
+    useEffect(() => {
+        setDept(mustDept);
+    }, [mustDept]);
+
+    useEffect(() => {
+        if (deptCheck === true && dept !== null) {
+            updateTable();
+        } else if (deptCheck === false && dept !== null) {
+            updateTable();
+            setDept(mustDept);
+        }
+    }, [deptCheck]);
+
+    useEffect(() => {
+        if (deptCheck) {
+            updateTable();
+        }
+    }, [dept]);
 
     // handlers
     const handleNavigateClick = (direction) => {
@@ -342,37 +380,94 @@ export default function ScheduleTable({ courses, display }) {
             <Grid
                 item
                 container
+                direction="row"
                 justify="center"
                 className={classes.restristionsContainer}
             >
-                <Grid item container direction="column" alignItems="center">
-                    <Grid item>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={surnameCheck}
-                                    onChange={() => {
-                                        setSurnameCheck(!surnameCheck);
-                                    }}
-                                    name="checkedB"
-                                    color="primary"
-                                />
-                            }
-                            label="Check Surname"
-                        />
-                    </Grid>
-                    <Grid item>
-                        <Collapse in={surnameCheck} timeout={0}>
-                            <TextField
-                                label="Surname"
-                                size="small"
-                                margin="dense"
-                                value={surname}
-                                onChange={handleSurnameChange}
-                                style={{ marginTop: "-10px", width: "90%" }}
-                                color="secondary"
+                <Grid item>
+                    <Grid item container direction="column">
+                        <Grid item>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={surnameCheck}
+                                        onChange={() => {
+                                            setSurnameCheck(!surnameCheck);
+                                        }}
+                                        name="checkedB"
+                                        color="primary"
+                                    />
+                                }
+                                label="Check Surname"
                             />
-                        </Collapse>
+                        </Grid>
+                        <Grid item>
+                            <Collapse in={surnameCheck} timeout={0}>
+                                <TextField
+                                    label="Surname"
+                                    size="small"
+                                    margin="dense"
+                                    value={surname}
+                                    onChange={handleSurnameChange}
+                                    style={{
+                                        marginTop: "-10px",
+                                        width: "90%",
+                                    }}
+                                    color="secondary"
+                                />
+                            </Collapse>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+                <Grid item>
+                    <Grid item container direction="column">
+                        <Grid item>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={deptCheck}
+                                        onChange={() => {
+                                            setDeptCheck(!deptCheck);
+                                        }}
+                                        name="checkedB"
+                                        color="primary"
+                                    />
+                                }
+                                label="Check Department"
+                            />
+                        </Grid>
+                        <Grid item>
+                            <Collapse in={deptCheck} timeout={0}>
+                                <Autocomplete
+                                    options={data.departments}
+                                    getOptionLabel={(department) =>
+                                        department.title
+                                    }
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            style={{
+                                                marginTop: "-13px",
+                                                width: "90%",
+                                            }}
+                                            label="Department"
+                                        />
+                                    )}
+                                    onChange={(event, value) => {
+                                        setDept(value);
+                                    }}
+                                    popupIcon={<></>} // no icon
+                                    fullWidth
+                                    clearOnEscape
+                                    autoSelect
+                                    blurOnSelect
+                                    autoHighlight
+                                    noOptionsText="Not found."
+                                    value={dept}
+                                />
+                            </Collapse>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Grid>

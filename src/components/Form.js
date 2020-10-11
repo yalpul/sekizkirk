@@ -138,13 +138,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Form = ({ courses, setCourses, display, setDisplay }) => {
+const Form = ({ courses, setCourses, display, setDisplay, dept, setDept }) => {
     const data = useContext(DataContext);
     const classes = useStyles();
 
     const [courseInput, setCourseInput] = useState("");
     const [courseValue, setCourseValue] = useState(null);
-    const [dept, setDept] = useState(null);
     const [semester, setSemester] = useState("");
     const [manualCourses, setManualCourses] = useState([]);
     const [mustCourses, setMustCourses] = useState([]);
