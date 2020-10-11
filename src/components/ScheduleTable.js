@@ -191,18 +191,22 @@ export default function ScheduleTable({ courses, display }) {
     }, [courses]);
 
     useEffect(() => {
-        setFirstTwoLetters(surname.substr(0, 2));
+        // letters inside the paranthesis
+        const insideParanthesis = /^\((\w\w)\)/;
+        const match = surname.match(insideParanthesis);
+        if (match) {
+            setFirstTwoLetters(match[1]);
+        } else {
+            setFirstTwoLetters("");
+        }
     }, [surname]);
 
     useEffect(() => {
-        // update table when user complete entering first two letters.
-        if (firstTwoLetters.length == 2) {
-            updateTable();
-        }
+        updateTable();
     }, [firstTwoLetters]);
 
     useEffect(() => {
-        if (surnameCheck === false) {
+        if (surnameCheck === false && firstTwoLetters.length === 2) {
             // TODO: maybe apply this only if the table's previous state was surname constrained.
             updateTable();
             setSurname("");
@@ -238,6 +242,18 @@ export default function ScheduleTable({ courses, display }) {
             currentSchedule === 0
                 ? setCurrentSchedule(possibleSchedules.length - 1)
                 : setCurrentSchedule(currentSchedule - 1);
+        }
+    };
+
+    const handleSurnameChange = (event) => {
+        const value = event.target.value;
+        const regTest = /^\(\w\w\)/;
+        if (value.length === 2) {
+            setSurname(`(${value})`);
+        } else if (value.length > 2 && value.match(regTest) === null) {
+            setSurname("");
+        } else {
+            setSurname(value);
         }
     };
 
@@ -339,7 +355,7 @@ export default function ScheduleTable({ courses, display }) {
                                         setSurnameCheck(!surnameCheck);
                                     }}
                                     name="checkedB"
-                                    color="secondary"
+                                    color="primary"
                                 />
                             }
                             label="Check Surname"
@@ -352,10 +368,9 @@ export default function ScheduleTable({ courses, display }) {
                                 size="small"
                                 margin="dense"
                                 value={surname}
-                                onChange={(event) => {
-                                    setSurname(event.target.value);
-                                }}
+                                onChange={handleSurnameChange}
                                 style={{ marginTop: "-10px", width: "90%" }}
+                                color="secondary"
                             />
                         </Collapse>
                     </Grid>
