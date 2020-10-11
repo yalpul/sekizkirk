@@ -11,6 +11,7 @@ import ScheduleTable from "./components/ScheduleTable";
 const App = () => {
     const [courses, setCourses] = useState([]);
     const [tableDisplay, setTableDisplay] = useState("flex");
+    const [dept, setDept] = useState(null);
 
     return (
         <ThemeProvider theme={theme}>
@@ -22,8 +23,14 @@ const App = () => {
                     setCourses={setCourses}
                     display={tableDisplay}
                     setDisplay={setTableDisplay}
+                    dept={dept}
+                    setDept={setDept}
                 />
-                <ScheduleTable courses={courses} display={tableDisplay} />
+                <ScheduleTable
+                    courses={courses}
+                    display={tableDisplay}
+                    mustDept={dept}
+                />
             </main>
         </ThemeProvider>
     );
