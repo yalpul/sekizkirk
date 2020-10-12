@@ -19,6 +19,8 @@ import Checkbox from "@material-ui/core/Checkbox";
 import Collapse from "@material-ui/core/Collapse";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import Button from "@material-ui/core/Button";
+import NotInterestedIcon from "@material-ui/icons/NotInterested";
 
 import DataContext from "./DataContext";
 
@@ -34,6 +36,12 @@ const useStyles = makeStyles((theme) => ({
     },
     restristionsContainer: {
         marginBottom: "1.5em",
+    },
+    cellButton: {
+        borderRadius: 0,
+        padding: 0,
+        height: "3.5em",
+        width: "100%",
     },
 }));
 
@@ -69,6 +77,10 @@ export default function ScheduleTable({ courses, display, mustDept }) {
 
     const [deptCheck, setDeptCheck] = useState(false);
     const [dept, setDept] = useState(null);
+
+    const [dontFills, setDontFills] = useState(
+        hours.map(() => days.map(() => false))
+    );
 
     // helper functions
     const updateTempTable = (course, sectionID, tempTable) => {
@@ -112,6 +124,11 @@ export default function ScheduleTable({ courses, display, mustDept }) {
 
             for (let slot of sectionSlots) {
                 const [day, hour] = slot;
+
+                if (dontFills[hour][day] === true) {
+                    // slot is on don't fill area
+                    return false;
+                }
 
                 // collison of slots occured
                 if (lookup[[day, hour]] === 1) {
@@ -270,6 +287,10 @@ export default function ScheduleTable({ courses, display, mustDept }) {
         }
     }, [dept]);
 
+    useEffect(() => {
+        updateTable();
+    }, [dontFills]);
+
     // handlers
     const handleNavigateClick = (direction) => {
         if (direction === "next" && possibleSchedules.length > 0) {
@@ -293,6 +314,14 @@ export default function ScheduleTable({ courses, display, mustDept }) {
         } else {
             setSurname(value);
         }
+    };
+
+    const handleCellClick = (hourIndex, dayIndex) => {
+        // toggle clicked cells don't fill value
+        const temp = [...dontFills];
+        temp[hourIndex][dayIndex] = !temp[hourIndex][dayIndex];
+
+        setDontFills(temp);
     };
 
     return (
@@ -352,23 +381,59 @@ export default function ScheduleTable({ courses, display, mustDept }) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {displayedSlot.map((hour, index) => (
-                                <TableRow key={`${hour}+${index}`}>
+                            {displayedSlot.map((hour, hourIndex) => (
+                                <TableRow key={`${hour}+${hourIndex}`}>
                                     <TableCell
                                         component="th"
                                         style={{ width: "150px" }}
                                         align="center"
                                     >
-                                        {hours[index]}
+                                        {hours[hourIndex]}
                                     </TableCell>
-                                    {hour.map((day, index) => (
-                                        <TableCell
-                                            key={`${day}+${index}`}
-                                            align="center"
-                                        >
-                                            {day}
-                                        </TableCell>
-                                    ))}
+                                    {hour.map((day, dayIndex) => {
+                                        const dontFill =
+                                            dontFills[hourIndex][dayIndex];
+                                        return (
+                                            <TableCell
+                                                key={`${day}+${dayIndex}`}
+                                                align="center"
+                                                style={{
+                                                    padding: 0,
+                                                    width: "150px",
+                                                }}
+                                            >
+                                                <Button
+                                                    className={
+                                                        classes.cellButton
+                                                    }
+                                                    onClick={() =>
+                                                        handleCellClick(
+                                                            hourIndex,
+                                                            dayIndex
+                                                        )
+                                                    }
+                                                    disableRipple
+                                                    style={{
+                                                        backgroundColor: dontFill
+                                                            ? "#000"
+                                                            : undefined,
+                                                        color: dontFill
+                                                            ? "#b80f0a"
+                                                            : undefined,
+                                                    }}
+                                                    startIcon={
+                                                        dontFill ? (
+                                                            <NotInterestedIcon />
+                                                        ) : undefined
+                                                    }
+                                                >
+                                                    {dontFill
+                                                        ? "Don't Fill"
+                                                        : day}
+                                                </Button>
+                                            </TableCell>
+                                        );
+                                    })}
                                 </TableRow>
                             ))}
                         </TableBody>
