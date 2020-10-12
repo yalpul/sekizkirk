@@ -38,10 +38,10 @@ const useStyles = makeStyles((theme) => ({
         marginBottom: "1.5em",
     },
     cellButton: {
-        borderRadius: 0,
+        borderRadius: 5,
         padding: 0,
         height: "3.5em",
-        width: "100%",
+        width: "95%",
     },
 }));
 
@@ -64,9 +64,25 @@ export default function ScheduleTable({ courses, display, mustDept }) {
         "15:40-16:40",
         "16:40-17:40",
     ];
+    const cellColors = [
+        "#002E2E",
+        "#7A00CC",
+        "#29A329",
+        "#CCCC00",
+        "#00CCCC",
+        "#00008A",
+        "#666633",
+        "#002900",
+        "#005C5C",
+        "#00FF00",
+        "#E62EB8",
+        "#CC3300",
+        "#808080",
+        "#CC0000",
+    ];
 
     const [displayedSlot, setDisplayedSlot] = useState(
-        hours.map(() => days.map(() => ""))
+        hours.map(() => days.map(() => ({ name: "", bg: undefined })))
     );
     const [possibleSchedules, setPossibleSchedules] = useState([]); // [schedule1->[[{course}, sectionID]] ,]
     const [currentSchedule, setCurrentSchedule] = useState(null);
@@ -83,7 +99,7 @@ export default function ScheduleTable({ courses, display, mustDept }) {
     );
 
     // helper functions
-    const updateTempTable = (course, sectionID, tempTable) => {
+    const updateTempTable = (course, sectionID, tempTable, backgroundColor) => {
         const section = slotsData[course.code][sectionID];
         const [sectionSlots, _] = section;
 
@@ -91,9 +107,11 @@ export default function ScheduleTable({ courses, display, mustDept }) {
             const [day, hour] = slot;
 
             // update table slot for this section
-            tempTable[hour][day] = `${
+            tempTable[hour][day].name = `${
                 courseData[course.code].title.split(" ", 1)[0] // only show plain code
             }/${sectionID + 1}`;
+
+            tempTable[hour][day].bg = `${backgroundColor}`;
         });
     };
 
@@ -250,11 +268,14 @@ export default function ScheduleTable({ courses, display, mustDept }) {
     }, [surnameCheck]);
 
     useEffect(() => {
-        const tempTable = hours.map(() => days.map(() => ""));
+        const tempTable = hours.map(() =>
+            days.map(() => ({ name: "", bg: undefined }))
+        );
 
         const schedule = possibleSchedules[currentSchedule] || [];
-        schedule.forEach(([course, sectionID]) => {
-            updateTempTable(course, sectionID, tempTable);
+        schedule.forEach(([course, sectionID], index) => {
+            const backgroundColor = cellColors[index % cellColors.length];
+            updateTempTable(course, sectionID, tempTable, backgroundColor);
         });
 
         setDisplayedSlot(tempTable);
@@ -416,10 +437,10 @@ export default function ScheduleTable({ courses, display, mustDept }) {
                                                     style={{
                                                         backgroundColor: dontFill
                                                             ? "#000"
-                                                            : undefined,
+                                                            : day.bg,
                                                         color: dontFill
                                                             ? "#b80f0a"
-                                                            : undefined,
+                                                            : "#FFF"
                                                     }}
                                                     startIcon={
                                                         dontFill ? (
@@ -429,7 +450,7 @@ export default function ScheduleTable({ courses, display, mustDept }) {
                                                 >
                                                     {dontFill
                                                         ? "Don't Fill"
-                                                        : day}
+                                                        : day.name}
                                                 </Button>
                                             </TableCell>
                                         );
