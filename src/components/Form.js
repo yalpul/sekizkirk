@@ -183,10 +183,11 @@ const Form = ({
 
     const handleClearAll = () => {
         setManualCourses([]);
-        // setMustCourses([]);
-        // setSelectiveCourses([]);
+
         // setting semester to unselected, deletes all must courses
         setSemester("");
+
+        setSectionChecks({});
     };
 
     const handleDeleteCourse = (course) => {
@@ -196,6 +197,8 @@ const Form = ({
 
         const newManual = manualCourses.filter((item) => item !== course);
         setManualCourses(newManual);
+
+        setSectionChecks({...sectionChecks, [course.code]: undefined}) 
     };
 
     const handleSelectiveClick = (course) => {
@@ -547,6 +550,11 @@ const Form = ({
                                                     <Checkbox
                                                         color="primary"
                                                         checked={checked}
+                                                        onChange={() => {
+                                                          const temp = sectionChecks[course.code];
+                                                          temp[index] = !temp[index]
+                                                          setSectionChecks({...sectionChecks, [course.code]: temp})
+                                                        }}
                                                     />
                                                 }
                                                 label={index + 1}
