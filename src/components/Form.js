@@ -31,6 +31,13 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import SchoolIcon from "@material-ui/icons/School";
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormGroup from "@material-ui/core/FormGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormLabel from "@material-ui/core/FormLabel";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
@@ -138,7 +145,16 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Form = ({ courses, setCourses, display, setDisplay, dept, setDept }) => {
+const Form = ({
+    courses,
+    setCourses,
+    display,
+    setDisplay,
+    dept,
+    setDept,
+    sectionChecks,
+    setSectionChecks,
+}) => {
     const data = useContext(DataContext);
     const classes = useStyles();
 
@@ -149,6 +165,7 @@ const Form = ({ courses, setCourses, display, setDisplay, dept, setDept }) => {
     const [mustCourses, setMustCourses] = useState([]);
     const [selectiveCourses, setSelectiveCourses] = useState([]);
     const [electiveCourses, setElectiveCourses] = useState([]);
+    const [openDialog, setOpenDialog] = useState(null);
 
     const handleCourseAdd = () => {
         if (courseValue !== null && !courses.includes(courseValue)) {
@@ -404,11 +421,12 @@ const Form = ({ courses, setCourses, display, setDisplay, dept, setDept }) => {
                         </Grid>
                         <Divider />
                         <List>
-                            {courses.map((course) => {
+                            {courses.map((course, index) => {
                                 return course ? (
                                     <ListItem
                                         key={`${course.title}+${course.code}`}
                                         button
+                                        onClick={() => setOpenDialog(index)}
                                     >
                                         <ListItemText primary={course.title} />
                                         <ListItemSecondaryAction>
@@ -495,6 +513,52 @@ const Form = ({ courses, setCourses, display, setDisplay, dept, setDept }) => {
                     </Button>
                 )}
             </Grid>
+
+            {/* modals for course options */}
+            {courses.map((course, index) => {
+                return (
+                    <Dialog
+                        open={index === openDialog}
+                        onClose={() => setOpenDialog(null)}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                        key={`${course}+${index}`}
+                    >
+                        <DialogTitle disableTypography>
+                            <Typography
+                                variant="h6"
+                                style={{ lineHeight: 1.6, fontSize: "1em" }}
+                            >
+                                {`${course.title} OPTIONS`}
+                            </Typography>
+                        </DialogTitle>
+                        <DialogContent>
+                            <FormControl component="fieldset">
+                                <FormLabel component="legend">
+                                    Sections
+                                </FormLabel>
+                                <FormGroup aria-label="position" row>
+                                    {sectionChecks[course.code] &&
+                                        sectionChecks[
+                                            course.code
+                                        ].map((checked, index) => (
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        color="primary"
+                                                        checked={checked}
+                                                    />
+                                                }
+                                                label={index + 1}
+                                                key={`${checked}+${index}`}
+                                            />
+                                        ))}
+                                </FormGroup>
+                            </FormControl>
+                        </DialogContent>
+                    </Dialog>
+                );
+            })}
         </Grid>
     );
 };
