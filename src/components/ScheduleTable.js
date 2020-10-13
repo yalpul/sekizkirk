@@ -45,7 +45,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function ScheduleTable({ courses, display, mustDept }) {
+export default function ScheduleTable({
+    courses,
+    display,
+    mustDept,
+    sectionChecks,
+}) {
     const data = useContext(DataContext);
     const classes = useStyles();
 
@@ -186,15 +191,21 @@ export default function ScheduleTable({ courses, display, mustDept }) {
     function updateTable() {
         const candidateCourseSections = [];
         console.log("update");
-        courses.forEach((course, index) => {
+        courses.forEach((course, courseIndex) => {
             // each course has its own array of sections
             const sections = slotsData[course.code];
-            candidateCourseSections[index] = sections
-                .map((section, index) => {
+            candidateCourseSections[courseIndex] = sections
+                .map((section, sectionIndex) => {
                     const [sectionSlots, constraints] = section;
 
                     if (sectionSlots.length === 0) {
                         // slots data not avaliable
+                        return null;
+                    } else if (
+                        sectionChecks[course.code] &&
+                        sectionChecks[course.code][sectionIndex] === false
+                    ) {
+                        // this section omitted by the user
                         return null;
                     } else if (deptCheck && dept !== null) {
                         //  dept constraint applied
@@ -225,7 +236,7 @@ export default function ScheduleTable({ courses, display, mustDept }) {
                             // TODO: change this behavior?
                         }
                     }
-                    return [course, index];
+                    return [course, sectionIndex];
                 })
                 .filter((slots) => slots !== null);
         });
@@ -311,6 +322,10 @@ export default function ScheduleTable({ courses, display, mustDept }) {
     useEffect(() => {
         updateTable();
     }, [dontFills]);
+
+    useEffect(() => {
+        updateTable();
+    }, [sectionChecks]);
 
     // handlers
     const handleNavigateClick = (direction) => {
@@ -440,7 +455,7 @@ export default function ScheduleTable({ courses, display, mustDept }) {
                                                             : day.bg,
                                                         color: dontFill
                                                             ? "#b80f0a"
-                                                            : "#FFF"
+                                                            : "#FFF",
                                                     }}
                                                     startIcon={
                                                         dontFill ? (

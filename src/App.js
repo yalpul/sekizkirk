@@ -51,6 +51,7 @@ const App = () => {
                     courses={courses}
                     display={tableDisplay}
                     mustDept={dept}
+                    sectionChecks={sectionChecks}
                 />
             </main>
         </ThemeProvider>
