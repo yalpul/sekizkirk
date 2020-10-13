@@ -34,6 +34,7 @@ import SchoolIcon from "@material-ui/icons/School";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
+import DialogActions from "@material-ui/core/DialogActions";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormGroup from "@material-ui/core/FormGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -198,7 +199,7 @@ const Form = ({
         const newManual = manualCourses.filter((item) => item !== course);
         setManualCourses(newManual);
 
-        setSectionChecks({...sectionChecks, [course.code]: undefined}) 
+        setSectionChecks({ ...sectionChecks, [course.code]: undefined });
     };
 
     const handleSelectiveClick = (course) => {
@@ -220,6 +221,22 @@ const Form = ({
         if (display === "flex") {
             document.getElementById("schedule-table").scrollIntoView();
         }
+    };
+
+    const handleUnselectAll = (course) => {
+        setSectionChecks({
+            ...sectionChecks,
+            [course.code]: sectionChecks[course.code].map(() => false),
+        });
+    };
+
+    const handleCheck = (course, index) => {
+        const temp = sectionChecks[course.code];
+        temp[index] = !temp[index];
+        setSectionChecks({
+            ...sectionChecks,
+            [course.code]: temp,
+        });
     };
 
     useEffect(() => {
@@ -532,13 +549,23 @@ const Form = ({
                                 variant="h6"
                                 style={{ lineHeight: 1.6, fontSize: "1em" }}
                             >
-                                {`${course.title} OPTIONS`}
+                                {`${course.title}`}
                             </Typography>
                         </DialogTitle>
                         <DialogContent>
                             <FormControl component="fieldset">
                                 <FormLabel component="legend">
-                                    Sections
+                                    Sections{" "}
+                                    <Button
+                                        variant="outlined"
+                                        size="small"
+                                        color="secondary"
+                                        onClick={() =>
+                                            handleUnselectAll(course)
+                                        }
+                                    >
+                                        Unselect All
+                                    </Button>
                                 </FormLabel>
                                 <FormGroup aria-label="position" row>
                                     {sectionChecks[course.code] &&
@@ -550,11 +577,12 @@ const Form = ({
                                                     <Checkbox
                                                         color="primary"
                                                         checked={checked}
-                                                        onChange={() => {
-                                                          const temp = sectionChecks[course.code];
-                                                          temp[index] = !temp[index]
-                                                          setSectionChecks({...sectionChecks, [course.code]: temp})
-                                                        }}
+                                                        onChange={() =>
+                                                            handleCheck(
+                                                                course,
+                                                                index
+                                                            )
+                                                        }
                                                     />
                                                 }
                                                 label={index + 1}
@@ -564,6 +592,14 @@ const Form = ({
                                 </FormGroup>
                             </FormControl>
                         </DialogContent>
+                        <DialogActions>
+                            <Button
+                                onClick={() => setOpenDialog(null)}
+                                color="secondary"
+                            >
+                                ok
+                            </Button>
+                        </DialogActions>
                     </Dialog>
                 );
             })}
