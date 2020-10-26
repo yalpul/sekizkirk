@@ -155,9 +155,12 @@ const Form = ({
     setDept,
     sectionChecks,
     setSectionChecks,
+    allowCollision,
+    setAllowCollision,
 }) => {
     const data = useContext(DataContext);
     const classes = useStyles();
+    const theme = useTheme();
 
     const [courseInput, setCourseInput] = useState("");
     const [courseValue, setCourseValue] = useState(null);
@@ -200,6 +203,7 @@ const Form = ({
         setManualCourses(newManual);
 
         setSectionChecks({ ...sectionChecks, [course.code]: undefined });
+        setAllowCollision({ ...allowCollision, [course.code]: undefined });
     };
 
     const handleSelectiveClick = (course) => {
@@ -553,44 +557,89 @@ const Form = ({
                             </Typography>
                         </DialogTitle>
                         <DialogContent>
-                            <FormControl component="fieldset">
-                                <FormLabel component="legend">
-                                    Sections{" "}
-                                    <Button
-                                        variant="outlined"
-                                        size="small"
-                                        color="secondary"
-                                        onClick={() =>
-                                            handleUnselectAll(course)
-                                        }
-                                    >
-                                        Unselect All
-                                    </Button>
-                                </FormLabel>
-                                <FormGroup aria-label="position" row>
-                                    {sectionChecks[course.code] &&
-                                        sectionChecks[
-                                            course.code
-                                        ].map((checked, index) => (
-                                            <FormControlLabel
-                                                control={
-                                                    <Checkbox
-                                                        color="primary"
-                                                        checked={checked}
-                                                        onChange={() =>
-                                                            handleCheck(
-                                                                course,
-                                                                index
-                                                            )
-                                                        }
-                                                    />
+                            <Grid container direction="column">
+                                <Grid item>
+                                    <FormControl component="fieldset">
+                                        <FormLabel
+                                            component="legend"
+                                            focused={false}
+                                        >
+                                            Course Options
+                                        </FormLabel>
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    color="primary"
+                                                    checked={
+                                                        allowCollision[
+                                                            course.code
+                                                        ]
+                                                    }
+                                                    onChange={() =>
+                                                        setAllowCollision(
+                                                            (
+                                                                prevCollision
+                                                            ) => ({
+                                                                ...prevCollision,
+                                                                [course.code]: !prevCollision[
+                                                                    course.code
+                                                                ],
+                                                            })
+                                                        )
+                                                    }
+                                                />
+                                            }
+                                            label="Allow Collision"
+                                        />
+                                    </FormControl>
+                                </Grid>
+
+                                <Grid item style={{ marginTop: "1em" }}>
+                                    <FormControl component="fieldset">
+                                        <FormLabel
+                                            component="legend"
+                                            focused={false}
+                                        >
+                                            Course Sections{" "}
+                                            <Button
+                                                variant="outlined"
+                                                size="small"
+                                                color="secondary"
+                                                onClick={() =>
+                                                    handleUnselectAll(course)
                                                 }
-                                                label={index + 1}
-                                                key={`${checked}+${index}`}
-                                            />
-                                        ))}
-                                </FormGroup>
-                            </FormControl>
+                                            >
+                                                Unselect All
+                                            </Button>
+                                        </FormLabel>
+                                        <FormGroup aria-label="position" row>
+                                            {sectionChecks[course.code] &&
+                                                sectionChecks[
+                                                    course.code
+                                                ].map((checked, index) => (
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Checkbox
+                                                                color="primary"
+                                                                checked={
+                                                                    checked
+                                                                }
+                                                                onChange={() =>
+                                                                    handleCheck(
+                                                                        course,
+                                                                        index
+                                                                    )
+                                                                }
+                                                            />
+                                                        }
+                                                        label={index + 1}
+                                                        key={`${checked}+${index}`}
+                                                    />
+                                                ))}
+                                        </FormGroup>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
                         </DialogContent>
                         <DialogActions>
                             <Button

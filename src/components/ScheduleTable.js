@@ -50,6 +50,7 @@ export default function ScheduleTable({
     display,
     mustDept,
     sectionChecks,
+    allowCollision,
 }) {
     const data = useContext(DataContext);
     const classes = useStyles();
@@ -126,6 +127,12 @@ export default function ScheduleTable({
         let lookup = {};
 
         function modifyLookUp([course, sectionID], action) {
+            if (allowCollision[course.code] === true) {
+                // course allowed to have collisions,
+                // don't modifiy the lookup(allow collisions)
+                return;
+            }
+
             const section = slotsData[course.code][sectionID];
             const [sectionSlots, _] = section;
             sectionSlots.forEach((slot) => {
@@ -145,6 +152,8 @@ export default function ScheduleTable({
             const slots = slotsData[course.code][sectionID];
             const [sectionSlots, _] = slots;
 
+            // don't fill have the hightes priority,
+            // check it first
             for (let slot of sectionSlots) {
                 const [day, hour] = slot;
 
@@ -152,12 +161,24 @@ export default function ScheduleTable({
                     // slot is on don't fill area
                     return false;
                 }
+            }
+
+            // this course is allowed to have collisions
+            // don't check collisions
+            if (allowCollision[course.code] === true) {
+                return true;
+            }
+
+            for (let slot of sectionSlots) {
+                const [day, hour] = slot;
 
                 // collison of slots occured
                 if (lookup[[day, hour]] === 1) {
                     return false;
                 }
             }
+
+            // no collisions occured
             return true;
         }
 
@@ -321,11 +342,15 @@ export default function ScheduleTable({
 
     useEffect(() => {
         updateTable();
-    }, [dontFills]);
+    }, [dontFills, sectionChecks, allowCollision]);
 
-    useEffect(() => {
-        updateTable();
-    }, [sectionChecks]);
+    // useEffect(() => {
+    //     updateTable();
+    // }, [sectionChecks]);
+
+    // useEffect(() => {
+    //     updateTable();
+    // }, [allowCollision]);
 
     // handlers
     const handleNavigateClick = (direction) => {

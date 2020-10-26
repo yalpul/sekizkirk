@@ -14,6 +14,7 @@ const App = () => {
 
     const [courses, setCourses] = useState([]);
     const [sectionChecks, setSectionChecks] = useState({});
+    const [allowCollision, setAllowCollision] = useState({});
 
     const [tableDisplay, setTableDisplay] = useState("flex");
     const [dept, setDept] = useState(null);
@@ -27,6 +28,16 @@ const App = () => {
                 setSectionChecks((prevChecks) => ({
                     ...prevChecks,
                     [course.code]: sections.map(() => true),
+                }));
+            }
+        });
+
+        // initialize allow collision for newly added courses
+        courses.forEach((course) => {
+            if (allowCollision[course.code] === undefined) {
+                setAllowCollision((prevCollision) => ({
+                    ...prevCollision,
+                    [course.code]: false,
                 }));
             }
         });
@@ -46,12 +57,15 @@ const App = () => {
                     setDept={setDept}
                     sectionChecks={sectionChecks}
                     setSectionChecks={setSectionChecks}
+                    allowCollision={allowCollision}
+                    setAllowCollision={setAllowCollision}
                 />
                 <ScheduleTable
                     courses={courses}
                     display={tableDisplay}
                     mustDept={dept}
                     sectionChecks={sectionChecks}
+                    allowCollision={allowCollision}
                 />
             </main>
         </ThemeProvider>
