@@ -191,7 +191,9 @@ const Form = ({
         // setting semester to unselected, deletes all must courses
         setSemester("");
 
+        // reset settings
         setSectionChecks({});
+        setAllowCollision({});
     };
 
     const handleDeleteCourse = (course) => {
