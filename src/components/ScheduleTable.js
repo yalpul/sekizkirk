@@ -50,6 +50,7 @@ export default function ScheduleTable({
     display,
     mustDept,
     sectionChecks,
+    allowCollision,
 }) {
     const data = useContext(DataContext);
     const classes = useStyles();
@@ -87,7 +88,7 @@ export default function ScheduleTable({
     ];
 
     const [displayedSlot, setDisplayedSlot] = useState(
-        hours.map(() => days.map(() => ({ name: "", bg: undefined })))
+        hours.map(() => days.map(() => []))
     );
     const [possibleSchedules, setPossibleSchedules] = useState([]); // [schedule1->[[{course}, sectionID]] ,]
     const [currentSchedule, setCurrentSchedule] = useState(null);
@@ -112,11 +113,12 @@ export default function ScheduleTable({
             const [day, hour] = slot;
 
             // update table slot for this section
-            tempTable[hour][day].name = `${
-                courseData[course.code].title.split(" ", 1)[0] // only show plain code
-            }/${sectionID + 1}`;
-
-            tempTable[hour][day].bg = `${backgroundColor}`;
+            tempTable[hour][day].push({
+                name: `${
+                    courseData[course.code].title.split(" ", 1)[0] // only show plain code
+                }/${sectionID + 1}`,
+                bg: `${backgroundColor}`,
+            });
         });
     };
 
@@ -126,6 +128,12 @@ export default function ScheduleTable({
         let lookup = {};
 
         function modifyLookUp([course, sectionID], action) {
+            if (allowCollision[course.code] === true) {
+                // course allowed to have collisions,
+                // don't modifiy the lookup(allow collisions)
+                return;
+            }
+
             const section = slotsData[course.code][sectionID];
             const [sectionSlots, _] = section;
             sectionSlots.forEach((slot) => {
@@ -145,6 +153,8 @@ export default function ScheduleTable({
             const slots = slotsData[course.code][sectionID];
             const [sectionSlots, _] = slots;
 
+            // don't fill have the hightes priority,
+            // check it first
             for (let slot of sectionSlots) {
                 const [day, hour] = slot;
 
@@ -152,12 +162,24 @@ export default function ScheduleTable({
                     // slot is on don't fill area
                     return false;
                 }
+            }
+
+            // this course is allowed to have collisions
+            // don't check collisions
+            if (allowCollision[course.code] === true) {
+                return true;
+            }
+
+            for (let slot of sectionSlots) {
+                const [day, hour] = slot;
 
                 // collison of slots occured
                 if (lookup[[day, hour]] === 1) {
                     return false;
                 }
             }
+
+            // no collisions occured
             return true;
         }
 
@@ -279,9 +301,7 @@ export default function ScheduleTable({
     }, [surnameCheck]);
 
     useEffect(() => {
-        const tempTable = hours.map(() =>
-            days.map(() => ({ name: "", bg: undefined }))
-        );
+        const tempTable = hours.map(() => days.map(() => []));
 
         const schedule = possibleSchedules[currentSchedule] || [];
         schedule.forEach(([course, sectionID], index) => {
@@ -321,11 +341,15 @@ export default function ScheduleTable({
 
     useEffect(() => {
         updateTable();
-    }, [dontFills]);
+    }, [dontFills, sectionChecks, allowCollision]);
 
-    useEffect(() => {
-        updateTable();
-    }, [sectionChecks]);
+    // useEffect(() => {
+    //     updateTable();
+    // }, [sectionChecks]);
+
+    // useEffect(() => {
+    //     updateTable();
+    // }, [allowCollision]);
 
     // handlers
     const handleNavigateClick = (direction) => {
@@ -438,35 +462,60 @@ export default function ScheduleTable({
                                                     width: "150px",
                                                 }}
                                             >
-                                                <Button
-                                                    className={
-                                                        classes.cellButton
-                                                    }
-                                                    onClick={() =>
-                                                        handleCellClick(
-                                                            hourIndex,
-                                                            dayIndex
-                                                        )
-                                                    }
-                                                    disableRipple
-                                                    style={{
-                                                        backgroundColor: dontFill
-                                                            ? "#000"
-                                                            : day.bg,
-                                                        color: dontFill
-                                                            ? "#b80f0a"
-                                                            : "#FFF",
-                                                    }}
-                                                    startIcon={
-                                                        dontFill ? (
-                                                            <NotInterestedIcon />
-                                                        ) : undefined
-                                                    }
-                                                >
-                                                    {dontFill
-                                                        ? "Don't Fill"
-                                                        : day.name}
-                                                </Button>
+                                                {day.length === 0 ? (
+                                                    // no course to displayed at this slot
+                                                    <Button
+                                                        className={
+                                                            classes.cellButton
+                                                        }
+                                                        onClick={() =>
+                                                            handleCellClick(
+                                                                hourIndex,
+                                                                dayIndex
+                                                            )
+                                                        }
+                                                        disableRipple
+                                                        style={{
+                                                            backgroundColor: dontFill
+                                                                ? "#000"
+                                                                : undefined,
+                                                            color: dontFill
+                                                                ? "#b80f0a"
+                                                                : "#FFF",
+                                                        }}
+                                                        startIcon={
+                                                            dontFill ? (
+                                                                <NotInterestedIcon />
+                                                            ) : undefined
+                                                        }
+                                                    >
+                                                        {dontFill
+                                                            ? "Don't Fill"
+                                                            : undefined}
+                                                    </Button>
+                                                ) : (
+                                                    day.map(({ name, bg }) => (
+                                                        <Button
+                                                            key={name}
+                                                            className={
+                                                                classes.cellButton
+                                                            }
+                                                            onClick={() =>
+                                                                handleCellClick(
+                                                                    hourIndex,
+                                                                    dayIndex
+                                                                )
+                                                            }
+                                                            disableRipple
+                                                            style={{
+                                                                backgroundColor: bg,
+                                                                color: "#FFF",
+                                                            }}
+                                                        >
+                                                            {name}
+                                                        </Button>
+                                                    ))
+                                                )}
                                             </TableCell>
                                         );
                                     })}
