@@ -23,6 +23,7 @@ import Button from "@material-ui/core/Button";
 import NotInterestedIcon from "@material-ui/icons/NotInterested";
 
 import DataContext from "./DataContext";
+import CourseDisplay from "./CourseDisplay";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
@@ -495,25 +496,11 @@ export default function ScheduleTable({
                                                     </Button>
                                                 ) : (
                                                     day.map(({ name, bg }) => (
-                                                        <Button
+                                                        <CourseDisplay
                                                             key={name}
-                                                            className={
-                                                                classes.cellButton
-                                                            }
-                                                            onClick={() =>
-                                                                handleCellClick(
-                                                                    hourIndex,
-                                                                    dayIndex
-                                                                )
-                                                            }
-                                                            disableRipple
-                                                            style={{
-                                                                backgroundColor: bg,
-                                                                color: "#FFF",
-                                                            }}
-                                                        >
-                                                            {name}
-                                                        </Button>
+                                                            name={name}
+                                                            bg={bg}
+                                                        />
                                                     ))
                                                 )}
                                             </TableCell>
