@@ -53,6 +53,8 @@ export default function ScheduleTable({
     sectionChecks,
     setSectionChecks,
     allowCollision,
+    fixedSections,
+    setFixedSections,
 }) {
     const data = useContext(DataContext);
     const classes = useStyles();
@@ -105,8 +107,6 @@ export default function ScheduleTable({
     const [dontFills, setDontFills] = useState(
         hours.map(() => days.map(() => false))
     );
-
-    const [fixedSections, setFixedSections] = useState({});
 
     // helper functions
     const updateTempTable = (course, sectionID, tempTable, backgroundColor) => {

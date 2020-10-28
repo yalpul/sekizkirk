@@ -19,6 +19,8 @@ const App = () => {
     const [tableDisplay, setTableDisplay] = useState("flex");
     const [dept, setDept] = useState(null);
 
+    const [fixedSections, setFixedSections] = useState({});
+
     useEffect(() => {
         // initialize sections for newly added courses
         courses.forEach((course, index) => {
@@ -59,6 +61,7 @@ const App = () => {
                     setSectionChecks={setSectionChecks}
                     allowCollision={allowCollision}
                     setAllowCollision={setAllowCollision}
+                    fixedSections={fixedSections}
                 />
                 <ScheduleTable
                     courses={courses}
@@ -67,6 +70,8 @@ const App = () => {
                     sectionChecks={sectionChecks}
                     setSectionChecks={setSectionChecks}
                     allowCollision={allowCollision}
+                    fixedSections={fixedSections}
+                    setFixedSections={setFixedSections}
                 />
             </main>
         </ThemeProvider>
