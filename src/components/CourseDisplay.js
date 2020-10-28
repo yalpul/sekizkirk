@@ -23,7 +23,13 @@ export default function CourseDisplay({
     const [isFixed, setIsFixed] = useState(false);
 
     const handleFix = () => {
-        setFixedSections({ ...fixedSections, [courseCode]: sectionID });
+        setFixedSections({
+            ...fixedSections,
+            [courseCode]: {
+                fixedSection: sectionID,
+                prevChecks: sectionChecks[courseCode],
+            },
+        });
 
         // only check the course's fixed section as true,
         // uncheck the remaining
@@ -37,13 +43,25 @@ export default function CourseDisplay({
 
     const handleUnfix = () => {
         setFixedSections({ ...fixedSections, [courseCode]: undefined });
+
+        // load the previosly selected sections for the courses
+        setSectionChecks({
+            ...sectionChecks,
+            [courseCode]: fixedSections[courseCode].prevChecks,
+        });
     };
 
     useEffect(() => {
-        if (sectionID === fixedSections[courseCode]) {
-            setIsFixed(true);
-        } else if (isFixed) {
-            setIsFixed(false);
+        try {
+            // fix other nodes on the table of the same sections as well
+            if (sectionID === fixedSections[courseCode].fixedSection) {
+                setIsFixed(true);
+            }
+        } catch (e) {
+            // unfix all the nodes of the section
+            if (isFixed) {
+                setIsFixed(false);
+            }
         }
     }, [fixedSections]);
 
