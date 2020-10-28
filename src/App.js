@@ -65,6 +65,7 @@ const App = () => {
                     display={tableDisplay}
                     mustDept={dept}
                     sectionChecks={sectionChecks}
+                    setSectionChecks={setSectionChecks}
                     allowCollision={allowCollision}
                 />
             </main>

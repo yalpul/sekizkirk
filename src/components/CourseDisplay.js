@@ -1,13 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import NotInterestedIcon from "@material-ui/icons/NotInterested";
 import LabelIcon from "@material-ui/icons/Label";
+import LabelOffIcon from "@material-ui/icons/LabelOff";
+import Tooltip from "@material-ui/core/Tooltip";
 
-export default function CourseDisplay({ name, bg }) {
+export default function CourseDisplay({
+    name,
+    bg,
+    dontFillHandler,
+    courseCode,
+    sectionID,
+    fixedSections,
+    setFixedSections,
+    sectionChecks,
+    setSectionChecks,
+}) {
     const [isMouseOver, setIsMouseOver] = useState(false);
+    const [isFixed, setIsFixed] = useState(false);
+
+    const handleFix = () => {
+        setFixedSections({ ...fixedSections, [courseCode]: sectionID });
+
+        // only check the course's fixed section as true,
+        // uncheck the remaining
+        setSectionChecks({
+            ...sectionChecks,
+            [courseCode]: sectionChecks[courseCode].map(
+                (_, index) => sectionID === index
+            ),
+        });
+    };
+
+    const handleUnfix = () => {
+        setFixedSections({ ...fixedSections, [courseCode]: undefined });
+    };
+
+    useEffect(() => {
+        if (sectionID === fixedSections[courseCode]) {
+            setIsFixed(true);
+        } else if (isFixed) {
+            setIsFixed(false);
+        }
+    }, [fixedSections]);
 
     return (
         <Grid
@@ -18,7 +56,7 @@ export default function CourseDisplay({ name, bg }) {
                 color: "#FFF",
                 height: "3.5em",
                 borderRadius: 5,
-                width: "95%",
+                width: "98%",
             }}
             alignItems="center"
             justify="center"
@@ -35,9 +73,14 @@ export default function CourseDisplay({ name, bg }) {
                     display: isMouseOver ? "flex" : "none",
                 }}
             >
-                <IconButton style={{ color: "inherit", padding: 0 }}>
-                    <NotInterestedIcon fontSize="small" />
-                </IconButton>
+                <Tooltip title="don't fill" arrow>
+                    <IconButton
+                        style={{ color: "inherit", padding: 0 }}
+                        onClick={dontFillHandler}
+                    >
+                        <NotInterestedIcon fontSize="small" />
+                    </IconButton>
+                </Tooltip>
             </Grid>
 
             <Grid item xs={8}>
@@ -51,14 +94,31 @@ export default function CourseDisplay({ name, bg }) {
                 xs={2}
                 style={{ display: isMouseOver ? "flex" : "none" }}
             >
-                <IconButton
-                    style={{
-                        color: "inherit",
-                        padding: 0,
-                    }}
-                >
-                    <LabelIcon fontSize="small" />
-                </IconButton>
+                {!isFixed ? (
+                    <Tooltip title="fix section" arrow>
+                        <IconButton
+                            style={{
+                                color: "inherit",
+                                padding: 0,
+                            }}
+                            onClick={handleFix}
+                        >
+                            <LabelIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                ) : (
+                    <Tooltip title="unfix" arrow>
+                        <IconButton
+                            style={{
+                                color: "inherit",
+                                padding: 0,
+                            }}
+                            onClick={handleUnfix}
+                        >
+                            <LabelOffIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                )}
             </Grid>
         </Grid>
     );

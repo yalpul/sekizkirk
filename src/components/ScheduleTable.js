@@ -51,6 +51,7 @@ export default function ScheduleTable({
     display,
     mustDept,
     sectionChecks,
+    setSectionChecks,
     allowCollision,
 }) {
     const data = useContext(DataContext);
@@ -105,6 +106,8 @@ export default function ScheduleTable({
         hours.map(() => days.map(() => false))
     );
 
+    const [fixedSections, setFixedSections] = useState({});
+
     // helper functions
     const updateTempTable = (course, sectionID, tempTable, backgroundColor) => {
         const section = slotsData[course.code][sectionID];
@@ -119,6 +122,8 @@ export default function ScheduleTable({
                     courseData[course.code].title.split(" ", 1)[0] // only show plain code
                 }/${sectionID + 1}`,
                 bg: `${backgroundColor}`,
+                courseCode: course.code,
+                sectionID: sectionID,
             });
         });
     };
@@ -344,14 +349,6 @@ export default function ScheduleTable({
         updateTable();
     }, [dontFills, sectionChecks, allowCollision]);
 
-    // useEffect(() => {
-    //     updateTable();
-    // }, [sectionChecks]);
-
-    // useEffect(() => {
-    //     updateTable();
-    // }, [allowCollision]);
-
     // handlers
     const handleNavigateClick = (direction) => {
         if (direction === "next" && possibleSchedules.length > 0) {
@@ -495,13 +492,44 @@ export default function ScheduleTable({
                                                             : undefined}
                                                     </Button>
                                                 ) : (
-                                                    day.map(({ name, bg }) => (
-                                                        <CourseDisplay
-                                                            key={name}
-                                                            name={name}
-                                                            bg={bg}
-                                                        />
-                                                    ))
+                                                    day.map(
+                                                        ({
+                                                            name,
+                                                            bg,
+                                                            courseCode,
+                                                            sectionID,
+                                                        }) => (
+                                                            <CourseDisplay
+                                                                key={name}
+                                                                name={name}
+                                                                bg={bg}
+                                                                courseCode={
+                                                                    courseCode
+                                                                }
+                                                                sectionID={
+                                                                    sectionID
+                                                                }
+                                                                fixedSections={
+                                                                    fixedSections
+                                                                }
+                                                                setFixedSections={
+                                                                    setFixedSections
+                                                                }
+                                                                sectionChecks={
+                                                                    sectionChecks
+                                                                }
+                                                                setSectionChecks={
+                                                                    setSectionChecks
+                                                                }
+                                                                dontFillHandler={() =>
+                                                                    handleCellClick(
+                                                                        hourIndex,
+                                                                        dayIndex
+                                                                    )
+                                                                }
+                                                            />
+                                                        )
+                                                    )
                                                 )}
                                             </TableCell>
                                         );
