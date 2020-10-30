@@ -21,6 +21,8 @@ import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import Button from "@material-ui/core/Button";
 import NotInterestedIcon from "@material-ui/icons/NotInterested";
+import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
+import FavoriteIcon from "@material-ui/icons/Favorite";
 
 import DataContext from "./DataContext";
 
@@ -43,7 +45,47 @@ const useStyles = makeStyles((theme) => ({
         height: "3.5em",
         width: "95%",
     },
+    showFavButton: {
+        position: "absolute",
+        right: 0,
+        marginRight: "1em",
+        color: theme.palette.secondary.main.light,
+        fontWeight: 700,
+    },
 }));
+
+function scheduleHash(schedule) {
+    function decimalToHex(d, padding) {
+        var hex = Number(d).toString(16);
+        padding =
+            typeof padding === "undefined" || padding === null
+                ? (padding = 2)
+                : padding;
+
+        while (hex.length < padding) {
+            hex = "0" + hex;
+        }
+
+        return hex;
+    }
+
+    const inputString = JSON.stringify(schedule);
+
+    const hashArray = [];
+    hashArray.length = 16;
+    hashArray.fill(0);
+
+    for (let i = 0; i < inputString.length; i++) {
+        hashArray[i % 16] ^= inputString.charCodeAt(i);
+    }
+
+    let hash = "";
+    for (var elem of hashArray) {
+        hash += decimalToHex(elem);
+    }
+
+    return hash;
+}
 
 export default function ScheduleTable({
     courses,
@@ -91,6 +133,7 @@ export default function ScheduleTable({
         hours.map(() => days.map(() => []))
     );
     const [possibleSchedules, setPossibleSchedules] = useState([]); // [schedule1->[[{course}, sectionID]] ,]
+    const [displayedSchedules, setDisplayedSchedules] = useState([]);
     const [currentSchedule, setCurrentSchedule] = useState(null);
 
     const [surnameCheck, setSurnameCheck] = useState(false);
@@ -103,6 +146,9 @@ export default function ScheduleTable({
     const [dontFills, setDontFills] = useState(
         hours.map(() => days.map(() => false))
     );
+
+    const [favSchedules, setFavSchedules] = useState({});
+    const [isFavsActive, setIsFavsActive] = useState(false);
 
     // helper functions
     const updateTempTable = (course, sectionID, tempTable, backgroundColor) => {
@@ -266,6 +312,10 @@ export default function ScheduleTable({
         candidateCourseSections.sort((a, b) => a.length - b.length);
 
         const schedules = findPossibleSchedules(candidateCourseSections);
+        // for consistent hast values for favorite sections
+        schedules.sort((a, b) => {
+            return a[0].code < b[0].code;
+        });
         setPossibleSchedules(schedules);
     }
 
@@ -303,7 +353,7 @@ export default function ScheduleTable({
     useEffect(() => {
         const tempTable = hours.map(() => days.map(() => []));
 
-        const schedule = possibleSchedules[currentSchedule] || [];
+        const schedule = displayedSchedules[currentSchedule] || [];
         schedule.forEach(([course, sectionID], index) => {
             const backgroundColor = cellColors[index % cellColors.length];
             updateTempTable(course, sectionID, tempTable, backgroundColor);
@@ -313,12 +363,17 @@ export default function ScheduleTable({
     }, [currentSchedule, possibleSchedules]);
 
     useEffect(() => {
-        if (possibleSchedules.length > 0) {
+        // when new schedules created, show them immediatly
+        setDisplayedSchedules(possibleSchedules);
+    }, [possibleSchedules]);
+
+    useEffect(() => {
+        if (displayedSchedules.length > 0) {
             setCurrentSchedule(0);
         } else {
             setCurrentSchedule(null);
         }
-    }, [possibleSchedules]);
+    }, [displayedSchedules]);
 
     useEffect(() => {
         setDept(mustDept);
@@ -343,23 +398,24 @@ export default function ScheduleTable({
         updateTable();
     }, [dontFills, sectionChecks, allowCollision]);
 
-    // useEffect(() => {
-    //     updateTable();
-    // }, [sectionChecks]);
-
-    // useEffect(() => {
-    //     updateTable();
-    // }, [allowCollision]);
+    useEffect(() => {
+        if (isFavsActive) {
+            setDisplayedSchedules(Object.values(favSchedules));
+            setCurrentSchedule(0);
+        } else {
+            setDisplayedSchedules(possibleSchedules);
+        }
+    }, [isFavsActive]);
 
     // handlers
     const handleNavigateClick = (direction) => {
-        if (direction === "next" && possibleSchedules.length > 0) {
-            currentSchedule === possibleSchedules.length - 1
+        if (direction === "next" && displayedSchedules.length > 0) {
+            currentSchedule === displayedSchedules.length - 1
                 ? setCurrentSchedule(0)
                 : setCurrentSchedule(currentSchedule + 1);
-        } else if (direction === "prev" && possibleSchedules.length > 0) {
+        } else if (direction === "prev" && displayedSchedules.length > 0) {
             currentSchedule === 0
-                ? setCurrentSchedule(possibleSchedules.length - 1)
+                ? setCurrentSchedule(displayedSchedules.length - 1)
                 : setCurrentSchedule(currentSchedule - 1);
         }
     };
@@ -384,6 +440,27 @@ export default function ScheduleTable({
         setDontFills(temp);
     };
 
+    const handleFavClick = () => {
+        const schedule = possibleSchedules[currentSchedule];
+        const hash = scheduleHash(schedule);
+
+        setFavSchedules({ ...favSchedules, [hash]: schedule });
+    };
+
+    const handleUnfavClick = () => {
+        const schedule = possibleSchedules[currentSchedule];
+        const hash = scheduleHash(schedule);
+
+        const temp = { ...favSchedules };
+        delete temp[hash];
+
+        setFavSchedules(temp);
+    };
+
+    const handleShowFavorites = () => {
+        setIsFavsActive(!isFavsActive);
+    };
+
     return (
         <Grid
             container
@@ -402,6 +479,7 @@ export default function ScheduleTable({
                                 container
                                 justify="center"
                                 alignItems="center"
+                                style={{ position: "relative" }}
                             >
                                 <Grid item>
                                     <IconButton
@@ -417,7 +495,9 @@ export default function ScheduleTable({
                                         currentSchedule === null
                                             ? 0
                                             : currentSchedule + 1
-                                    }/${possibleSchedules.length}`}</Typography>
+                                    }/${
+                                        displayedSchedules.length
+                                    }`}</Typography>
                                 </Grid>
                                 <Grid item>
                                     <IconButton
@@ -428,11 +508,36 @@ export default function ScheduleTable({
                                         <NavigateNextIcon />
                                     </IconButton>
                                 </Grid>
+                                <Button
+                                    size="small"
+                                    variant="outlined"
+                                    className={classes.showFavButton}
+                                    onClick={handleShowFavorites}
+                                >
+                                    {isFavsActive
+                                        ? "show all"
+                                        : "show favorites"}
+                                </Button>
                             </Grid>
                         </caption>
                         <TableHead>
                             <TableRow>
-                                <TableCell></TableCell>
+                                <TableCell align="center">
+                                    {displayedSchedules[currentSchedule] &&
+                                    favSchedules[
+                                        scheduleHash(
+                                            displayedSchedules[currentSchedule]
+                                        )
+                                    ] ? (
+                                        <IconButton onClick={handleUnfavClick}>
+                                            <FavoriteIcon />
+                                        </IconButton>
+                                    ) : (
+                                        <IconButton onClick={handleFavClick}>
+                                            <FavoriteBorderIcon />
+                                        </IconButton>
+                                    )}
+                                </TableCell>
                                 {days.map((day) => (
                                     <TableCell key={day} align="center">
                                         {day}
