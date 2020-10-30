@@ -4,8 +4,8 @@ import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import NotInterestedIcon from "@material-ui/icons/NotInterested";
-import LabelIcon from "@material-ui/icons/Label";
-import LabelOffIcon from "@material-ui/icons/LabelOff";
+import LockIcon from "@material-ui/icons/Lock";
+import LockOpenIcon from "@material-ui/icons/LockOpen";
 import Tooltip from "@material-ui/core/Tooltip";
 
 export default function CourseDisplay({
@@ -88,7 +88,7 @@ export default function CourseDisplay({
                 xs={2}
                 style={{
                     paddingLeft: "10px",
-                    display: isMouseOver ? "flex" : "none",
+                    visibility: isFixed || !isMouseOver ? "hidden" : undefined,
                 }}
             >
                 <Tooltip title="don't fill" arrow>
@@ -110,7 +110,9 @@ export default function CourseDisplay({
             <Grid
                 item
                 xs={2}
-                style={{ display: isMouseOver ? "flex" : "none" }}
+                style={{
+                    visibility: !isFixed && !isMouseOver ? "hidden" : undefined,
+                }}
             >
                 {!isFixed ? (
                     <Tooltip title="fix section" arrow>
@@ -121,7 +123,7 @@ export default function CourseDisplay({
                             }}
                             onClick={handleFix}
                         >
-                            <LabelIcon fontSize="small" />
+                            <LockOpenIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                 ) : (
@@ -133,7 +135,7 @@ export default function CourseDisplay({
                             }}
                             onClick={handleUnfix}
                         >
-                            <LabelOffIcon fontSize="small" />
+                            <LockIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                 )}
