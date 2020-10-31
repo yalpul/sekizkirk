@@ -149,6 +149,7 @@ export default function ScheduleTable({
 
     const [favSchedules, setFavSchedules] = useState({});
     const [isFavsActive, setIsFavsActive] = useState(false);
+    const [lastScheduleIndex, setLastScheduleIndex] = useState(null);
 
     // helper functions
     const updateTempTable = (course, sectionID, tempTable, backgroundColor) => {
@@ -360,16 +361,27 @@ export default function ScheduleTable({
         });
 
         setDisplayedSlot(tempTable);
-    }, [currentSchedule, possibleSchedules]);
+    }, [currentSchedule, displayedSchedules]);
 
     useEffect(() => {
         // when new schedules created, show them immediatly
         setDisplayedSchedules(possibleSchedules);
+        setLastScheduleIndex(null);
+        setIsFavsActive(false);
     }, [possibleSchedules]);
 
     useEffect(() => {
         if (displayedSchedules.length > 0) {
-            setCurrentSchedule(0);
+            if (isFavsActive) {
+                // when a fav is unselected, show next favorite
+                setCurrentSchedule(currentSchedule % displayedSchedules.length);
+            } else {
+                if (lastScheduleIndex !== null) {
+                    setCurrentSchedule(lastScheduleIndex);
+                } else {
+                    setCurrentSchedule(0);
+                }
+            }
         } else {
             setCurrentSchedule(null);
         }
@@ -401,11 +413,19 @@ export default function ScheduleTable({
     useEffect(() => {
         if (isFavsActive) {
             setDisplayedSchedules(Object.values(favSchedules));
+            setLastScheduleIndex(currentSchedule);
             setCurrentSchedule(0);
         } else {
             setDisplayedSchedules(possibleSchedules);
         }
     }, [isFavsActive]);
+
+    useEffect(() => {
+        // handle unselecting favorite section when showing favorites
+        if (isFavsActive) {
+            setDisplayedSchedules(Object.values(favSchedules));
+        }
+    }, [favSchedules]);
 
     // handlers
     const handleNavigateClick = (direction) => {
@@ -448,7 +468,7 @@ export default function ScheduleTable({
     };
 
     const handleUnfavClick = () => {
-        const schedule = possibleSchedules[currentSchedule];
+        const schedule = displayedSchedules[currentSchedule];
         const hash = scheduleHash(schedule);
 
         const temp = { ...favSchedules };
