@@ -599,22 +599,29 @@ export default function ScheduleTable({
                                                                 dayIndex
                                                             )
                                                         }
+                                                        disabled={isFavsActive}
                                                         disableRipple
                                                         style={{
-                                                            backgroundColor: dontFill
-                                                                ? "#000"
-                                                                : undefined,
-                                                            color: dontFill
-                                                                ? "#b80f0a"
-                                                                : "#FFF",
+                                                            backgroundColor:
+                                                                dontFill &&
+                                                                !isFavsActive
+                                                                    ? "#000"
+                                                                    : undefined,
+                                                            color:
+                                                                dontFill &&
+                                                                !isFavsActive
+                                                                    ? "#b80f0a"
+                                                                    : "#FFF",
                                                         }}
                                                         startIcon={
-                                                            dontFill ? (
+                                                            dontFill &&
+                                                            !isFavsActive ? (
                                                                 <NotInterestedIcon />
                                                             ) : undefined
                                                         }
                                                     >
-                                                        {dontFill
+                                                        {dontFill &&
+                                                        !isFavsActive
                                                             ? "Don't Fill"
                                                             : undefined}
                                                     </Button>
@@ -624,6 +631,9 @@ export default function ScheduleTable({
                                                             key={name}
                                                             className={
                                                                 classes.cellButton
+                                                            }
+                                                            disabled={
+                                                                isFavsActive
                                                             }
                                                             onClick={() =>
                                                                 handleCellClick(
