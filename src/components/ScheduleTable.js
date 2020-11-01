@@ -26,6 +26,7 @@ import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 
 import DataContext from "./DataContext";
+import CourseDisplay from "./CourseDisplay";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
@@ -65,7 +66,10 @@ export default function ScheduleTable({
     display,
     mustDept,
     sectionChecks,
+    setSectionChecks,
     allowCollision,
+    fixedSections,
+    setFixedSections,
 }) {
     const data = useContext(DataContext);
     const classes = useStyles();
@@ -138,6 +142,8 @@ export default function ScheduleTable({
                     courseData[course.code].title.split(" ", 1)[0] // only show plain code
                 }/${sectionID + 1}`,
                 bg: `${backgroundColor}`,
+                courseCode: course.code,
+                sectionID: sectionID,
             });
         });
     };
@@ -602,30 +608,47 @@ export default function ScheduleTable({
                                                             : undefined}
                                                     </Button>
                                                 ) : (
-                                                    day.map(({ name, bg }) => (
-                                                        <Button
-                                                            key={name}
-                                                            className={
-                                                                classes.cellButton
-                                                            }
-                                                            disabled={
-                                                                isFavsActive
-                                                            }
-                                                            onClick={() =>
-                                                                handleCellClick(
-                                                                    hourIndex,
-                                                                    dayIndex
-                                                                )
-                                                            }
-                                                            disableRipple
-                                                            style={{
-                                                                backgroundColor: bg,
-                                                                color: "#FFF",
-                                                            }}
-                                                        >
-                                                            {name}
-                                                        </Button>
-                                                    ))
+                                                    day.map(
+                                                        ({
+                                                            name,
+                                                            bg,
+                                                            courseCode,
+                                                            sectionID,
+                                                        }) => (
+                                                            <CourseDisplay
+                                                                key={name}
+                                                                name={name}
+                                                                bg={bg}
+                                                                courseCode={
+                                                                    courseCode
+                                                                }
+                                                                sectionID={
+                                                                    sectionID
+                                                                }
+                                                                fixedSections={
+                                                                    fixedSections
+                                                                }
+                                                                setFixedSections={
+                                                                    setFixedSections
+                                                                }
+                                                                sectionChecks={
+                                                                    sectionChecks
+                                                                }
+                                                                setSectionChecks={
+                                                                    setSectionChecks
+                                                                }
+                                                                isFavsActive={
+                                                                    isFavsActive
+                                                                }
+                                                                dontFillHandler={() =>
+                                                                    handleCellClick(
+                                                                        hourIndex,
+                                                                        dayIndex
+                                                                    )
+                                                                }
+                                                            />
+                                                        )
+                                                    )
                                                 )}
                                             </TableCell>
                                         );

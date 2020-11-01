@@ -39,6 +39,9 @@ import Checkbox from "@material-ui/core/Checkbox";
 import FormGroup from "@material-ui/core/FormGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormLabel from "@material-ui/core/FormLabel";
+import FeedbackIcon from "@material-ui/icons/Feedback";
+import Tooltip from "@material-ui/core/Tooltip";
+import HelpIcon from "@material-ui/icons/Help";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
@@ -157,6 +160,7 @@ const Form = ({
     setSectionChecks,
     allowCollision,
     setAllowCollision,
+    fixedSections,
 }) => {
     const data = useContext(DataContext);
     const classes = useStyles();
@@ -602,17 +606,50 @@ const Form = ({
                                             component="legend"
                                             focused={false}
                                         >
-                                            Course Sections{" "}
-                                            <Button
-                                                variant="outlined"
-                                                size="small"
-                                                color="secondary"
-                                                onClick={() =>
-                                                    handleUnselectAll(course)
-                                                }
-                                            >
-                                                Unselect All
-                                            </Button>
+                                            <Grid container alignItems="center">
+                                                <Grid item>
+                                                    <Typography>
+                                                        Course Sections
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid
+                                                    item
+                                                    style={{
+                                                        marginLeft: "0.5em",
+                                                        marginRight: "0.5em",
+                                                    }}
+                                                >
+                                                    <Button
+                                                        variant="outlined"
+                                                        size="small"
+                                                        color="secondary"
+                                                        onClick={() =>
+                                                            handleUnselectAll(
+                                                                course
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            fixedSections[
+                                                                course.code
+                                                            ]
+                                                        }
+                                                    >
+                                                        Unselect All
+                                                    </Button>
+                                                </Grid>
+                                                <Grid item>
+                                                    {fixedSections[
+                                                        course.code
+                                                    ] && (
+                                                        <Tooltip
+                                                            arrow
+                                                            title="Unfix section in the table to enable selection."
+                                                        >
+                                                            <HelpIcon color="primary" />
+                                                        </Tooltip>
+                                                    )}
+                                                </Grid>
+                                            </Grid>
                                         </FormLabel>
                                         <FormGroup aria-label="position" row>
                                             {sectionChecks[course.code] &&
@@ -631,6 +668,12 @@ const Form = ({
                                                                         course,
                                                                         index
                                                                     )
+                                                                }
+                                                                disabled={
+                                                                    fixedSections[
+                                                                        course
+                                                                            .code
+                                                                    ]
                                                                 }
                                                             />
                                                         }
