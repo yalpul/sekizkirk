@@ -24,7 +24,8 @@
         "@material-ui/lab": "^4.0.0-alpha.56",
         "@types/react": "^16.8.6",
         "react": "^16.8.0",
-        "react-dom": "^16.8.0"
+        "react-dom": "^16.8.0",
+        "sha1": "^1.1.1"
     },
     "scripts": {
         "format": "prettier --write src/**/*.{js,jsx}",

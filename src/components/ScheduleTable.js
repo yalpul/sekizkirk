@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import sha1 from "sha1";
 
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 
@@ -55,36 +56,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function scheduleHash(schedule) {
-    function decimalToHex(d, padding) {
-        var hex = Number(d).toString(16);
-        padding =
-            typeof padding === "undefined" || padding === null
-                ? (padding = 2)
-                : padding;
-
-        while (hex.length < padding) {
-            hex = "0" + hex;
-        }
-
-        return hex;
-    }
-
     const inputString = JSON.stringify(schedule);
-
-    const hashArray = [];
-    hashArray.length = 16;
-    hashArray.fill(0);
-
-    for (let i = 0; i < inputString.length; i++) {
-        hashArray[i % 16] ^= inputString.charCodeAt(i);
-    }
-
-    let hash = "";
-    for (var elem of hashArray) {
-        hash += decimalToHex(elem);
-    }
-
-    return hash;
+    return sha1(inputString);
 }
 
 export default function ScheduleTable({
@@ -233,7 +206,13 @@ export default function ScheduleTable({
         (function runner(candidateCourseSections) {
             // base case, combination is a valid schedule, save it to the state
             if (candidateCourseSections.length === 0) {
-                validSchedules.push([...possibleSchedule]);
+                // sort schedule for consistent hash value
+                const sortedPossibleSchedule = [...possibleSchedule];
+                sortedPossibleSchedule.sort((a, b) => {
+                    return parseInt(a[0].code) - parseInt(b[0].code);
+                });
+
+                validSchedules.push([...sortedPossibleSchedule]);
                 return;
             }
 
@@ -313,10 +292,7 @@ export default function ScheduleTable({
         candidateCourseSections.sort((a, b) => a.length - b.length);
 
         const schedules = findPossibleSchedules(candidateCourseSections);
-        // for consistent hast values for favorite sections
-        schedules.sort((a, b) => {
-            return a[0].code < b[0].code;
-        });
+        console.log(schedules);
         setPossibleSchedules(schedules);
     }
 
