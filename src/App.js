@@ -23,7 +23,7 @@ const App = () => {
 
     useEffect(() => {
         // initialize sections for newly added courses
-        courses.forEach((course, index) => {
+        courses.forEach((course) => {
             const sections = data.courseSlots[course.code];
 
             if (sectionChecks[course.code] === undefined) {

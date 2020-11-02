@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import sha1 from "sha1";
 
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 
 import Grid from "@material-ui/core/Grid";
 import Table from "@material-ui/core/Table";
@@ -131,7 +131,7 @@ export default function ScheduleTable({
     // helper functions
     const updateTempTable = (course, sectionID, tempTable, backgroundColor) => {
         const section = slotsData[course.code][sectionID];
-        const [sectionSlots, _] = section;
+        const [sectionName, sectionSlots] = section;
 
         sectionSlots.forEach((slot) => {
             const [day, hour] = slot;
@@ -140,7 +140,7 @@ export default function ScheduleTable({
             tempTable[hour][day].push({
                 name: `${
                     courseData[course.code].title.split(" ", 1)[0] // only show plain code
-                }/${sectionID + 1}`,
+                }/${sectionName}`,
                 bg: `${backgroundColor}`,
                 courseCode: course.code,
                 sectionID: sectionID,
@@ -161,7 +161,7 @@ export default function ScheduleTable({
             }
 
             const section = slotsData[course.code][sectionID];
-            const [sectionSlots, _] = section;
+            const [, sectionSlots] = section;
             sectionSlots.forEach((slot) => {
                 const [day, hour] = slot;
                 if (action === "update") {
@@ -177,7 +177,7 @@ export default function ScheduleTable({
 
             const [course, sectionID] = section;
             const slots = slotsData[course.code][sectionID];
-            const [sectionSlots, _] = slots;
+            const [, sectionSlots] = slots;
 
             // don't fill have the hightes priority,
             // check it first
@@ -250,7 +250,7 @@ export default function ScheduleTable({
             const sections = slotsData[course.code];
             candidateCourseSections[courseIndex] = sections
                 .map((section, sectionIndex) => {
-                    const [sectionSlots, constraints] = section;
+                    const [, sectionSlots, constraints] = section;
 
                     if (sectionSlots.length === 0) {
                         // slots data not avaliable

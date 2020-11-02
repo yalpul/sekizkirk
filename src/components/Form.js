@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import DataContext from "./DataContext";
 
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
@@ -39,7 +39,6 @@ import Checkbox from "@material-ui/core/Checkbox";
 import FormGroup from "@material-ui/core/FormGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormLabel from "@material-ui/core/FormLabel";
-import FeedbackIcon from "@material-ui/icons/Feedback";
 import Tooltip from "@material-ui/core/Tooltip";
 import HelpIcon from "@material-ui/icons/Help";
 
@@ -164,7 +163,8 @@ const Form = ({
 }) => {
     const data = useContext(DataContext);
     const classes = useStyles();
-    const theme = useTheme();
+
+    const slotsData = data.courseSlots;
 
     const [courseInput, setCourseInput] = useState("");
     const [courseValue, setCourseValue] = useState(null);
@@ -653,34 +653,44 @@ const Form = ({
                                         </FormLabel>
                                         <FormGroup aria-label="position" row>
                                             {sectionChecks[course.code] &&
-                                                sectionChecks[
-                                                    course.code
-                                                ].map((checked, index) => (
-                                                    <FormControlLabel
-                                                        control={
-                                                            <Checkbox
-                                                                color="primary"
-                                                                checked={
-                                                                    checked
+                                                sectionChecks[course.code].map(
+                                                    (checked, index) => {
+                                                        const [
+                                                            sectionName,
+                                                        ] = slotsData[
+                                                            course.code
+                                                        ][index];
+
+                                                        return (
+                                                            <FormControlLabel
+                                                                control={
+                                                                    <Checkbox
+                                                                        color="primary"
+                                                                        checked={
+                                                                            checked
+                                                                        }
+                                                                        onChange={() =>
+                                                                            handleCheck(
+                                                                                course,
+                                                                                index
+                                                                            )
+                                                                        }
+                                                                        disabled={
+                                                                            fixedSections[
+                                                                                course
+                                                                                    .code
+                                                                            ]
+                                                                        }
+                                                                    />
                                                                 }
-                                                                onChange={() =>
-                                                                    handleCheck(
-                                                                        course,
-                                                                        index
-                                                                    )
+                                                                label={
+                                                                    sectionName
                                                                 }
-                                                                disabled={
-                                                                    fixedSections[
-                                                                        course
-                                                                            .code
-                                                                    ]
-                                                                }
+                                                                key={`${checked}+${index}`}
                                                             />
-                                                        }
-                                                        label={index + 1}
-                                                        key={`${checked}+${index}`}
-                                                    />
-                                                ))}
+                                                        );
+                                                    }
+                                                )}
                                         </FormGroup>
                                     </FormControl>
                                 </Grid>
