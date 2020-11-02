@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import sha1 from "sha1";
 
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 
 import Grid from "@material-ui/core/Grid";
 import Table from "@material-ui/core/Table";
@@ -79,15 +79,15 @@ export default function ScheduleTable({
 
     const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
     const hours = [
-        "8:40-9:40",
-        "9:40-10:40",
-        "10:40-11:40",
-        "11:40-12:40",
-        "12:40-13:40",
-        "13:40-14:40",
-        "14:40-15:40",
-        "15:40-16:40",
-        "16:40-17:40",
+        "8:40-9:30",
+        "9:40-10:30",
+        "10:40-11:30",
+        "11:40-12:30",
+        "12:40-13:30",
+        "13:40-14:30",
+        "14:40-15:30",
+        "15:40-16:30",
+        "16:40-17:30",
     ];
     const cellColors = [
         "#002E2E",
@@ -131,7 +131,7 @@ export default function ScheduleTable({
     // helper functions
     const updateTempTable = (course, sectionID, tempTable, backgroundColor) => {
         const section = slotsData[course.code][sectionID];
-        const [sectionSlots, _] = section;
+        const [sectionName, sectionSlots] = section;
 
         sectionSlots.forEach((slot) => {
             const [day, hour] = slot;
@@ -140,7 +140,7 @@ export default function ScheduleTable({
             tempTable[hour][day].push({
                 name: `${
                     courseData[course.code].title.split(" ", 1)[0] // only show plain code
-                }/${sectionID + 1}`,
+                }/${sectionName}`,
                 bg: `${backgroundColor}`,
                 courseCode: course.code,
                 sectionID: sectionID,
@@ -161,7 +161,7 @@ export default function ScheduleTable({
             }
 
             const section = slotsData[course.code][sectionID];
-            const [sectionSlots, _] = section;
+            const [, sectionSlots] = section;
             sectionSlots.forEach((slot) => {
                 const [day, hour] = slot;
                 if (action === "update") {
@@ -177,7 +177,7 @@ export default function ScheduleTable({
 
             const [course, sectionID] = section;
             const slots = slotsData[course.code][sectionID];
-            const [sectionSlots, _] = slots;
+            const [, sectionSlots] = slots;
 
             // don't fill have the hightes priority,
             // check it first
@@ -250,7 +250,7 @@ export default function ScheduleTable({
             const sections = slotsData[course.code];
             candidateCourseSections[courseIndex] = sections
                 .map((section, sectionIndex) => {
-                    const [sectionSlots, constraints] = section;
+                    const [, sectionSlots, constraints] = section;
 
                     if (sectionSlots.length === 0) {
                         // slots data not avaliable

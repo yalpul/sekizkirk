@@ -66,13 +66,14 @@ class slots:
         start_str = '<FONT FACE=ARIAL>'
         end_str = '</FONT>'
         str_len = len(start_str)
-        section = 1
-        section_str = lambda x : '<INPUT TYPE="submit" VALUE="'+str(x)+'"'
+        section_str = '<INPUT TYPE="submit" VALUE="'
         slots = []
         idx = 0
         while True:
-            idx = html.find(section_str(section), idx)
+            idx = html.find(section_str, idx)
             if idx == -1: break
+            idx_end = html.find('"', idx+len(section_str))
+            section = int(html[idx+len(section_str):idx_end])
             constraints_html = self.get_constraints_html(section)
             constraints = self.parse_constraints(constraints_html)
             standard_constraints = self.normalize_constraints(constraints)
@@ -88,8 +89,7 @@ class slots:
                     idx = idx2
                 if len(record) > 1:
                     time_slots += self.to_standard_form(record)
-            slots.append([time_slots, standard_constraints])
-            section += 1
+            slots.append([section, time_slots, standard_constraints])
         return slots
 
     # Convert constraint data to a standard form
