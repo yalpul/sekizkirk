@@ -396,7 +396,10 @@ const Form = ({
                                         label="semester"
                                     >
                                         <ListSubheader
-                                            style={{ fontWeight: 700 }}
+                                            style={{
+                                                fontWeight: 700,
+                                                pointerEvents: "none",
+                                            }}
                                         >
                                             Fall
                                         </ListSubheader>
@@ -406,7 +409,10 @@ const Form = ({
                                             </MenuItem>
                                         ))}
                                         <ListSubheader
-                                            style={{ fontWeight: 700 }}
+                                            style={{
+                                                fontWeight: 700,
+                                                pointerEvents: "none",
+                                            }}
                                         >
                                             Spring
                                         </ListSubheader>
