@@ -124,7 +124,9 @@ export default function ScheduleTable({
         hours.map(() => days.map(() => false))
     );
 
-    const [favSchedules, setFavSchedules] = useState({});
+    const [favSchedules, setFavSchedules] = useState(
+        JSON.parse(window.localStorage.getItem("favSchedules")) || {}
+    );
     const [isFavsActive, setIsFavsActive] = useState(false);
     const [lastScheduleIndex, setLastScheduleIndex] = useState(null);
 
@@ -407,6 +409,12 @@ export default function ScheduleTable({
         if (isFavsActive) {
             setDisplayedSchedules(Object.values(favSchedules));
         }
+
+        // save favorites for other sessions
+        window.localStorage.setItem(
+            "favSchedules",
+            JSON.stringify(favSchedules)
+        );
     }, [favSchedules]);
 
     // handlers
