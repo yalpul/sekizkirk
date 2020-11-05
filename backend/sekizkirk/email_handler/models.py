@@ -1,3 +1,5 @@
 from django.db import models
 
-# Create your models here.
+class Email(models.Model):
+    email_name = models.EmailField()
+    schedule = models.JSONField()
