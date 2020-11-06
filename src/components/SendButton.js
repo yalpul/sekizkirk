@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function SendButton() {
+export default function SendButton({ schedule }) {
     const classes = useStyles();
 
     const [open, setOpen] = useState(false);
@@ -48,7 +48,7 @@ export default function SendButton() {
     const handleMailSend = () => {
         const test_url = "http://localhost:8000/email/";
         axios
-            .post(test_url, { email: value })
+            .post(test_url, { email: value, schedule: schedule })
             .then((response) => console.log(response))
             .catch((error) => console.log(error));
     };

@@ -492,7 +492,11 @@ export default function ScheduleTable({
                                 alignItems="center"
                                 style={{ position: "relative" }}
                             >
-                                <SendButton />
+                                <SendButton
+                                    schedule={
+                                        displayedSchedules[currentSchedule]
+                                    }
+                                />
                                 <Grid item>
                                     <IconButton
                                         onClick={() =>
