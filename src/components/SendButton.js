@@ -11,6 +11,8 @@ import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import SendIcon from "@material-ui/icons/Send";
 import IconButton from "@material-ui/core/IconButton";
+import Divider from "@material-ui/core/Divider";
+import GetAppIcon from "@material-ui/icons/GetApp";
 import { DialogContentText, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
@@ -121,6 +123,23 @@ export default function SendButton() {
                                     <SendIcon />
                                 </IconButton>
                             </Grid>
+                        </Grid>
+
+                        <Grid
+                            item
+                            style={{ marginTop: "2em", marginBottom: "2em" }}
+                        >
+                            <Divider variant="middle" />
+                        </Grid>
+
+                        <Grid item>
+                            <Button
+                                endIcon={<GetAppIcon />}
+                                variant="outlined"
+                                color="secondary"
+                            >
+                                download
+                            </Button>
                         </Grid>
                     </Grid>
                 </DialogContent>
