@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -39,6 +39,14 @@ export default function SendButton() {
     const classes = useStyles();
 
     const [open, setOpen] = useState(false);
+    const [validEmail, setValidEmail] = useState(false);
+    const [value, setValue] = useState("");
+
+    useEffect(() => {
+        const re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+        const isValid = re.test(value);
+        setValidEmail(isValid);
+    }, [value]);
 
     return (
         <>
@@ -75,7 +83,7 @@ export default function SendButton() {
                             style={{ marginTop: "-1em", marginBottom: "2em" }}
                         >
                             <DialogContentText>
-                                We can send your schedule via e-mail, or you can
+                                We can send your schedule via email, or you can
                                 dowload it.
                             </DialogContentText>
                         </Grid>
@@ -85,7 +93,17 @@ export default function SendButton() {
                                 <TextField
                                     variant="outlined"
                                     label="your email"
-                                    tyle="email"
+                                    type="email"
+                                    error={!validEmail}
+                                    helperText={
+                                        validEmail
+                                            ? ""
+                                            : "enter a valid email adress"
+                                    }
+                                    value={value}
+                                    onChange={(event) =>
+                                        setValue(event.target.value)
+                                    }
                                 />
                             </Grid>
 
@@ -96,7 +114,10 @@ export default function SendButton() {
                                     marginLeft: "1em",
                                 }}
                             >
-                                <IconButton className={classes.sendIcon}>
+                                <IconButton
+                                    className={classes.sendIcon}
+                                    disabled={!validEmail}
+                                >
                                     <SendIcon />
                                 </IconButton>
                             </Grid>
