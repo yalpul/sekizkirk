@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -44,8 +45,16 @@ export default function SendButton() {
     const [validEmail, setValidEmail] = useState(false);
     const [value, setValue] = useState("");
 
+    const handleMailSend = () => {
+        const test_url = "http://localhost:8000/email/";
+        axios
+            .post(test_url, { email: value })
+            .then((response) => console.log(response))
+            .catch((error) => console.log(error));
+    };
+
     useEffect(() => {
-        const re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+        const re = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
         const isValid = re.test(value);
         setValidEmail(isValid);
     }, [value]);
@@ -119,6 +128,7 @@ export default function SendButton() {
                                 <IconButton
                                     className={classes.sendIcon}
                                     disabled={!validEmail}
+                                    onClick={handleMailSend}
                                 >
                                     <SendIcon />
                                 </IconButton>
