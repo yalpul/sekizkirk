@@ -14,6 +14,7 @@ export default function CourseDisplay({
     dontFillHandler,
     courseCode,
     sectionID,
+    classroom,
     fixedSections,
     setFixedSections,
     sectionChecks,
@@ -108,6 +109,8 @@ export default function CourseDisplay({
             <Grid item xs={8}>
                 <Typography variant="body1" align="center">
                     {name}
+                    <br />
+                    {classroom ? classroom : null}
                 </Typography>
             </Grid>
 

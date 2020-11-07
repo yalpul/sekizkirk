@@ -136,7 +136,7 @@ export default function ScheduleTable({
         const [sectionName, sectionSlots] = section;
 
         sectionSlots.forEach((slot) => {
-            const [day, hour] = slot;
+            const [day, hour, classroom] = slot;
 
             // update table slot for this section
             tempTable[hour][day].push({
@@ -146,6 +146,7 @@ export default function ScheduleTable({
                 bg: `${backgroundColor}`,
                 courseCode: course.code,
                 sectionID: sectionID,
+                classroom: classroom,
             });
         });
     };
@@ -622,6 +623,7 @@ export default function ScheduleTable({
                                                             bg,
                                                             courseCode,
                                                             sectionID,
+                                                            classroom,
                                                         }) => (
                                                             <CourseDisplay
                                                                 key={name}
@@ -632,6 +634,9 @@ export default function ScheduleTable({
                                                                 }
                                                                 sectionID={
                                                                     sectionID
+                                                                }
+                                                                classroom={
+                                                                    classroom
                                                                 }
                                                                 fixedSections={
                                                                     fixedSections
