@@ -24,6 +24,7 @@ import Button from "@material-ui/core/Button";
 import NotInterestedIcon from "@material-ui/icons/NotInterested";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import FavoriteIcon from "@material-ui/icons/Favorite";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 import DataContext from "./DataContext";
 import CourseDisplay from "./CourseDisplay";
@@ -133,6 +134,8 @@ export default function ScheduleTable({
     const [isFavsActive, setIsFavsActive] = useState(false);
     const [lastScheduleIndex, setLastScheduleIndex] = useState(null);
 
+    const [loading, setLoading] = useState(false);
+
     // helper functions
     const updateTempTable = (course, sectionID, tempTable, backgroundColor) => {
         const section = slotsData[course.code][sectionID];
@@ -155,6 +158,7 @@ export default function ScheduleTable({
     };
 
     function updateTable() {
+        setLoading(true);
         // terminate the previous worker,
         // this is usefull only when user changes the schedule inputs quickly,
         // so the previous calculation does not matter(don't wait it to finish)
@@ -165,6 +169,7 @@ export default function ScheduleTable({
         worker.addEventListener("message", (message) => {
             const schedules = message.data;
             setPossibleSchedules(schedules);
+            setLoading(false);
             console.log("update");
         });
 
@@ -416,33 +421,39 @@ export default function ScheduleTable({
                                 alignItems="center"
                                 style={{ position: "relative" }}
                             >
-                                <Grid item>
-                                    <IconButton
-                                        onClick={() =>
-                                            handleNavigateClick("prev")
-                                        }
-                                    >
-                                        <NavigateBeforeIcon />
-                                    </IconButton>
-                                </Grid>
-                                <Grid item>
-                                    <Typography variantion="body1">{`${
-                                        currentSchedule === null
-                                            ? 0
-                                            : currentSchedule + 1
-                                    }/${
-                                        displayedSchedules.length
-                                    }`}</Typography>
-                                </Grid>
-                                <Grid item>
-                                    <IconButton
-                                        onClick={() =>
-                                            handleNavigateClick("next")
-                                        }
-                                    >
-                                        <NavigateNextIcon />
-                                    </IconButton>
-                                </Grid>
+                                {loading ? (
+                                    <CircularProgress />
+                                ) : (
+                                    <>
+                                        <Grid item>
+                                            <IconButton
+                                                onClick={() =>
+                                                    handleNavigateClick("prev")
+                                                }
+                                            >
+                                                <NavigateBeforeIcon />
+                                            </IconButton>
+                                        </Grid>
+                                        <Grid item>
+                                            <Typography variantion="body1">{`${
+                                                currentSchedule === null
+                                                    ? 0
+                                                    : currentSchedule + 1
+                                            }/${
+                                                displayedSchedules.length
+                                            }`}</Typography>
+                                        </Grid>
+                                        <Grid item>
+                                            <IconButton
+                                                onClick={() =>
+                                                    handleNavigateClick("next")
+                                                }
+                                            >
+                                                <NavigateNextIcon />
+                                            </IconButton>
+                                        </Grid>
+                                    </>
+                                )}
                                 <Button
                                     size="small"
                                     variant="outlined"
