@@ -61,6 +61,9 @@ function scheduleHash(schedule) {
     return sha1(inputString);
 }
 
+// initialize the worker
+let worker = new Worker("../workers/scheduleWorker.js");
+
 export default function ScheduleTable({
     courses,
     display,
@@ -151,103 +154,21 @@ export default function ScheduleTable({
         });
     };
 
-    const findPossibleSchedules = (candidateCourseSections) => {
-        const validSchedules = [];
-        const possibleSchedule = [];
-        let lookup = {};
-
-        function modifyLookUp([course, sectionID], action) {
-            if (allowCollision[course.code] === true) {
-                // course allowed to have collisions,
-                // don't modifiy the lookup(allow collisions)
-                return;
-            }
-
-            const section = slotsData[course.code][sectionID];
-            const [, sectionSlots] = section;
-            sectionSlots.forEach((slot) => {
-                const [day, hour] = slot;
-                if (action === "update") {
-                    lookup[[day, hour]] = 1;
-                } else if (action === "delete") {
-                    delete lookup[[day, hour]];
-                }
-            });
-        }
-
-        function checkCollision(section) {
-            possibleSchedule.push([...section]);
-
-            const [course, sectionID] = section;
-            const slots = slotsData[course.code][sectionID];
-            const [, sectionSlots] = slots;
-
-            // don't fill have the hightes priority,
-            // check it first
-            for (let slot of sectionSlots) {
-                const [day, hour] = slot;
-
-                if (dontFills[hour][day] === true) {
-                    // slot is on don't fill area
-                    return false;
-                }
-            }
-
-            // this course is allowed to have collisions
-            // don't check collisions
-            if (allowCollision[course.code] === true) {
-                return true;
-            }
-
-            for (let slot of sectionSlots) {
-                const [day, hour] = slot;
-
-                // collison of slots occured
-                if (lookup[[day, hour]] === 1) {
-                    return false;
-                }
-            }
-
-            // no collisions occured
-            return true;
-        }
-
-        (function runner(candidateCourseSections) {
-            // base case, combination is a valid schedule, save it to the state
-            if (candidateCourseSections.length === 0) {
-                // sort schedule for consistent hash value
-                const sortedPossibleSchedule = [...possibleSchedule];
-                sortedPossibleSchedule.sort((a, b) => {
-                    return parseInt(a[0].code) - parseInt(b[0].code);
-                });
-
-                validSchedules.push([...sortedPossibleSchedule]);
-                return;
-            }
-
-            let courseSections = candidateCourseSections[0];
-
-            if (courseSections.length === 0) {
-                // current course lack slots information,
-                runner(candidateCourseSections.slice(1));
-            }
-
-            courseSections.forEach((section) => {
-                if (checkCollision(section)) {
-                    modifyLookUp(section, "update");
-                    runner(candidateCourseSections.slice(1));
-                    modifyLookUp(section, "delete");
-                }
-                possibleSchedule.pop();
-            });
-        })(candidateCourseSections);
-
-        return validSchedules;
-    };
-
     function updateTable() {
+        // terminate the previous worker,
+        // this is usefull only when user changes the schedule inputs quickly,
+        // so the previous calculation does not matter(don't wait it to finish)
+        worker.terminate();
+
+        // create new worker
+        worker = new Worker("../workers/scheduleWorker.js");
+        worker.addEventListener("message", (message) => {
+            const schedules = message.data;
+            setPossibleSchedules(schedules);
+            console.log("update");
+        });
+
         const candidateCourseSections = [];
-        console.log("update");
         courses.forEach((course, courseIndex) => {
             // each course has its own array of sections
             const sections = slotsData[course.code];
@@ -300,9 +221,12 @@ export default function ScheduleTable({
         // sort courses as their section number, ascending order
         candidateCourseSections.sort((a, b) => a.length - b.length);
 
-        const schedules = findPossibleSchedules(candidateCourseSections);
-        console.log(schedules);
-        setPossibleSchedules(schedules);
+        worker.postMessage({
+            allowCollision,
+            slotsData,
+            candidateCourseSections,
+            dontFills,
+        });
     }
 
     useEffect(() => {
