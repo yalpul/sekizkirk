@@ -31,9 +31,10 @@
         "format": "prettier --write src/**/*.{js,jsx}",
         "lint": "eslint src/**/*.{js,jsx} --quiet",
         "dev": "parcel src/index.html",
+        "build": "parcel build src/index.html",
         "preCommit": "yarn format && yarn lint"
     },
-    "browserlist": [
+    "browserslist": [
         "last 2 Chrome versions"
     ]
 }
