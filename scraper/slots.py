@@ -159,6 +159,13 @@ class slots:
             with open(slots_path, 'r') as f:
                 self.course_slots = eval(f.read())
         else:
+            from datetime import datetime, timezone, timedelta
             self.collect_course_slots()
+            ankara_timezone = timezone(timedelta(hours=3))
+            timestamp = datetime.now(tz=ankara_timezone).strftime('%d-%m-%Y %H:%M')
+            slots = {
+                'tstamp': timestamp,
+                'data': self.course_slots,
+            }
             with open(slots_path, 'w') as f:
-                f.write(json.dumps(self.course_slots))
+                f.write(json.dumps(slots))
