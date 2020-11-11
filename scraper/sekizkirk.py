@@ -20,7 +20,9 @@ def parse_arguments():
     parser.add_argument('--update-slots', action='store_true',\
         help='Force an update on slots data')
     parser.add_argument('--musts', action='store_true',\
-        help='Update only must courses')
+        help='Update must courses')
+    parser.add_argument('--departments', action='store_true',\
+        help='Update department codes')
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -34,7 +36,12 @@ if __name__ == '__main__':
         must_data = musts.get_all_musts(args.silent)
         with open(os.path.join(data_path, 'musts.json'), 'w') as f:
             f.write(json.dumps(must_data))
-        sys.exit()
+
+    if args.departments:
+        departments = depts.depts.get_department_codes()
+        with open(os.path.join(data_path, 'departments.json'), 'w') as f:
+            f.write(json.dumps(departments))
+
 
     dp = depts.depts(update_courses = args.update_courses,\
                      silent = args.silent,\

@@ -125,3 +125,11 @@ class depts:
 
     def get_codes(self):
         return self.course_codes
+
+    @staticmethod
+    def get_department_codes():
+        departments = [{
+            'code' : code,
+            'title' : dept,
+        } for code, dept in dept_codes.items()]
+        return departments
