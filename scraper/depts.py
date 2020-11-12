@@ -87,11 +87,25 @@ class depts:
             i += 1
         self.log('Course codes collected.')
 
+    # prepare a data structure with merged course code and name
+    def merge_course_data(self):
+        courses = {}
+        for code, name in zip(self.course_codes, self.course_names):
+            dept_code = code[:3]
+            dept_name = dept_codes[dept_code]
+            course_code = code[4:] if code[3] == '0' else code[3:]
+            courses[code] = {
+                'title': dept_name + course_code + ' - ' + name.replace(' ()', ''),
+                'code': code,
+            }
+        return courses
+
     # Try to read data from files if they exist. Otherwise get from oibs
     def import_data(self, force_update):
         import os
         names_path = os.path.join(self.cache_dir, 'course_names.json')
         codes_path = os.path.join(self.cache_dir, 'course_codes.json')
+        courses_path = os.path.join(self.cache_dir, 'courses.json')
         if os.path.exists(names_path) and os.path.exists(codes_path)\
             and not force_update:
             self.log('Course codes found. Importing...')
@@ -101,10 +115,21 @@ class depts:
                 self.course_codes = eval(f.read())
         else:
             self.collect_courses()
+            courses = self.merge_course_data()
             with open(names_path, 'w') as f:
                 f.write(json.dumps(self.course_names))
             with open(codes_path, 'w') as f:
                 f.write(json.dumps(self.course_codes))
+            with open(courses_path, 'w') as f:
+                f.write(json.dumps(courses))
 
     def get_codes(self):
         return self.course_codes
+
+    @staticmethod
+    def get_department_codes():
+        departments = [{
+            'code' : code,
+            'title' : dept,
+        } for code, dept in dept_codes.items()]
+        return departments
