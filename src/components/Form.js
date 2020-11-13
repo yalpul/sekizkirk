@@ -3,12 +3,12 @@ import DataContext from "./DataContext";
 
 import { makeStyles } from "@material-ui/core/styles";
 
+import AddCourse from "./AddCourse";
+
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import Typography from "@material-ui/core/Typography";
-import Fab from "@material-ui/core/Fab";
-import AddIcon from "@material-ui/icons/Add";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
@@ -59,24 +59,6 @@ const useStyles = makeStyles((theme) => ({
     heading: {
         [theme.breakpoints.down("xs")]: {
             fontSize: "2.5em",
-        },
-    },
-    courseSelect: {
-        [theme.breakpoints.up("sm")]: {
-            width: "35em",
-        },
-        [theme.breakpoints.down("xs")]: {
-            width: "25em",
-            paddingLeft: theme.spacing(2),
-            paddingRight: theme.spacing(2),
-            // pushes the add button a little bit
-            marginBottom: theme.spacing(3),
-        },
-    },
-    addButton: {
-        marginLeft: "1em",
-        "&:hover": {
-            backgroundColor: theme.palette.primary.light,
         },
     },
     accordionContainer: {
@@ -161,12 +143,12 @@ const Form = ({
     setAllowCollision,
     fixedSections,
 }) => {
+    console.log("Form rendered.");
     const data = useContext(DataContext);
     const classes = useStyles();
 
     const slotsData = data.courseSlots;
 
-    const [courseInput, setCourseInput] = useState("");
     const [courseValue, setCourseValue] = useState(null);
     const [semester, setSemester] = useState("");
     const [manualCourses, setManualCourses] = useState([]);
@@ -301,44 +283,12 @@ const Form = ({
                     Select Your Courses
                 </Typography>
             </Grid>
-            <Grid item container direction="row" justify="center">
-                <Grid item>
-                    <Autocomplete
-                        options={Object.values(data.courses)} // NOTE: put this computation out of component?
-                        getOptionLabel={(course) => course.title}
-                        open={courseInput.length > 2}
-                        popupIcon={<></>} // no icon
-                        onInputChange={(event, value) => setCourseInput(value)}
-                        onClose={(event, reason) => setCourseInput("")} // prevent popup options
-                        onChange={(event, value) => setCourseValue(value)}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Course Name"
-                                variant="outlined"
-                            />
-                        )}
-                        fullWidth
-                        clearOnEscape
-                        autoSelect
-                        blurOnSelect
-                        autoHighlight
-                        noOptionsText="Course not found."
-                        className={classes.courseSelect}
-                        id="course-select"
-                    />
-                </Grid>
-                <Grid item>
-                    <Fab
-                        color="primary"
-                        aria-label="add"
-                        className={classes.addButton}
-                        onClick={handleCourseAdd}
-                    >
-                        <AddIcon />
-                    </Fab>
-                </Grid>
-            </Grid>
+
+            <AddCourse
+                setCourseValue={setCourseValue}
+                handleCourseAdd={handleCourseAdd}
+            />
+
             <Grid item className={classes.accordionContainer}>
                 <Accordion className={classes.accordion}>
                     <AccordionSummary
