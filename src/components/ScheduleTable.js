@@ -235,11 +235,7 @@ export default function ScheduleTable({
     }
 
     useEffect(() => {
-        if (courses.length > 0) {
-            updateTable();
-        } else {
-            setPossibleSchedules([]);
-        }
+        updateTable();
     }, [courses]);
 
     useEffect(() => {
