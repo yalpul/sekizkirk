@@ -25,6 +25,7 @@ import NotInterestedIcon from "@material-ui/icons/NotInterested";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import DataContext from "./DataContext";
 import CourseDisplay from "./CourseDisplay";
@@ -75,6 +76,8 @@ export default function ScheduleTable({
     fixedSections,
     setFixedSections,
 }) {
+    console.log("ScheduleTable rendered.");
+
     const data = useContext(DataContext);
     const classes = useStyles();
 
@@ -471,13 +474,21 @@ export default function ScheduleTable({
                                             displayedSchedules[currentSchedule]
                                         )
                                     ] ? (
-                                        <IconButton onClick={handleUnfavClick}>
-                                            <FavoriteIcon />
-                                        </IconButton>
+                                        <Tooltip title="remove" arrow>
+                                            <IconButton
+                                                onClick={handleUnfavClick}
+                                            >
+                                                <FavoriteIcon />
+                                            </IconButton>
+                                        </Tooltip>
                                     ) : (
-                                        <IconButton onClick={handleFavClick}>
-                                            <FavoriteBorderIcon />
-                                        </IconButton>
+                                        <Tooltip title="add to favorites" arrow>
+                                            <IconButton
+                                                onClick={handleFavClick}
+                                            >
+                                                <FavoriteBorderIcon />
+                                            </IconButton>
+                                        </Tooltip>
                                     )}
                                 </TableCell>
                                 {days.map((day) => (
