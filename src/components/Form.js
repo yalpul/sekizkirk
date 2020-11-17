@@ -60,7 +60,6 @@ const Form = ({
     setAllowCollision,
     fixedSections,
 }) => {
-    console.log("Form rendered.");
     const data = useContext(DataContext);
     const classes = useStyles();
 

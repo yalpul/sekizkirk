@@ -59,7 +59,6 @@ const AddMusts = ({ setDept, setSemester, semester }) => {
         setSemester(event.target.value);
     };
 
-    console.log("AddMusts rendered.");
     return (
         <Grid item className={classes.accordionContainer}>
             <Accordion className={classes.accordion}>

@@ -76,8 +76,6 @@ export default function ScheduleTable({
     fixedSections,
     setFixedSections,
 }) {
-    console.log("ScheduleTable rendered.");
-
     const data = useContext(DataContext);
     const classes = useStyles();
 

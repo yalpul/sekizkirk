@@ -80,7 +80,6 @@ const CoursesList = ({
         setElectiveCourses(tempElectives);
     };
 
-    console.log("CoursesList rendered.");
     return (
         <Grid item className={classes.courseListContainer}>
             {courses.length > 0 && (

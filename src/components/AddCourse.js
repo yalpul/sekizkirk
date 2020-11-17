@@ -37,7 +37,6 @@ const AddCourse = ({ setCourseValue, handleCourseAdd }) => {
     const [courseInput, setCourseInput] = useState("");
 
     const options = React.useMemo(() => {
-        console.log("run");
         return Object.values(data.courses);
     }, [data]);
 

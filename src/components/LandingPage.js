@@ -80,7 +80,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const LandingPage = () => {
-    console.log("Landing rendered.");
     const classes = useStyles();
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down("xs"));
