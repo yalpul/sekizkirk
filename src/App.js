@@ -16,7 +16,7 @@ const App = () => {
     const [sectionChecks, setSectionChecks] = useState({});
     const [allowCollision, setAllowCollision] = useState({});
 
-    const [tableDisplay, setTableDisplay] = useState("flex");
+    const [tableDisplay, setTableDisplay] = useState("none");
     const [dept, setDept] = useState(null);
 
     const [fixedSections, setFixedSections] = useState({});

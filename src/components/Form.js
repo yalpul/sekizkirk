@@ -86,7 +86,9 @@ const Form = ({
     };
 
     useEffect(() => {
-        document.getElementById("schedule-table").scrollIntoView();
+        if (display === "flex") {
+            document.getElementById("schedule-table").scrollIntoView();
+        }
     }, [display]);
 
     // set the must courses when user select different
