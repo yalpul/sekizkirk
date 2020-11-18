@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
+
 import { DataContext } from "./components/DataContext";
+import { CoursesProvider } from "./components/CoursesContext";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core";
@@ -50,29 +52,31 @@ const App = () => {
             <CssBaseline />
             <main>
                 <LandingPage />
-                <Form
-                    courses={courses}
-                    setCourses={setCourses}
-                    display={tableDisplay}
-                    setDisplay={setTableDisplay}
-                    dept={dept}
-                    setDept={setDept}
-                    sectionChecks={sectionChecks}
-                    setSectionChecks={setSectionChecks}
-                    allowCollision={allowCollision}
-                    setAllowCollision={setAllowCollision}
-                    fixedSections={fixedSections}
-                />
-                <ScheduleTable
-                    courses={courses}
-                    display={tableDisplay}
-                    mustDept={dept}
-                    sectionChecks={sectionChecks}
-                    setSectionChecks={setSectionChecks}
-                    allowCollision={allowCollision}
-                    fixedSections={fixedSections}
-                    setFixedSections={setFixedSections}
-                />
+                <CoursesProvider>
+                    <Form
+                        courses={courses}
+                        setCourses={setCourses}
+                        display={tableDisplay}
+                        setDisplay={setTableDisplay}
+                        dept={dept}
+                        setDept={setDept}
+                        sectionChecks={sectionChecks}
+                        setSectionChecks={setSectionChecks}
+                        allowCollision={allowCollision}
+                        setAllowCollision={setAllowCollision}
+                        fixedSections={fixedSections}
+                    />
+                    <ScheduleTable
+                        courses={courses}
+                        display={tableDisplay}
+                        mustDept={dept}
+                        sectionChecks={sectionChecks}
+                        setSectionChecks={setSectionChecks}
+                        allowCollision={allowCollision}
+                        fixedSections={fixedSections}
+                        setFixedSections={setFixedSections}
+                    />
+                </CoursesProvider>
             </main>
         </ThemeProvider>
     );

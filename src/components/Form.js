@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 
 import { DataContext } from "./DataContext";
+import { CoursesContext, COURSE_ADD } from "./CoursesContext";
+
 import AddCourse from "./AddCourse";
 import AddMusts from "./AddMusts";
 import CoursesList from "./CoursesList";
@@ -61,6 +63,8 @@ const Form = ({
     fixedSections,
 }) => {
     const data = useContext(DataContext);
+    const { dispatch } = useContext(CoursesContext);
+
     const classes = useStyles();
 
     const [courseValue, setCourseValue] = useState(null);
@@ -75,6 +79,7 @@ const Form = ({
         if (courseValue !== null && !courses.includes(courseValue)) {
             setManualCourses(manualCourses.concat(courseValue));
         }
+        dispatch({ type: COURSE_ADD, payload: { courseValue } });
     };
 
     const handleScheduleClick = () => {
