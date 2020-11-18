@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import DataContext from "./components/DataContext";
+import { DataContext } from "./components/DataContext";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core";

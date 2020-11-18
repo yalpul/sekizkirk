@@ -27,8 +27,8 @@ import FavoriteIcon from "@material-ui/icons/Favorite";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Tooltip from "@material-ui/core/Tooltip";
 
-import DataContext from "./DataContext";
-import CourseDisplay from "./CourseDisplay";
+import { DataContext } from "./DataContext";
+import CellDisplay from "./CellDisplay";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
@@ -565,7 +565,7 @@ export default function ScheduleTable({
                                                             sectionID,
                                                             classroom,
                                                         }) => (
-                                                            <CourseDisplay
+                                                            <CellDisplay
                                                                 key={name}
                                                                 name={name}
                                                                 bg={bg}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 
-import DataContext from "./DataContext";
+import { DataContext } from "./DataContext";
 import AddCourse from "./AddCourse";
 import AddMusts from "./AddMusts";
 import CoursesList from "./CoursesList";

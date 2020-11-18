@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 
-import DataContext from "./DataContext";
+import { DataContext } from "./DataContext";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
