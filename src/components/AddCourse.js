@@ -38,10 +38,10 @@ const AddCourse = () => {
     const classes = useStyles();
 
     const [courseInput, setCourseInput] = useState("");
-    const [courseValue, setCourseValue] = useState(null);
+    const [course, setCourse] = useState(null);
 
     const handleCourseAdd = () => {
-        dispatch({ type: ADD_COURSE, payload: { courseValue } });
+        dispatch({ type: ADD_COURSE, payload: { course } });
     };
 
     const options = React.useMemo(() => {
@@ -59,7 +59,7 @@ const AddCourse = () => {
                     popupIcon={<></>} // no icon
                     onInputChange={(event, value) => setCourseInput(value)}
                     onClose={() => setCourseInput("")} // prevent popup options
-                    onChange={(event, value) => setCourseValue(value)}
+                    onChange={(event, value) => setCourse(value)}
                     renderInput={(params) => (
                         <TextField
                             {...params}

@@ -3,7 +3,7 @@ import React, { createContext, useReducer, useContext } from "react";
 import { DataContext } from "./DataContext";
 
 const initialState = {
-    manuelCourses: [],
+    manualCourses: [],
     mustCourses: [],
     selectiveCourses: [],
     electiveCourses: [],
@@ -15,8 +15,8 @@ const initialState = {
 export const ADD_COURSE = "ADD_COURSE";
 export const ADD_MUSTS = "ADD_MUSTS";
 export const DELETE_COURSE = "DELETE_COURSE";
-export const DELETE_MUSTS = "DELETE_MUSTS";
 export const DELETE_ALL = "DELETE_ALL";
+export const ELECTIVE_SELECT = "ELECTIVE_SELECT";
 
 export const CoursesContext = createContext({});
 
@@ -27,30 +27,30 @@ export const CoursesProvider = ({ children }) => {
     // it uses `useContext` hook.
     const reducer = (state, action) => {
         if (action.type === ADD_COURSE) {
-            const { manuelCourses, mustCourses } = state;
-            const { courseValue } = action.payload;
+            const { manualCourses, mustCourses } = state;
+            const { course } = action.payload;
 
             // if course already included in the courses don't modify the state
             if (
-                courseValue === null ||
-                manuelCourses.includes(courseValue) ||
-                mustCourses.includes(courseValue)
+                course === null ||
+                manualCourses.includes(course) ||
+                mustCourses.includes(course)
             )
                 return state;
 
-            const sections = courseSlots[courseValue.code];
+            const sections = courseSlots[course.code];
 
             return {
                 ...state,
                 sectionChecks: {
-                    [courseValue.code]: sections.map(() => true), // select by default all sections for this course
+                    [course.code]: sections.map(() => true), // select by default all sections for this course
                     ...state.sectionChecks,
                 },
                 allowCollision: {
-                    [courseValue.code]: false, // don't allow collisions by default
+                    [course.code]: false, // don't allow collisions by default
                     ...state.allowCollision,
                 },
-                manuelCourses: [courseValue, ...state.manuelCourses],
+                manualCourses: [course, ...state.manualCourses],
             };
         }
 
@@ -86,12 +86,35 @@ export const CoursesProvider = ({ children }) => {
             };
         }
 
-        if (action.type === DELETE_MUSTS) {
+        if (action.type === DELETE_COURSE) {
+            const { course } = action.payload;
+
+            // same course might be included in both manual courses and must courses.
+            // delete it from both.
             return {
                 ...state,
-                mustCourses: [],
-                selectiveCourses: [],
-                electiveCourses: [],
+                mustCourses: state.mustCourses.filter(
+                    (mustCourse) => mustCourse !== course
+                ),
+                manualCourses: state.manualCourses.filter(
+                    (manualCourse) => manualCourse !== course
+                ),
+            };
+        }
+
+        if (action.type === DELETE_ALL) {
+            return initialState;
+        }
+
+        if (action.type === ELECTIVE_SELECT) {
+            const { index } = action.payload;
+
+            // remove the elective select from the UI
+            const temp = [...state.electiveCourses];
+            temp.splice(index, 1);
+            return {
+                ...state,
+                electiveCourses: temp,
             };
         }
 

@@ -53,7 +53,7 @@ const Form = ({ display, setDisplay, fixedSections }) => {
     // const data = useContext(DataContext);
     const classes = useStyles();
 
-    // const [openDialog, setOpenDialog] = useState(null);
+    const [openDialog, setOpenDialog] = useState(null);
 
     // const handleScheduleClick = () => {
     //     setDisplay("flex");
@@ -98,21 +98,7 @@ const Form = ({ display, setDisplay, fixedSections }) => {
 
             <AddMusts />
 
-            {/* <CoursesList
-                courses={courses}
-                setManualCourses={setManualCourses}
-                setSemester={setSemester}
-                setSectionChecks={setSectionChecks}
-                setAllowCollision={setAllowCollision}
-                mustCourses={mustCourses}
-                setMustCourses={setMustCourses}
-                manualCourses={manualCourses}
-                sectionChecks={sectionChecks}
-                allowCollision={allowCollision}
-                electiveCourses={electiveCourses}
-                setElectiveCourses={setElectiveCourses}
-                setOpenDialog={setOpenDialog}
-            /> */}
+            <CoursesList setOpenDialog={setOpenDialog} />
 
             {/* <SelectiveList
                 selectiveCourses={selectiveCourses}

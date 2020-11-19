@@ -1,4 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
+
+import {
+    CoursesContext,
+    DELETE_COURSE,
+    DELETE_ALL,
+    ELECTIVE_SELECT,
+} from "./CoursesContext";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -32,52 +39,26 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const CoursesList = ({
-    courses,
-    setManualCourses,
-    setSemester,
-    setSectionChecks,
-    setAllowCollision,
-    mustCourses,
-    setMustCourses,
-    manualCourses,
-    sectionChecks,
-    allowCollision,
-    electiveCourses,
-    setElectiveCourses,
-    setOpenDialog,
-}) => {
+const CoursesList = ({ setOpenDialog }) => {
     const classes = useStyles();
+    const { coursesState, dispatch } = useContext(CoursesContext);
+    const { mustCourses, manualCourses, electiveCourses } = coursesState;
+
+    // find unique courses, same courses might be added manuelly as well as
+    // included in the musts.
+    const courses = [...new Set([...mustCourses, ...manualCourses])];
 
     const handleClearAll = () => {
-        setManualCourses([]);
-
-        // setting semester to unselected, deletes all must courses
-        setSemester("");
-
-        // reset settings
-        setSectionChecks({});
-        setAllowCollision({});
+        dispatch({ type: DELETE_ALL });
     };
 
     const handleDeleteCourse = (course) => {
-        // remember, course might be included in both of the arrays
-        const newMust = mustCourses.filter((item) => item !== course);
-        setMustCourses(newMust);
-
-        const newManual = manualCourses.filter((item) => item !== course);
-        setManualCourses(newManual);
-
-        setSectionChecks({ ...sectionChecks, [course.code]: undefined });
-        setAllowCollision({ ...allowCollision, [course.code]: undefined });
+        dispatch({ type: DELETE_COURSE, payload: { course } });
     };
 
     const handleElectiveClick = (index) => {
         document.getElementById("course-select").focus();
-
-        const tempElectives = [...electiveCourses];
-        tempElectives.splice(index, 1);
-        setElectiveCourses(tempElectives);
+        dispatch({ type: ELECTIVE_SELECT, payload: { index } });
     };
 
     return (
@@ -131,7 +112,7 @@ const CoursesList = ({
                                 button
                                 justify="space-between"
                                 className={classes.listItem}
-                                onClick={(index) => handleElectiveClick(index)}
+                                onClick={() => handleElectiveClick(index)}
                             >
                                 <ListItemText primary={`Add your ${type}`} />
                                 <ListItemIcon style={{ paddingLeft: "2.5em" }}>
