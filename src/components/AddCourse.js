@@ -1,5 +1,7 @@
 import React, { useState, useContext } from "react";
+
 import { DataContext } from "./DataContext";
+import { CoursesContext, ADD_COURSE } from "./CoursesContext";
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -30,16 +32,23 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const AddCourse = ({ setCourseValue, handleCourseAdd }) => {
+const AddCourse = () => {
     const data = useContext(DataContext);
+    const { dispatch } = useContext(CoursesContext);
     const classes = useStyles();
 
     const [courseInput, setCourseInput] = useState("");
+    const [courseValue, setCourseValue] = useState(null);
+
+    const handleCourseAdd = () => {
+        dispatch({ type: ADD_COURSE, payload: { courseValue } });
+    };
 
     const options = React.useMemo(() => {
         return Object.values(data.courses);
     }, [data]);
 
+    console.log("AddCourse rendered.");
     return (
         <Grid item container direction="row" justify="center">
             <Grid item>

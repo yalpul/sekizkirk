@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 
 import { DataContext } from "./DataContext";
-import { CoursesContext, COURSE_ADD } from "./CoursesContext";
+import { CoursesContext } from "./CoursesContext";
 
 import AddCourse from "./AddCourse";
 import AddMusts from "./AddMusts";
@@ -49,88 +49,37 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Form = ({
-    courses,
-    setCourses,
-    display,
-    setDisplay,
-    dept,
-    setDept,
-    sectionChecks,
-    setSectionChecks,
-    allowCollision,
-    setAllowCollision,
-    fixedSections,
-}) => {
-    const data = useContext(DataContext);
-    const { dispatch } = useContext(CoursesContext);
-
+const Form = ({ display, setDisplay, fixedSections }) => {
+    // const data = useContext(DataContext);
     const classes = useStyles();
 
-    const [courseValue, setCourseValue] = useState(null);
-    const [semester, setSemester] = useState("");
-    const [manualCourses, setManualCourses] = useState([]);
-    const [mustCourses, setMustCourses] = useState([]);
-    const [selectiveCourses, setSelectiveCourses] = useState([]);
-    const [electiveCourses, setElectiveCourses] = useState([]);
-    const [openDialog, setOpenDialog] = useState(null);
+    // const [openDialog, setOpenDialog] = useState(null);
 
-    const handleCourseAdd = () => {
-        if (courseValue !== null && !courses.includes(courseValue)) {
-            setManualCourses(manualCourses.concat(courseValue));
-        }
-        dispatch({ type: COURSE_ADD, payload: { courseValue } });
-    };
+    // const handleScheduleClick = () => {
+    //     setDisplay("flex");
 
-    const handleScheduleClick = () => {
-        setDisplay("flex");
+    //     if (display === "flex") {
+    //         document.getElementById("schedule-table").scrollIntoView();
+    //     }
+    // };
 
-        if (display === "flex") {
-            document.getElementById("schedule-table").scrollIntoView();
-        }
-    };
+    // useEffect(() => {
+    //     document.getElementById("schedule-table").scrollIntoView();
+    // }, [display]);
 
-    useEffect(() => {
-        if (display === "flex") {
-            document.getElementById("schedule-table").scrollIntoView();
-        }
-    }, [display]);
+    // useEffect(() => {
+    //     // deduplicate manually added courses and must courses
+    //     const uniqCourses = [...new Set([...mustCourses, ...manualCourses])];
+    //     setCourses(uniqCourses);
+    // }, [mustCourses, manualCourses]);
 
-    // set the must courses when user select different
-    // dept or semester options
-    useEffect(() => {
-        if (dept !== null && semester !== "") {
-            // see musts data to understand its structure
+    // useEffect(() => {
+    //     if (courses.length === 0) {
+    //         setSelectiveCourses([]);
+    //     }
+    // }, [courses]);
 
-            const mustCodes = data.musts[dept.code][semester - 1][0];
-            setMustCourses(mustCodes.map((code) => data.courses[code]));
-
-            const selectiveCodes = data.musts[dept.code][semester - 1][1];
-            setSelectiveCourses(
-                selectiveCodes.map((code) => data.courses[code])
-            );
-
-            const electives = data.musts[dept.code][semester - 1][2];
-            setElectiveCourses(electives);
-        } else {
-            setMustCourses([]);
-            setSelectiveCourses([]);
-            setElectiveCourses([]);
-        }
-    }, [dept, semester]);
-
-    useEffect(() => {
-        // deduplicate manually added courses and must courses
-        const uniqCourses = [...new Set([...mustCourses, ...manualCourses])];
-        setCourses(uniqCourses);
-    }, [mustCourses, manualCourses]);
-
-    useEffect(() => {
-        if (courses.length === 0) {
-            setSelectiveCourses([]);
-        }
-    }, [courses]);
-
+    console.log("Form rendered.");
     return (
         <Grid
             container
@@ -145,18 +94,11 @@ const Form = ({
                 </Typography>
             </Grid>
 
-            <AddCourse
-                setCourseValue={setCourseValue}
-                handleCourseAdd={handleCourseAdd}
-            />
+            <AddCourse />
 
-            <AddMusts
-                setDept={setDept}
-                setSemester={setSemester}
-                semester={semester}
-            />
+            <AddMusts />
 
-            <CoursesList
+            {/* <CoursesList
                 courses={courses}
                 setManualCourses={setManualCourses}
                 setSemester={setSemester}
@@ -170,16 +112,16 @@ const Form = ({
                 electiveCourses={electiveCourses}
                 setElectiveCourses={setElectiveCourses}
                 setOpenDialog={setOpenDialog}
-            />
+            /> */}
 
-            <SelectiveList
+            {/* <SelectiveList
                 selectiveCourses={selectiveCourses}
                 setMustCourses={setMustCourses}
                 mustCourses={mustCourses}
                 setSelectiveCourses={setSelectiveCourses}
-            />
+            /> */}
 
-            <Grid item className={classes.buttonContainer}>
+            {/* <Grid item className={classes.buttonContainer}>
                 {courses.length > 0 && (
                     <Button
                         variant="contained"
@@ -192,10 +134,10 @@ const Form = ({
                         schedule
                     </Button>
                 )}
-            </Grid>
+            </Grid> */}
 
             {/* modals for course options */}
-            {courses.map((course, index) => (
+            {/* {courses.map((course, index) => (
                 <SectionOptions
                     sectionChecks={sectionChecks}
                     setSectionChecks={setSectionChecks}
@@ -208,7 +150,7 @@ const Form = ({
                     fixedSections={fixedSections}
                     key={`${course}+${index}`}
                 />
-            ))}
+            ))} */}
         </Grid>
     );
 };
