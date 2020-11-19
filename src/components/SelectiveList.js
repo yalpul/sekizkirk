@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
+
+import { CoursesContext, ADD_SELECTIVE } from "./CoursesContext";
 
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
@@ -31,19 +33,16 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const SelectiveList = ({
-    selectiveCourses,
-    setMustCourses,
-    mustCourses,
-    setSelectiveCourses,
-}) => {
+const SelectiveList = () => {
     const classes = useStyles();
+    const { coursesState, dispatch } = useContext(CoursesContext);
+    const { selectiveCourses } = coursesState;
 
     const handleSelectiveClick = (course) => {
-        setMustCourses([...mustCourses].concat(course));
-        setSelectiveCourses([]);
+        dispatch({ type: ADD_SELECTIVE, payload: { course } });
     };
 
+    console.log("SelectiveList rendered.");
     return (
         <Grid item className={classes.selectiveContainer}>
             {selectiveCourses.length > 0 && (

@@ -17,6 +17,7 @@ export const ADD_MUSTS = "ADD_MUSTS";
 export const DELETE_COURSE = "DELETE_COURSE";
 export const DELETE_ALL = "DELETE_ALL";
 export const ELECTIVE_SELECT = "ELECTIVE_SELECT";
+export const ADD_SELECTIVE = "ADD_SELECTIVE";
 
 export const CoursesContext = createContext({});
 
@@ -115,6 +116,18 @@ export const CoursesProvider = ({ children }) => {
             return {
                 ...state,
                 electiveCourses: temp,
+            };
+        }
+
+        if (action.type === ADD_SELECTIVE) {
+            const { course } = action.payload;
+
+            // add selected course to the musts,
+            // clear selectiveCourses
+            return {
+                ...state,
+                mustCourses: [...state.mustCourses, course],
+                selectiveCourses: [],
             };
         }
 

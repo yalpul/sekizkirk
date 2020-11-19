@@ -100,12 +100,7 @@ const Form = ({ display, setDisplay, fixedSections }) => {
 
             <CoursesList setOpenDialog={setOpenDialog} />
 
-            {/* <SelectiveList
-                selectiveCourses={selectiveCourses}
-                setMustCourses={setMustCourses}
-                mustCourses={mustCourses}
-                setSelectiveCourses={setSelectiveCourses}
-            /> */}
+            <SelectiveList />
 
             {/* <Grid item className={classes.buttonContainer}>
                 {courses.length > 0 && (
