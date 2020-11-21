@@ -66,7 +66,7 @@ const CoursesList = () => {
 
     return (
         <Grid item className={classes.courseListContainer}>
-            {courses.length > 0 && (
+            {(courses.length > 0 || electiveCourses.length > 0) && (
                 <>
                     <Grid
                         container
