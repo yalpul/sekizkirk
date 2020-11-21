@@ -9,6 +9,7 @@ const initialState = {
     electiveCourses: [],
     sectionChecks: {},
     allowCollision: {},
+    fixedSections: {},
 };
 
 // available action types in this reducer
@@ -18,6 +19,9 @@ export const DELETE_COURSE = "DELETE_COURSE";
 export const DELETE_ALL = "DELETE_ALL";
 export const ELECTIVE_SELECT = "ELECTIVE_SELECT";
 export const ADD_SELECTIVE = "ADD_SELECTIVE";
+export const UNSELECT_ALL_SECTIONS = "UNSELECT_ALL_SECTIONS";
+export const TOGGLE_CHECK = "TOGGLE_CHECK";
+export const TOGGLE_COLLISION = "TOGGLE_COLLISION";
 
 export const CoursesContext = createContext({});
 
@@ -128,6 +132,46 @@ export const CoursesProvider = ({ children }) => {
                 ...state,
                 mustCourses: [...state.mustCourses, course],
                 selectiveCourses: [],
+            };
+        }
+
+        if (action.type === UNSELECT_ALL_SECTIONS) {
+            const { course } = action.payload;
+
+            return {
+                ...state,
+                sectionChecks: {
+                    ...state.sectionChecks,
+                    // unchecked all the sections for given course
+                    [course.code]: state.sectionChecks[course.code].map(
+                        () => false
+                    ),
+                },
+            };
+        }
+
+        if (action.type === TOGGLE_CHECK) {
+            const { course, index } = action.payload;
+            const { sectionChecks } = state;
+
+            const temp = [...sectionChecks[course.code]];
+            temp[index] = !temp[index];
+            return {
+                ...state,
+                sectionChecks: { ...sectionChecks, [course.code]: temp },
+            };
+        }
+
+        if (action.type === TOGGLE_COLLISION) {
+            const { course } = action.payload;
+            const { allowCollision } = state;
+
+            return {
+                ...state,
+                allowCollision: {
+                    ...allowCollision,
+                    [course.code]: !allowCollision[course.code],
+                },
             };
         }
 

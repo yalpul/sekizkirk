@@ -1,13 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
 
-import { DataContext } from "./DataContext";
-import { CoursesContext } from "./CoursesContext";
-
 import AddCourse from "./AddCourse";
 import AddMusts from "./AddMusts";
 import CoursesList from "./CoursesList";
 import SelectiveList from "./SelectiveList";
-import SectionOptions from "./SectionOptions";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -50,15 +46,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Form = ({ display, setDisplay, fixedSections }) => {
-    // const data = useContext(DataContext);
     const classes = useStyles();
 
-    const [openDialog, setOpenDialog] = useState(null);
-
     // const handleScheduleClick = () => {
-    //     setDisplay("flex");
+    //     if (display !== "flex") {
+    //         setDisplay("flex");
+    //     }
 
     //     if (display === "flex") {
+    //         // if the table shown in the UI, clicking `shedule button`
+    //         // will focus `schedule-table` element.
     //         document.getElementById("schedule-table").scrollIntoView();
     //     }
     // };
@@ -98,7 +95,7 @@ const Form = ({ display, setDisplay, fixedSections }) => {
 
             <AddMusts />
 
-            <CoursesList setOpenDialog={setOpenDialog} />
+            <CoursesList />
 
             <SelectiveList />
 
@@ -116,22 +113,6 @@ const Form = ({ display, setDisplay, fixedSections }) => {
                     </Button>
                 )}
             </Grid> */}
-
-            {/* modals for course options */}
-            {/* {courses.map((course, index) => (
-                <SectionOptions
-                    sectionChecks={sectionChecks}
-                    setSectionChecks={setSectionChecks}
-                    index={index}
-                    course={course}
-                    openDialog={openDialog}
-                    setOpenDialog={setOpenDialog}
-                    allowCollision={allowCollision}
-                    setAllowCollision={setAllowCollision}
-                    fixedSections={fixedSections}
-                    key={`${course}+${index}`}
-                />
-            ))} */}
         </Grid>
     );
 };

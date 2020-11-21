@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import {
     CoursesContext,
@@ -6,6 +6,7 @@ import {
     DELETE_ALL,
     ELECTIVE_SELECT,
 } from "./CoursesContext";
+import SectionOptions from "./SectionOptions";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -39,10 +40,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const CoursesList = ({ setOpenDialog }) => {
+const CoursesList = () => {
     const classes = useStyles();
     const { coursesState, dispatch } = useContext(CoursesContext);
     const { mustCourses, manualCourses, electiveCourses } = coursesState;
+
+    const [openDialog, setOpenDialog] = useState(null);
 
     // find unique courses, same courses might be added manuelly as well as
     // included in the musts.
@@ -123,6 +126,17 @@ const CoursesList = ({ setOpenDialog }) => {
                     </List>
                 </>
             )}
+
+            {/* modals for course options */}
+            {courses.map((course, index) => (
+                <SectionOptions
+                    index={index}
+                    course={course}
+                    openDialog={openDialog}
+                    setOpenDialog={setOpenDialog}
+                    key={`${course}+${index}`}
+                />
+            ))}
         </Grid>
     );
 };
