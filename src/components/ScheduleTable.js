@@ -68,7 +68,7 @@ let worker = new Worker("../workers/scheduleWorker.js");
 
 export default function ScheduleTable({
     courses,
-    display,
+    tableDisplay,
     mustDept,
     sectionChecks,
     setSectionChecks,
@@ -236,7 +236,7 @@ export default function ScheduleTable({
     }
 
     useEffect(() => {
-        updateTable();
+        // updateTable();
     }, [courses]);
 
     useEffect(() => {
@@ -251,13 +251,13 @@ export default function ScheduleTable({
     }, [surname]);
 
     useEffect(() => {
-        updateTable();
+        // updateTable();
     }, [firstTwoLetters]);
 
     useEffect(() => {
         if (surnameCheck === false && firstTwoLetters.length === 2) {
             // TODO: maybe apply this only if the table's previous state was surname constrained.
-            updateTable();
+            // updateTable();
             setSurname("");
         }
     }, [surnameCheck]);
@@ -304,21 +304,21 @@ export default function ScheduleTable({
 
     useEffect(() => {
         if (deptCheck === true && dept !== null) {
-            updateTable();
+            // updateTable();
         } else if (deptCheck === false && dept !== null) {
-            updateTable();
+            // updateTable();
             setDept(mustDept);
         }
     }, [deptCheck]);
 
     useEffect(() => {
         if (deptCheck) {
-            updateTable();
+            // updateTable();
         }
     }, [dept]);
 
     useEffect(() => {
-        updateTable();
+        // updateTable();
     }, [dontFills, sectionChecks, allowCollision]);
 
     useEffect(() => {
@@ -402,7 +402,7 @@ export default function ScheduleTable({
         <Grid
             container
             className={classes.mainContainer}
-            style={{ display: display }}
+            style={{ display: tableDisplay }}
             id="schedule-table"
             direction="column"
             alignItems="center"

@@ -9,12 +9,10 @@ import { ThemeProvider } from "@material-ui/core";
 import LandingPage from "./components/LandingPage";
 import Form from "./components/Form";
 import theme from "./components/Theme";
-// import ScheduleTable from "./components/ScheduleTable";
+import ScheduleTable from "./components/ScheduleTable";
 
 const App = () => {
-    // const [tableDisplay, setTableDisplay] = useState("flex");
-
-    // const [fixedSections, setFixedSections] = useState({});
+    const [tableDisplay, setTableDisplay] = useState("none");
 
     console.log("app rendered.");
     return (
@@ -25,16 +23,10 @@ const App = () => {
                 <DataProvider>
                     <CoursesProvider>
                         <Form
-                        // display={tableDisplay}
-                        // setDisplay={setTableDisplay}
-                        // fixedSections={fixedSections}
+                            tableDisplay={tableDisplay}
+                            setTableDisplay={setTableDisplay}
                         />
-                        {/* <ScheduleTable
-                            display={tableDisplay}
-                            mustDept={dept}
-                            fixedSections={fixedSections}
-                            setFixedSections={setFixedSections}
-                        /> */}
+                        <ScheduleTable tableDisplay={tableDisplay} />
                     </CoursesProvider>
                 </DataProvider>
             </main>
