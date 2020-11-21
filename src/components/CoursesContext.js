@@ -131,8 +131,10 @@ export const CoursesProvider = ({ children }) => {
         }
 
         if (action.type === ADD_SELECTIVE) {
-            const { mustCourses } = state;
+            const { mustCourses, sectionChecks, allowCollision } = state;
             const { course } = action.payload;
+
+            const sections = courseSlots[course.code];
 
             // add selected course to the musts,
             // clear selectiveCourses
@@ -140,6 +142,14 @@ export const CoursesProvider = ({ children }) => {
                 ...state,
                 mustCourses: [...mustCourses, course],
                 selectiveCourses: [],
+                sectionChecks: {
+                    ...sectionChecks,
+                    [course.code]: sections.map(() => true), // select by default all sections for this course
+                },
+                allowCollision: {
+                    ...allowCollision,
+                    [course.code]: false, // don't allow collisions by default
+                },
             };
         }
 
