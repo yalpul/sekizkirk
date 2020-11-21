@@ -32,7 +32,12 @@ export const CoursesProvider = ({ children }) => {
     // it uses `useContext` hook.
     const reducer = (state, action) => {
         if (action.type === ADD_COURSE) {
-            const { manualCourses, mustCourses } = state;
+            const {
+                manualCourses,
+                mustCourses,
+                sectionChecks,
+                allowCollision,
+            } = state;
             const { course } = action.payload;
 
             // if course already included in the courses don't modify the state
@@ -48,18 +53,19 @@ export const CoursesProvider = ({ children }) => {
             return {
                 ...state,
                 sectionChecks: {
+                    ...sectionChecks,
                     [course.code]: sections.map(() => true), // select by default all sections for this course
-                    ...state.sectionChecks,
                 },
                 allowCollision: {
+                    ...allowCollision,
                     [course.code]: false, // don't allow collisions by default
-                    ...state.allowCollision,
                 },
-                manualCourses: [course, ...state.manualCourses],
+                manualCourses: [course, ...manualCourses],
             };
         }
 
         if (action.type === ADD_MUSTS) {
+            const { sectionChecks, allowCollision } = state;
             const { dept, semester } = action.payload;
 
             // see the musts.json for structure of the data
@@ -83,10 +89,10 @@ export const CoursesProvider = ({ children }) => {
                 mustCourses: mustCodes.map((code) => courses[code]),
                 selectiveCourses: selectiveCodes.map((code) => courses[code]),
                 electiveCourses: [...electiveTypes],
-                sectionChecks: { ...sectionsForMusts, ...state.sectionChecks },
+                sectionChecks: { ...sectionsForMusts, ...sectionChecks },
                 allowCollision: {
                     ...collisionForMusts,
-                    ...state.allowCollision,
+                    ...allowCollision,
                 },
             };
         }
@@ -112,10 +118,11 @@ export const CoursesProvider = ({ children }) => {
         }
 
         if (action.type === ELECTIVE_SELECT) {
+            const { electiveCourses } = state;
             const { index } = action.payload;
 
             // remove the elective select from the UI
-            const temp = [...state.electiveCourses];
+            const temp = [...electiveCourses];
             temp.splice(index, 1);
             return {
                 ...state,
@@ -124,28 +131,28 @@ export const CoursesProvider = ({ children }) => {
         }
 
         if (action.type === ADD_SELECTIVE) {
+            const { mustCourses } = state;
             const { course } = action.payload;
 
             // add selected course to the musts,
             // clear selectiveCourses
             return {
                 ...state,
-                mustCourses: [...state.mustCourses, course],
+                mustCourses: [...mustCourses, course],
                 selectiveCourses: [],
             };
         }
 
         if (action.type === UNSELECT_ALL_SECTIONS) {
+            const { sectionChecks } = state;
             const { course } = action.payload;
 
             return {
                 ...state,
                 sectionChecks: {
-                    ...state.sectionChecks,
+                    ...sectionChecks,
                     // unchecked all the sections for given course
-                    [course.code]: state.sectionChecks[course.code].map(
-                        () => false
-                    ),
+                    [course.code]: sectionChecks[course.code].map(() => false),
                 },
             };
         }
