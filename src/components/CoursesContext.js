@@ -22,6 +22,7 @@ export const ADD_SELECTIVE = "ADD_SELECTIVE";
 export const UNSELECT_ALL_SECTIONS = "UNSELECT_ALL_SECTIONS";
 export const TOGGLE_CHECK = "TOGGLE_CHECK";
 export const TOGGLE_COLLISION = "TOGGLE_COLLISION";
+export const CANCEL_SELECTIVES = "CANCEL_SELECTIVES";
 
 export const CoursesContext = createContext({});
 
@@ -189,6 +190,13 @@ export const CoursesProvider = ({ children }) => {
                     ...allowCollision,
                     [course.code]: !allowCollision[course.code],
                 },
+            };
+        }
+
+        if (action.type === CANCEL_SELECTIVES) {
+            return {
+                ...state,
+                selectiveCourses: [],
             };
         }
 
