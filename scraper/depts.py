@@ -19,6 +19,7 @@ class depts:
         self.silent = silent
         self.course_codes = []
         self.course_names = []
+        self.courses = {}
         self.cache_dir = cache_dir
         self.dept_form['select_semester'] = self.get_current_semester()
         self.log(f"Semester: {self.dept_form['select_semester']}")
@@ -89,42 +90,33 @@ class depts:
 
     # prepare a data structure with merged course code and name
     def merge_course_data(self):
-        courses = {}
+        self.courses = {}
         for code, name in zip(self.course_codes, self.course_names):
             dept_code = code[:3]
             dept_name = dept_codes[dept_code]
             course_code = code[4:] if code[3] == '0' else code[3:]
-            courses[code] = {
+            self.courses[code] = {
                 'title': dept_name + course_code + ' - ' + name.replace(' ()', ''),
                 'code': code,
             }
-        return courses
+        return self.courses
 
     # Try to read data from files if they exist. Otherwise get from oibs
     def import_data(self, force_update):
         import os
-        names_path = os.path.join(self.cache_dir, 'course_names.json')
-        codes_path = os.path.join(self.cache_dir, 'course_codes.json')
         courses_path = os.path.join(self.cache_dir, 'courses.json')
-        if os.path.exists(names_path) and os.path.exists(codes_path)\
-            and not force_update:
+        if os.path.exists(courses_path) and not force_update:
             self.log('Course codes found. Importing...')
-            with open(names_path, 'r') as f:
-                self.course_names = eval(f.read())
-            with open(codes_path, 'r') as f:
-                self.course_codes = eval(f.read())
+            with open(courses_path, 'r') as f:
+                self.courses = json.loads(f.read())
         else:
             self.collect_courses()
-            courses = self.merge_course_data()
-            with open(names_path, 'w') as f:
-                f.write(json.dumps(self.course_names))
-            with open(codes_path, 'w') as f:
-                f.write(json.dumps(self.course_codes))
+            self.courses = self.merge_course_data()
             with open(courses_path, 'w') as f:
-                f.write(json.dumps(courses))
+                f.write(json.dumps(self.courses))
 
     def get_codes(self):
-        return self.course_codes
+        return self.courses.keys()
 
     @staticmethod
     def get_department_codes():
