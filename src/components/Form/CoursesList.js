@@ -5,7 +5,7 @@ import {
     DELETE_COURSE,
     DELETE_ALL,
     ELECTIVE_SELECT,
-} from "./CoursesContext";
+} from "../CoursesContext";
 import SectionOptions from "./SectionOptions";
 
 import { makeStyles } from "@material-ui/core/styles";

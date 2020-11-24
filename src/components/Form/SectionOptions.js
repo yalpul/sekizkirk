@@ -1,12 +1,12 @@
 import React, { useContext } from "react";
 
-import { DataContext } from "./DataContext";
+import { DataContext } from "../DataContext";
 import {
     CoursesContext,
     UNSELECT_ALL_SECTIONS,
     TOGGLE_CHECK,
     TOGGLE_COLLISION,
-} from "./CoursesContext";
+} from "../CoursesContext";
 
 import Grid from "@material-ui/core/Grid";
 import Dialog from "@material-ui/core/Dialog";

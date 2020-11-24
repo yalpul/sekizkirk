@@ -4,7 +4,7 @@ import {
     CoursesContext,
     ADD_SELECTIVE,
     CANCEL_SELECTIVES,
-} from "./CoursesContext";
+} from "../CoursesContext";
 
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";

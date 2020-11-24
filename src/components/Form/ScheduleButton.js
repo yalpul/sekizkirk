@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from "react";
 
-import { CoursesContext } from "./CoursesContext";
+import { CoursesContext } from "../CoursesContext";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";

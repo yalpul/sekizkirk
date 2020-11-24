@@ -34,12 +34,6 @@ const useStyles = makeStyles((theme) => ({
 const Form = ({ tableDisplay, setTableDisplay }) => {
     const classes = useStyles();
 
-    // useEffect(() => {
-    //     if (courses.length === 0) {
-    //         setSelectiveCourses([]);
-    //     }
-    // }, [courses]);
-
     console.log("Form rendered.");
     return (
         <Grid

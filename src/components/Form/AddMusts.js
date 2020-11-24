@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 
-import { DataContext } from "./DataContext";
-import { CoursesContext, ADD_MUSTS } from "./CoursesContext";
+import { DataContext } from "../DataContext";
+import { CoursesContext, ADD_MUSTS } from "../CoursesContext";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";

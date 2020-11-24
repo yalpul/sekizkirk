@@ -7,7 +7,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core";
 
 import LandingPage from "./components/LandingPage";
-import Form from "./components/Form";
+import Form from "./components/Form/Form";
 import theme from "./components/Theme";
 import ScheduleTable from "./components/ScheduleTable";
 
