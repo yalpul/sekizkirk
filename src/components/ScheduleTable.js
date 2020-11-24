@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import sha1 from "sha1";
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -28,6 +27,8 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Tooltip from "@material-ui/core/Tooltip";
 
 import { DataContext } from "./DataContext";
+import { scheduleHash } from "../utils";
+import { days, hours, cellColors } from "../constants";
 import CellDisplay from "./CellDisplay";
 
 const useStyles = makeStyles((theme) => ({
@@ -58,58 +59,17 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function scheduleHash(schedule) {
-    const inputString = JSON.stringify(schedule);
-    return sha1(inputString);
-}
-
 // initialize the worker
 let worker = new Worker("../workers/scheduleWorker.js");
 
-export default function ScheduleTable({
-    courses,
-    tableDisplay,
-    mustDept,
-    sectionChecks,
-    setSectionChecks,
-    allowCollision,
-    fixedSections,
-    setFixedSections,
-}) {
+export default function ScheduleTable({ tableDisplay }) {
+    console.log("ScheduleTable rendered.");
+
     const data = useContext(DataContext);
     const classes = useStyles();
 
     const slotsData = data.courseSlots;
     const courseData = data.courses;
-
-    const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
-    const hours = [
-        "8:40-9:30",
-        "9:40-10:30",
-        "10:40-11:30",
-        "11:40-12:30",
-        "12:40-13:30",
-        "13:40-14:30",
-        "14:40-15:30",
-        "15:40-16:30",
-        "16:40-17:30",
-    ];
-    const cellColors = [
-        "#002E2E",
-        "#7A00CC",
-        "#29A329",
-        "#CCCC00",
-        "#00CCCC",
-        "#00008A",
-        "#666633",
-        "#002900",
-        "#005C5C",
-        "#00FF00",
-        "#E62EB8",
-        "#CC3300",
-        "#808080",
-        "#CC0000",
-    ];
 
     const [displayedSlot, setDisplayedSlot] = useState(
         hours.map(() => days.map(() => []))
