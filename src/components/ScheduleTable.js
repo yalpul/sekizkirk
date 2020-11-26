@@ -27,7 +27,15 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Tooltip from "@material-ui/core/Tooltip";
 
 import { DataContext } from "./DataContext";
-import { scheduleHash } from "../utils";
+import { CoursesContext } from "./CoursesContext";
+import {
+    DisplayContext,
+    UPDATE_POSSIBLE_SCHEDULES,
+    DELETE_FROM_FAVS,
+    ADD_TO_FAVS,
+    TOGGLE_DONT_FILL,
+} from "./DisplayContext";
+import { scheduleHash, findCandidateCourseSections } from "../utils";
 import { days, hours, cellColors } from "../constants";
 import CellDisplay from "./CellDisplay";
 
@@ -59,257 +67,227 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-// initialize the worker
-let worker = new Worker("../workers/scheduleWorker.js");
-
 export default function ScheduleTable({ tableDisplay }) {
-    console.log("ScheduleTable rendered.");
-
-    const data = useContext(DataContext);
     const classes = useStyles();
 
-    const slotsData = data.courseSlots;
-    const courseData = data.courses;
+    const {
+        coursesState: { manualCourses, mustCourses, allowCollision },
+    } = useContext(CoursesContext);
 
-    const [displayedSlot, setDisplayedSlot] = useState(
-        hours.map(() => days.map(() => []))
-    );
-    const [possibleSchedules, setPossibleSchedules] = useState([]); // [schedule1->[[{course}, sectionID]] ,]
-    const [displayedSchedules, setDisplayedSchedules] = useState([]);
-    const [currentSchedule, setCurrentSchedule] = useState(null);
+    const {
+        displayState: { possibleSchedules, dontFills, favSchedules },
+        dispatch,
+    } = useContext(DisplayContext);
 
-    const [surnameCheck, setSurnameCheck] = useState(false);
-    const [surname, setSurname] = useState("");
-    const [firstTwoLetters, setFirstTwoLetters] = useState("");
-
-    const [deptCheck, setDeptCheck] = useState(false);
-    const [dept, setDept] = useState(null);
-
-    const [dontFills, setDontFills] = useState(
-        hours.map(() => days.map(() => false))
-    );
-
-    const [favSchedules, setFavSchedules] = useState(
-        JSON.parse(window.localStorage.getItem("favSchedules")) || {}
-    );
-    const [isFavsActive, setIsFavsActive] = useState(false);
-    const [lastScheduleIndex, setLastScheduleIndex] = useState(null);
+    const { courseSlots } = useContext(DataContext);
 
     const [loading, setLoading] = useState(false);
+    const [isFavsActive, setIsFavsActive] = useState(false);
+    const [displayedSchedules, setDisplayedSchedules] = useState([]);
+    const [currentSchedule, setCurrentSchedule] = useState(0);
+    const [currentDisplay, setCurrentDisplay] = useState(null);
+    // const [currentDisplay, setCurrentD = useState(hours.map(() => days.map(() => [])));
+
+    // const [surnameCheck, setSurnameCheck] = useState(false);
+    // const [surname, setSurname] = useState("");
+    // const [firstTwoLetters, setFirstTwoLetters] = useState("");
+
+    // const [deptCheck, setDeptCheck] = useState(false);
+    // const [dept, setDept] = useState(null);
+
+    // const [lastScheduleIndex, setLastScheduleIndex] = useState(null);
 
     // helper functions
-    const updateTempTable = (course, sectionID, tempTable, backgroundColor) => {
-        const section = slotsData[course.code][sectionID];
-        const [sectionName, sectionSlots] = section;
+    const updateDisplay = () => {
+        const newDisplay = hours.map(() => days.map(() => []));
 
-        sectionSlots.forEach((slot) => {
-            const [day, hour, classroom] = slot;
+        try {
+            displayedSchedules[currentSchedule].map(
+                ([course, sectionID], index) => {
+                    const section = courseSlots[course.code][sectionID];
+                    const [sectionName, sectionSlots] = section;
+                    const backgroundColor =
+                        cellColors[index % cellColors.length];
 
-            // update table slot for this section
-            tempTable[hour][day].push({
-                name: `${
-                    courseData[course.code].title.split(" ", 1)[0] // only show plain code
-                }/${sectionName}`,
-                bg: `${backgroundColor}`,
-                courseCode: course.code,
-                sectionID: sectionID,
-                classroom: classroom,
-            });
-        });
+                    sectionSlots.forEach((slot) => {
+                        const [day, hour, classroom] = slot;
+
+                        // update table slot for this section
+                        newDisplay[hour][day].push({
+                            name: `${
+                                course.title.split(" ", 1)[0] // only show plain code
+                            }/${sectionName}`,
+                            bg: `${backgroundColor}`,
+                            courseCode: course.code,
+                            sectionID,
+                            classroom,
+                        });
+                    });
+                }
+            );
+            setCurrentDisplay(newDisplay);
+        } catch {
+            // displayedSchedules hasn't initialized yet.
+            setCurrentDisplay(newDisplay);
+        }
     };
 
-    function updateTable() {
+    function updateSchedules() {
         setLoading(true);
         // terminate the previous worker,
         // this is usefull only when user changes the schedule inputs quickly,
         // so the previous calculation does not matter(don't wait it to finish)
-        worker.terminate();
+        // worker.terminate();
 
-        // create new worker
-        worker = new Worker("../workers/scheduleWorker.js");
+        const uniqueCourses = [...new Set([...mustCourses, ...manualCourses])];
+        const candidateCourseSections = findCandidateCourseSections(
+            uniqueCourses,
+            courseSlots
+        );
+
+        const worker = new Worker("../workers/scheduleWorker.js");
         worker.addEventListener("message", (message) => {
             const schedules = message.data;
-            setPossibleSchedules(schedules);
+            dispatch({
+                type: UPDATE_POSSIBLE_SCHEDULES,
+                payload: { schedules },
+            });
             setLoading(false);
             console.log("update");
         });
 
-        const candidateCourseSections = [];
-        courses.forEach((course, courseIndex) => {
-            // each course has its own array of sections
-            const sections = slotsData[course.code];
-            candidateCourseSections[courseIndex] = sections
-                .map((section, sectionIndex) => {
-                    const [, sectionSlots, constraints] = section;
-
-                    if (sectionSlots.length === 0) {
-                        // slots data not avaliable
-                        return null;
-                    } else if (
-                        sectionChecks[course.code] &&
-                        sectionChecks[course.code][sectionIndex] === false
-                    ) {
-                        // this section omitted by the user
-                        return null;
-                    } else if (deptCheck && dept !== null) {
-                        //  dept constraint applied
-                        try {
-                            const [[deptConstraint]] = constraints;
-                            if (
-                                deptConstraint !== "ALL" &&
-                                deptConstraint !== dept.title
-                            ) {
-                                return null;
-                            }
-                        } catch (err) {
-                            // constraint data not avaliable
-                            // don't apply to this section.
-                            // TODO: change this behavior?
-                        }
-                    } else if (surnameCheck && firstTwoLetters.length === 2) {
-                        // surname constraint applied
-                        try {
-                            const [[_, surStart, surEnd]] = constraints;
-                            const letters = firstTwoLetters.toUpperCase();
-                            if (!(surStart <= letters && letters <= surEnd)) {
-                                return null;
-                            }
-                        } catch (err) {
-                            // constraint data not avaliable
-                            // don't apply to this section.
-                            // TODO: change this behavior?
-                        }
-                    }
-                    return [course, sectionIndex];
-                })
-                .filter((slots) => slots !== null);
-        });
-        // sort courses as their section number, ascending order
-        candidateCourseSections.sort((a, b) => a.length - b.length);
-
         worker.postMessage({
             allowCollision,
-            slotsData,
+            courseSlots,
             candidateCourseSections,
             dontFills,
         });
     }
 
     useEffect(() => {
-        // updateTable();
-    }, [courses]);
+        updateSchedules();
+    }, [manualCourses, mustCourses]);
 
     useEffect(() => {
-        // letters inside the paranthesis
-        const insideParanthesis = /^\((\w\w)\)/;
-        const match = surname.match(insideParanthesis);
-        if (match) {
-            setFirstTwoLetters(match[1]);
-        } else {
-            setFirstTwoLetters("");
-        }
-    }, [surname]);
-
-    useEffect(() => {
-        // updateTable();
-    }, [firstTwoLetters]);
-
-    useEffect(() => {
-        if (surnameCheck === false && firstTwoLetters.length === 2) {
-            // TODO: maybe apply this only if the table's previous state was surname constrained.
-            // updateTable();
-            setSurname("");
-        }
-    }, [surnameCheck]);
-
-    useEffect(() => {
-        const tempTable = hours.map(() => days.map(() => []));
-
-        const schedule = displayedSchedules[currentSchedule] || [];
-        schedule.forEach(([course, sectionID], index) => {
-            const backgroundColor = cellColors[index % cellColors.length];
-            updateTempTable(course, sectionID, tempTable, backgroundColor);
-        });
-
-        setDisplayedSlot(tempTable);
+        updateDisplay();
     }, [currentSchedule, displayedSchedules]);
 
     useEffect(() => {
-        // when new schedules created, show them immediatly
         setDisplayedSchedules(possibleSchedules);
-        setLastScheduleIndex(null);
-        setIsFavsActive(false);
+        setCurrentSchedule(0);
     }, [possibleSchedules]);
 
-    useEffect(() => {
-        if (displayedSchedules.length > 0) {
-            if (isFavsActive) {
-                // when a fav is unselected, show next favorite
-                setCurrentSchedule(currentSchedule % displayedSchedules.length);
-            } else {
-                if (lastScheduleIndex !== null) {
-                    setCurrentSchedule(lastScheduleIndex);
-                } else {
-                    setCurrentSchedule(0);
-                }
-            }
-        } else {
-            setCurrentSchedule(null);
-        }
-    }, [displayedSchedules]);
+    // useEffect(() => {
+    //     // letters inside the paranthesis
+    //     const insideParanthesis = /^\((\w\w)\)/;
+    //     const match = surname.match(insideParanthesis);
+    //     if (match) {
+    //         setFirstTwoLetters(match[1]);
+    //     } else {
+    //         setFirstTwoLetters("");
+    //     }
+    // }, [surname]);
 
-    useEffect(() => {
-        setDept(mustDept);
-    }, [mustDept]);
+    // useEffect(() => {
+    //     // updateTable();
+    // }, [firstTwoLetters]);
 
-    useEffect(() => {
-        if (deptCheck === true && dept !== null) {
-            // updateTable();
-        } else if (deptCheck === false && dept !== null) {
-            // updateTable();
-            setDept(mustDept);
-        }
-    }, [deptCheck]);
+    // useEffect(() => {
+    //     if (surnameCheck === false && firstTwoLetters.length === 2) {
+    //         // TODO: maybe apply this only if the table's previous state was surname constrained.
+    //         // updateTable();
+    //         setSurname("");
+    //     }
+    // }, [surnameCheck]);
 
-    useEffect(() => {
-        if (deptCheck) {
-            // updateTable();
-        }
-    }, [dept]);
+    // useEffect(() => {
+    //     const tempTable = hours.map(() => days.map(() => []));
 
-    useEffect(() => {
-        // updateTable();
-    }, [dontFills, sectionChecks, allowCollision]);
+    //     const schedule = displayedSchedules[currentSchedule] || [];
+    //     schedule.forEach(([course, sectionID], index) => {
+    //         const backgroundColor = cellColors[index % cellColors.length];
+    //         updateTempTable(course, sectionID, tempTable, backgroundColor);
+    //     });
 
-    useEffect(() => {
-        if (isFavsActive) {
-            setDisplayedSchedules(Object.values(favSchedules));
-            setLastScheduleIndex(currentSchedule);
-            setCurrentSchedule(0);
-        } else {
-            setDisplayedSchedules(possibleSchedules);
-        }
-    }, [isFavsActive]);
+    //     setDisplayedSlot(tempTable);
+    // }, [currentSchedule, displayedSchedules]);
 
-    useEffect(() => {
-        // handle unselecting favorite section when showing favorites
-        if (isFavsActive) {
-            setDisplayedSchedules(Object.values(favSchedules));
-        }
+    // useEffect(() => {
+    //     // when new schedules created, show them immediatly
+    //     setDisplayedSchedules(possibleSchedules);
+    //     setLastScheduleIndex(null);
+    //     setIsFavsActive(false);
+    // }, [possibleSchedules]);
 
-        // save favorites for other sessions
-        window.localStorage.setItem(
-            "favSchedules",
-            JSON.stringify(favSchedules)
-        );
-    }, [favSchedules]);
+    // useEffect(() => {
+    //     if (displayedSchedules.length > 0) {
+    //         if (isFavsActive) {
+    //             // when a fav is unselected, show next favorite
+    //             setCurrentSchedule(currentSchedule % displayedSchedules.length);
+    //         } else {
+    //             if (lastScheduleIndex !== null) {
+    //                 setCurrentSchedule(lastScheduleIndex);
+    //             } else {
+    //                 setCurrentSchedule(0);
+    //             }
+    //         }
+    //     } else {
+    //         setCurrentSchedule(null);
+    //     }
+    // }, [displayedSchedules]);
 
-    // handlers
+    // useEffect(() => {
+    //     setDept(mustDept);
+    // }, [mustDept]);
+
+    // useEffect(() => {
+    //     if (deptCheck === true && dept !== null) {
+    //         // updateTable();
+    //     } else if (deptCheck === false && dept !== null) {
+    //         // updateTable();
+    //         setDept(mustDept);
+    //     }
+    // }, [deptCheck]);
+
+    // useEffect(() => {
+    //     if (deptCheck) {
+    //         // updateTable();
+    //     }
+    // }, [dept]);
+
+    // useEffect(() => {
+    //     // updateTable();
+    // }, [dontFills, sectionChecks, allowCollision]);
+
+    // useEffect(() => {
+    //     if (isFavsActive) {
+    //         setDisplayedSchedules(Object.values(favSchedules));
+    //         setLastScheduleIndex(currentSchedule);
+    //         setCurrentSchedule(0);
+    //     } else {
+    //         setDisplayedSchedules(possibleSchedules);
+    //     }
+    // }, [isFavsActive]);
+
+    // useEffect(() => {
+    //     // handle unselecting favorite section when showing favorites
+    //     if (isFavsActive) {
+    //         setDisplayedSchedules(Object.values(favSchedules));
+    //     }
+
+    //     // save favorites for other sessions
+    //     window.localStorage.setItem(
+    //         "favSchedules",
+    //         JSON.stringify(favSchedules)
+    //     );
+    // }, [favSchedules]);
+
+    // // handlers
     const handleNavigateClick = (direction) => {
-        if (direction === "next" && displayedSchedules.length > 0) {
-            currentSchedule === displayedSchedules.length - 1
-                ? setCurrentSchedule(0)
-                : setCurrentSchedule(currentSchedule + 1);
+        if (direction === "next") {
+            currentSchedule < displayedSchedules.length - 1
+                ? setCurrentSchedule(currentSchedule + 1)
+                : setCurrentSchedule(0);
         } else if (direction === "prev" && displayedSchedules.length > 0) {
             currentSchedule === 0
                 ? setCurrentSchedule(displayedSchedules.length - 1)
@@ -317,47 +295,42 @@ export default function ScheduleTable({ tableDisplay }) {
         }
     };
 
-    const handleSurnameChange = (event) => {
-        const value = event.target.value;
-        const regTest = /^\(\w\w\)/;
-        if (value.length === 2) {
-            setSurname(`(${value})`);
-        } else if (value.length > 2 && value.match(regTest) === null) {
-            setSurname("");
-        } else {
-            setSurname(value);
-        }
-    };
+    // const handleSurnameChange = (event) => {
+    //     const value = event.target.value;
+    //     const regTest = /^\(\w\w\)/;
+    //     if (value.length === 2) {
+    //         setSurname(`(${value})`);
+    //     } else if (value.length > 2 && value.match(regTest) === null) {
+    //         setSurname("");
+    //     } else {
+    //         setSurname(value);
+    //     }
+    // };
 
     const handleCellClick = (hourIndex, dayIndex) => {
         // toggle clicked cells don't fill value
-        const temp = [...dontFills];
-        temp[hourIndex][dayIndex] = !temp[hourIndex][dayIndex];
-
-        setDontFills(temp);
+        dispatch({ type: TOGGLE_DONT_FILL, payload: { hourIndex, dayIndex } });
     };
 
     const handleFavClick = () => {
         const schedule = possibleSchedules[currentSchedule];
         const hash = scheduleHash(schedule);
 
-        setFavSchedules({ ...favSchedules, [hash]: schedule });
+        dispatch({ type: ADD_TO_FAVS, payload: { hash, schedule } });
     };
 
     const handleUnfavClick = () => {
         const schedule = displayedSchedules[currentSchedule];
         const hash = scheduleHash(schedule);
 
-        const temp = { ...favSchedules };
-        delete temp[hash];
-
-        setFavSchedules(temp);
+        dispatch({ type: DELETE_FROM_FAVS, payload: { hash } });
     };
 
-    const handleShowFavorites = () => {
+    const handleToggleFavs = () => {
         setIsFavsActive(!isFavsActive);
     };
 
+    console.log("ScheduleTable rendered.");
     return (
         <Grid
             container
@@ -393,9 +366,9 @@ export default function ScheduleTable({ tableDisplay }) {
                                         </Grid>
                                         <Grid item>
                                             <Typography variantion="body1">{`${
-                                                currentSchedule === null
-                                                    ? 0
-                                                    : currentSchedule + 1
+                                                displayedSchedules.length
+                                                    ? currentSchedule + 1
+                                                    : currentSchedule
                                             }/${
                                                 displayedSchedules.length
                                             }`}</Typography>
@@ -415,7 +388,7 @@ export default function ScheduleTable({ tableDisplay }) {
                                     size="small"
                                     variant="outlined"
                                     className={classes.showFavButton}
-                                    onClick={handleShowFavorites}
+                                    onClick={handleToggleFavs}
                                 >
                                     {isFavsActive
                                         ? "show all"
@@ -426,11 +399,9 @@ export default function ScheduleTable({ tableDisplay }) {
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center">
-                                    {displayedSchedules[currentSchedule] &&
-                                    favSchedules[
-                                        scheduleHash(
-                                            displayedSchedules[currentSchedule]
-                                        )
+                                    {/* {displayedSchedules[currentSchedule] && */}
+                                    {favSchedules[
+                                        scheduleHash(currentDisplay)
                                     ] ? (
                                         <Tooltip title="remove" arrow>
                                             <IconButton
@@ -457,124 +428,115 @@ export default function ScheduleTable({ tableDisplay }) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {displayedSlot.map((hour, hourIndex) => (
-                                <TableRow key={`${hour}+${hourIndex}`}>
-                                    <TableCell
-                                        component="th"
-                                        style={{ width: "150px" }}
-                                        align="center"
-                                    >
-                                        {hours[hourIndex]}
-                                    </TableCell>
-                                    {hour.map((day, dayIndex) => {
-                                        const dontFill =
-                                            dontFills[hourIndex][dayIndex];
-                                        return (
-                                            <TableCell
-                                                key={`${day}+${dayIndex}`}
-                                                align="center"
-                                                style={{
-                                                    padding: 0,
-                                                    width: "150px",
-                                                }}
-                                            >
-                                                {day.length === 0 ? (
-                                                    // no course to displayed at this slot
-                                                    <Button
-                                                        className={
-                                                            classes.cellButton
-                                                        }
-                                                        onClick={() =>
-                                                            handleCellClick(
-                                                                hourIndex,
-                                                                dayIndex
+                            {currentDisplay &&
+                                currentDisplay.map((hour, hourIndex) => (
+                                    <TableRow key={`${hour}+${hourIndex}`}>
+                                        <TableCell
+                                            component="th"
+                                            style={{ width: "150px" }}
+                                            align="center"
+                                        >
+                                            {hours[hourIndex]}
+                                        </TableCell>
+                                        {hour.map((day, dayIndex) => {
+                                            const dontFill =
+                                                dontFills[hourIndex][dayIndex];
+                                            return (
+                                                <TableCell
+                                                    key={`${day}+${dayIndex}`}
+                                                    align="center"
+                                                    style={{
+                                                        padding: 0,
+                                                        width: "150px",
+                                                    }}
+                                                >
+                                                    {day.length === 0 ? (
+                                                        // no course to displayed at this slot
+                                                        <Button
+                                                            className={
+                                                                classes.cellButton
+                                                            }
+                                                            onClick={() =>
+                                                                handleCellClick(
+                                                                    hourIndex,
+                                                                    dayIndex
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                isFavsActive
+                                                            }
+                                                            disableRipple
+                                                            style={{
+                                                                backgroundColor:
+                                                                    dontFill &&
+                                                                    !isFavsActive
+                                                                        ? "#000"
+                                                                        : undefined,
+                                                                color:
+                                                                    dontFill &&
+                                                                    !isFavsActive
+                                                                        ? "#b80f0a"
+                                                                        : "#FFF",
+                                                            }}
+                                                            startIcon={
+                                                                dontFill &&
+                                                                !isFavsActive ? (
+                                                                    <NotInterestedIcon />
+                                                                ) : undefined
+                                                            }
+                                                        >
+                                                            {dontFill &&
+                                                            !isFavsActive
+                                                                ? "Don't Fill"
+                                                                : undefined}
+                                                        </Button>
+                                                    ) : (
+                                                        day.map(
+                                                            ({
+                                                                name,
+                                                                bg,
+                                                                courseCode,
+                                                                sectionID,
+                                                                classroom,
+                                                            }) => (
+                                                                <CellDisplay
+                                                                    key={name}
+                                                                    name={name}
+                                                                    bg={bg}
+                                                                    courseCode={
+                                                                        courseCode
+                                                                    }
+                                                                    sectionID={
+                                                                        sectionID
+                                                                    }
+                                                                    classroom={
+                                                                        classroom
+                                                                    }
+                                                                    isFavsActive={
+                                                                        isFavsActive
+                                                                    }
+                                                                    dontFillHandler={() =>
+                                                                        handleCellClick(
+                                                                            hourIndex,
+                                                                            dayIndex
+                                                                        )
+                                                                    }
+                                                                />
                                                             )
-                                                        }
-                                                        disabled={isFavsActive}
-                                                        disableRipple
-                                                        style={{
-                                                            backgroundColor:
-                                                                dontFill &&
-                                                                !isFavsActive
-                                                                    ? "#000"
-                                                                    : undefined,
-                                                            color:
-                                                                dontFill &&
-                                                                !isFavsActive
-                                                                    ? "#b80f0a"
-                                                                    : "#FFF",
-                                                        }}
-                                                        startIcon={
-                                                            dontFill &&
-                                                            !isFavsActive ? (
-                                                                <NotInterestedIcon />
-                                                            ) : undefined
-                                                        }
-                                                    >
-                                                        {dontFill &&
-                                                        !isFavsActive
-                                                            ? "Don't Fill"
-                                                            : undefined}
-                                                    </Button>
-                                                ) : (
-                                                    day.map(
-                                                        ({
-                                                            name,
-                                                            bg,
-                                                            courseCode,
-                                                            sectionID,
-                                                            classroom,
-                                                        }) => (
-                                                            <CellDisplay
-                                                                key={name}
-                                                                name={name}
-                                                                bg={bg}
-                                                                courseCode={
-                                                                    courseCode
-                                                                }
-                                                                sectionID={
-                                                                    sectionID
-                                                                }
-                                                                classroom={
-                                                                    classroom
-                                                                }
-                                                                fixedSections={
-                                                                    fixedSections
-                                                                }
-                                                                setFixedSections={
-                                                                    setFixedSections
-                                                                }
-                                                                sectionChecks={
-                                                                    sectionChecks
-                                                                }
-                                                                setSectionChecks={
-                                                                    setSectionChecks
-                                                                }
-                                                                isFavsActive={
-                                                                    isFavsActive
-                                                                }
-                                                                dontFillHandler={() =>
-                                                                    handleCellClick(
-                                                                        hourIndex,
-                                                                        dayIndex
-                                                                    )
-                                                                }
-                                                            />
                                                         )
-                                                    )
-                                                )}
-                                            </TableCell>
-                                        );
-                                    })}
-                                </TableRow>
-                            ))}
+                                                    )}
+                                                </TableCell>
+                                            );
+                                        })}
+                                    </TableRow>
+                                ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
             </Grid>
 
             {/* restristions */}
-            <Grid
+            {/* <Grid
                 item
                 container
                 direction="row"
@@ -667,7 +629,7 @@ export default function ScheduleTable({ tableDisplay }) {
                         </Grid>
                     </Grid>
                 </Grid>
-            </Grid>
+            </Grid> */}
         </Grid>
     );
 }

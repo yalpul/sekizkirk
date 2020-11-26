@@ -1,15 +1,15 @@
 onmessage = (e) => {
     const {
-        allowCollision,
-        slotsData,
         candidateCourseSections,
+        allowCollision,
+        courseSlots,
         dontFills,
     } = e.data;
 
     const schedules = findPossibleSchedules(
         candidateCourseSections,
         allowCollision,
-        slotsData,
+        courseSlots,
         dontFills
     );
 
@@ -85,13 +85,16 @@ const findPossibleSchedules = (
     (function runner(candidateCourseSections) {
         // base case, combination is a valid schedule, save it to the state
         if (candidateCourseSections.length === 0) {
-            // sort schedule for consistent hash value
-            const sortedPossibleSchedule = [...possibleSchedule];
-            sortedPossibleSchedule.sort((a, b) => {
-                return parseInt(a[0].code) - parseInt(b[0].code);
-            });
+            if (possibleSchedule.length > 0) {
+                // sort schedule for consistent hash value
+                const sortedPossibleSchedule = [...possibleSchedule];
+                sortedPossibleSchedule.sort((a, b) => {
+                    return parseInt(a[0].code) - parseInt(b[0].code);
+                });
 
-            validSchedules.push([...sortedPossibleSchedule]);
+                validSchedules.push([...sortedPossibleSchedule]);
+            }
+
             return;
         }
 

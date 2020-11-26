@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import { DataProvider } from "./components/DataContext";
 import { CoursesProvider } from "./components/CoursesContext";
+import { DisplayProvider } from "./components/DisplayContext";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core";
@@ -26,7 +27,9 @@ const App = () => {
                             tableDisplay={tableDisplay}
                             setTableDisplay={setTableDisplay}
                         />
-                        <ScheduleTable tableDisplay={tableDisplay} />
+                        <DisplayProvider>
+                            <ScheduleTable tableDisplay={tableDisplay} />
+                        </DisplayProvider>
                     </CoursesProvider>
                 </DataProvider>
             </main>

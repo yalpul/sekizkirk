@@ -23,6 +23,8 @@ export const UNSELECT_ALL_SECTIONS = "UNSELECT_ALL_SECTIONS";
 export const TOGGLE_CHECK = "TOGGLE_CHECK";
 export const TOGGLE_COLLISION = "TOGGLE_COLLISION";
 export const CANCEL_SELECTIVES = "CANCEL_SELECTIVES";
+export const FIX_SECTION = "FIX_SECTION";
+export const UNFIX_SECTION = "UNFIX_SECTION";
 
 export const CoursesContext = createContext({});
 
@@ -197,6 +199,49 @@ export const CoursesProvider = ({ children }) => {
             return {
                 ...state,
                 selectiveCourses: [],
+            };
+        }
+
+        if (action.type === FIX_SECTION) {
+            const { courseCode, sectionID } = action.payload;
+            const { sectionChecks, fixedSections } = state;
+
+            return {
+                ...state,
+                // cache previously selected checks,
+                // they are displayed exactly same when user unfixes section
+                fixedSections: {
+                    ...fixedSections,
+                    [courseCode]: {
+                        fixedSection: sectionID,
+                        prevChecks: [...sectionChecks[courseCode]],
+                    },
+                },
+                // only check the course's fixed section as true,
+                // uncheck the remaining
+                sectionChecks: {
+                    ...sectionChecks,
+                    [courseCode]: sectionChecks[courseCode].map(
+                        (_, index) => sectionID === index
+                    ),
+                },
+            };
+        }
+
+        if (action.type === UNFIX_SECTION) {
+            const { courseCode } = action.payload;
+            const { sectionChecks, fixedSections } = state;
+
+            return {
+                ...state,
+                fixedSection: {
+                    ...fixedSections,
+                    [courseCode]: undefined,
+                },
+                sectionChecks: {
+                    ...sectionChecks,
+                    [courseCode]: fixedSections[courseCode].prevChecks,
+                },
             };
         }
 
