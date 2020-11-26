@@ -35,7 +35,7 @@ import {
     ADD_TO_FAVS,
     TOGGLE_DONT_FILL,
 } from "./DisplayContext";
-import { scheduleHash, findCandidateCourseSections } from "../utils";
+import { scheduleHash } from "../utils";
 import { days, hours, cellColors } from "../constants";
 import CellDisplay from "./CellDisplay";
 
@@ -86,7 +86,6 @@ export default function ScheduleTable({ tableDisplay }) {
     const [displayedSchedules, setDisplayedSchedules] = useState([]);
     const [currentSchedule, setCurrentSchedule] = useState(0);
     const [currentDisplay, setCurrentDisplay] = useState(null);
-    // const [currentDisplay, setCurrentD = useState(hours.map(() => days.map(() => [])));
 
     // const [surnameCheck, setSurnameCheck] = useState(false);
     // const [surname, setSurname] = useState("");
@@ -132,6 +131,66 @@ export default function ScheduleTable({ tableDisplay }) {
         }
     };
 
+    function findCandidateCourseSections(
+        courses
+        // sectionChecks
+    ) {
+        const candidateCourseSections = [];
+        courses.forEach((course, courseIndex) => {
+            // each course has its own array of sections
+            const sections = courseSlots[course.code];
+            candidateCourseSections[courseIndex] = sections
+                .map((section, sectionIndex) => {
+                    const [, sectionSlots, constraints] = section;
+
+                    if (sectionSlots.length === 0) {
+                        // slots data not avaliable
+                        return null;
+                    }
+                    //  else if (
+                    //     sectionChecks[course.code] &&
+                    //     sectionChecks[course.code][sectionIndex] === false
+                    // ) {
+                    //     // this section omitted by the user
+                    //     return null;
+                    // } else if (deptCheck && dept !== null) {
+                    //     //  dept constraint applied
+                    //     try {
+                    //         const [[deptConstraint]] = constraints;
+                    //         if (
+                    //             deptConstraint !== "ALL" &&
+                    //             deptConstraint !== dept.title
+                    //         ) {
+                    //             return null;
+                    //         }
+                    //     } catch (err) {
+                    //         // constraint data not avaliable
+                    //         // don't apply to this section.
+                    //         // TODO: change this behavior?
+                    //     }
+                    // } else if (surnameCheck && firstTwoLetters.length === 2) {
+                    //     // surname constraint applied
+                    //     try {
+                    //         const [[_, surStart, surEnd]] = constraints;
+                    //         const letters = firstTwoLetters.toUpperCase();
+                    //         if (!(surStart <= letters && letters <= surEnd)) {
+                    //             return null;
+                    //         }
+                    //     } catch (err) {
+                    //         // constraint data not avaliable
+                    //         // don't apply to this section.
+                    //         // TODO: change this behavior?
+                    //     }
+                    // }
+                    return [course, sectionIndex];
+                })
+                .filter((slots) => slots !== null);
+        });
+        // sort courses as their section number, ascending order
+        candidateCourseSections.sort((a, b) => a.length - b.length);
+
+        return candidateCourseSections;
+    }
     function updateSchedules() {
         setLoading(true);
         // terminate the previous worker,
@@ -141,8 +200,7 @@ export default function ScheduleTable({ tableDisplay }) {
 
         const uniqueCourses = [...new Set([...mustCourses, ...manualCourses])];
         const candidateCourseSections = findCandidateCourseSections(
-            uniqueCourses,
-            courseSlots
+            uniqueCourses
         );
 
         const worker = new Worker("../workers/scheduleWorker.js");
@@ -166,7 +224,7 @@ export default function ScheduleTable({ tableDisplay }) {
 
     useEffect(() => {
         updateSchedules();
-    }, [manualCourses, mustCourses]);
+    }, [manualCourses, mustCourses, dontFills]);
 
     useEffect(() => {
         updateDisplay();
