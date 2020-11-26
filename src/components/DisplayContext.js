@@ -1,4 +1,4 @@
-import React, { createContext, useReducer } from "react";
+import React, { createContext, useEffect, useReducer } from "react";
 
 import { days, hours } from "../constants";
 
@@ -66,6 +66,14 @@ const reducer = (state, action) => {
 
 export const DisplayProvider = ({ children }) => {
     const [displayState, dispatch] = useReducer(reducer, initialState);
+    const { favSchedules } = displayState;
+
+    useEffect(() => {
+        window.localStorage.setItem(
+            "favSchedules",
+            JSON.stringify(favSchedules)
+        );
+    }, [favSchedules]);
 
     console.log(displayState);
     return (

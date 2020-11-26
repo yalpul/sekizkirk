@@ -86,6 +86,7 @@ export default function ScheduleTable({ tableDisplay }) {
     const [displayedSchedules, setDisplayedSchedules] = useState([]);
     const [currentSchedule, setCurrentSchedule] = useState(0);
     const [currentDisplay, setCurrentDisplay] = useState(null);
+    const [lastShownSchedule, setLastShownSchedule] = useState(null);
 
     // const [surnameCheck, setSurnameCheck] = useState(false);
     // const [surname, setSurname] = useState("");
@@ -93,8 +94,6 @@ export default function ScheduleTable({ tableDisplay }) {
 
     // const [deptCheck, setDeptCheck] = useState(false);
     // const [dept, setDept] = useState(null);
-
-    // const [lastScheduleIndex, setLastScheduleIndex] = useState(null);
 
     // helper functions
     const updateDisplay = () => {
@@ -131,10 +130,7 @@ export default function ScheduleTable({ tableDisplay }) {
         }
     };
 
-    function findCandidateCourseSections(
-        courses
-        // sectionChecks
-    ) {
+    function findCandidateCourseSections(courses) {
         const candidateCourseSections = [];
         courses.forEach((course, courseIndex) => {
             // each course has its own array of sections
@@ -223,17 +219,50 @@ export default function ScheduleTable({ tableDisplay }) {
     }
 
     useEffect(() => {
+        // Schedules will be updated in the following situations:
+        // 1. user adds or deletes course(s).
+        // 2. user changes any don't fill areas in the UI.
         updateSchedules();
     }, [manualCourses, mustCourses, dontFills]);
 
     useEffect(() => {
+        // Displayed schedule will be updated in the following situations:
+        // 1. User decides to see another schedule in possible schedules.
+        // 2. User switches between favorite and all schedules
         updateDisplay();
     }, [currentSchedule, displayedSchedules]);
 
     useEffect(() => {
+        // When possible schedules updated via `updateSchedules`,
+        // switch to the all schedules if you are in the favorite schedules.
         setDisplayedSchedules(possibleSchedules);
         setCurrentSchedule(0);
+        setIsFavsActive(false);
     }, [possibleSchedules]);
+
+    useEffect(() => {
+        // When user switched to the favorites, start with the first one.
+        // Remember the last schedule place in the all schedules so,
+        // when user switches back to the all schedules, continue from there.
+        if (isFavsActive) {
+            setDisplayedSchedules(Object.values(favSchedules));
+            setLastShownSchedule(currentSchedule);
+            setCurrentSchedule(0);
+        } else {
+            setDisplayedSchedules(possibleSchedules);
+            setCurrentSchedule(lastShownSchedule);
+        }
+    }, [isFavsActive]);
+
+    useEffect(() => {
+        // if user deletes any favorite while in the favorite section,
+        // update favorites
+        const favs = Object.values(favSchedules);
+        if (isFavsActive) {
+            setDisplayedSchedules(favs);
+            setCurrentSchedule(currentSchedule % favs.length || 0);
+        }
+    }, [favSchedules]);
 
     // useEffect(() => {
     //     // letters inside the paranthesis
@@ -457,9 +486,11 @@ export default function ScheduleTable({ tableDisplay }) {
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center">
-                                    {/* {displayedSchedules[currentSchedule] && */}
-                                    {favSchedules[
-                                        scheduleHash(currentDisplay)
+                                    {displayedSchedules[currentSchedule] &&
+                                    favSchedules[
+                                        scheduleHash(
+                                            displayedSchedules[currentSchedule]
+                                        )
                                     ] ? (
                                         <Tooltip title="remove" arrow>
                                             <IconButton
