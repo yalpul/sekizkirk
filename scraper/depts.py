@@ -124,4 +124,4 @@ class depts:
             'code' : code,
             'title' : dept,
         } for code, dept in dept_codes.items()]
-        return departments
+        return sorted(departments, key=lambda x:x['title'])
