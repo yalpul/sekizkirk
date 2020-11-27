@@ -19,10 +19,13 @@ export default function CourseDisplay({
     classroom,
     isFavsActive,
 }) {
+    const {
+        coursesState: { fixedSections },
+        dispatch,
+    } = useContext(CoursesContext);
+
     const [isMouseOver, setIsMouseOver] = useState(false);
     const [isFixed, setIsFixed] = useState(false);
-
-    const { coursesState, dispatch } = useContext(CoursesContext);
 
     const handleFix = () => {
         dispatch({ type: FIX_SECTION, payload: { courseCode, sectionID } });
@@ -32,19 +35,16 @@ export default function CourseDisplay({
         dispatch({ type: UNFIX_SECTION, payload: { courseCode } });
     };
 
-    // useEffect(() => {
-    //     try {
-    //         // fix other nodes on the table of the same sections as well
-    //         if (sectionID === fixedSections[courseCode].fixedSection) {
-    //             setIsFixed(true);
-    //         }
-    //     } catch (e) {
-    //         // unfix all the nodes of the section
-    //         if (isFixed) {
-    //             setIsFixed(false);
-    //         }
-    //     }
-    // }, [fixedSections]);
+    useEffect(() => {
+        if (
+            fixedSections[courseCode] &&
+            sectionID === fixedSections[courseCode].fixedSection
+        ) {
+            setIsFixed(true);
+        } else {
+            setIsFixed(false);
+        }
+    }, [fixedSections]);
 
     return (
         <Grid

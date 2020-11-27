@@ -71,7 +71,13 @@ export default function ScheduleTable({ tableDisplay }) {
     const classes = useStyles();
 
     const {
-        coursesState: { manualCourses, mustCourses, allowCollision },
+        coursesState: {
+            manualCourses,
+            mustCourses,
+            allowCollision,
+            fixedSections,
+            sectionChecks,
+        },
     } = useContext(CoursesContext);
 
     const {
@@ -142,13 +148,13 @@ export default function ScheduleTable({ tableDisplay }) {
                     if (sectionSlots.length === 0) {
                         // slots data not avaliable
                         return null;
+                    } else if (
+                        // sectionChecks[course.code] &&
+                        sectionChecks[course.code][sectionIndex] === false
+                    ) {
+                        // this section omitted by the user
+                        return null;
                     }
-                    //  else if (
-                    //     sectionChecks[course.code] &&
-                    //     sectionChecks[course.code][sectionIndex] === false
-                    // ) {
-                    //     // this section omitted by the user
-                    //     return null;
                     // } else if (deptCheck && dept !== null) {
                     //     //  dept constraint applied
                     //     try {
@@ -223,7 +229,7 @@ export default function ScheduleTable({ tableDisplay }) {
         // 1. user adds or deletes course(s).
         // 2. user changes any don't fill areas in the UI.
         updateSchedules();
-    }, [manualCourses, mustCourses, dontFills]);
+    }, [manualCourses, mustCourses, dontFills, fixedSections]);
 
     useEffect(() => {
         // Displayed schedule will be updated in the following situations:

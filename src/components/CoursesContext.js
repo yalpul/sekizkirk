@@ -234,7 +234,7 @@ export const CoursesProvider = ({ children }) => {
 
             return {
                 ...state,
-                fixedSection: {
+                fixedSections: {
                     ...fixedSections,
                     [courseCode]: undefined,
                 },
