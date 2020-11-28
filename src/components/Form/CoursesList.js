@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 
 import {
     CoursesContext,
@@ -40,12 +40,10 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const CoursesList = () => {
+const CoursesList = ({ openDialog, setOpenDialog }) => {
     const classes = useStyles();
     const { coursesState, dispatch } = useContext(CoursesContext);
     const { mustCourses, manualCourses, electiveCourses } = coursesState;
-
-    const [openDialog, setOpenDialog] = useState(null);
 
     // find unique courses, same courses might be added manuelly as well as
     // included in the musts.

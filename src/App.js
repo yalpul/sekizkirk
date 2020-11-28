@@ -14,6 +14,7 @@ import ScheduleTable from "./components/ScheduleTable";
 
 const App = () => {
     const [tableDisplay, setTableDisplay] = useState("none");
+    const [openDialog, setOpenDialog] = useState(null);
 
     console.log("app rendered.");
     return (
@@ -26,9 +27,14 @@ const App = () => {
                         <Form
                             tableDisplay={tableDisplay}
                             setTableDisplay={setTableDisplay}
+                            openDialog={openDialog}
+                            setOpenDialog={setOpenDialog}
                         />
                         <DisplayProvider>
-                            <ScheduleTable tableDisplay={tableDisplay} />
+                            <ScheduleTable
+                                tableDisplay={tableDisplay}
+                                openDialog={openDialog}
+                            />
                         </DisplayProvider>
                     </CoursesProvider>
                 </DataProvider>

@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function ScheduleTable({ tableDisplay }) {
+export default function ScheduleTable({ tableDisplay, openDialog }) {
     const classes = useStyles();
 
     const {
@@ -214,6 +214,7 @@ export default function ScheduleTable({ tableDisplay }) {
             });
             setLoading(false);
             console.log("update");
+            worker.terminate();
         });
 
         worker.postMessage({
@@ -228,8 +229,18 @@ export default function ScheduleTable({ tableDisplay }) {
         // Schedules will be updated in the following situations:
         // 1. user adds or deletes course(s).
         // 2. user changes any don't fill areas in the UI.
+        // 3. user fixes any course section
+
         updateSchedules();
     }, [manualCourses, mustCourses, dontFills, fixedSections]);
+
+    useEffect(() => {
+        // 4. user closesDialog, we presume that `sectionChecks` are changed
+
+        // NOTE: 4th points behaviour might be changed later.
+        if (openDialog !== null) return;
+        updateSchedules();
+    }, [openDialog]);
 
     useEffect(() => {
         // Displayed schedule will be updated in the following situations:
