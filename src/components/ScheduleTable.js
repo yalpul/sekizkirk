@@ -85,7 +85,7 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
         dispatch,
     } = useContext(DisplayContext);
 
-    const { courseSlots } = useContext(DataContext);
+    const { courseSlots, departments } = useContext(DataContext);
 
     const [loading, setLoading] = useState(false);
     const [isFavsActive, setIsFavsActive] = useState(false);
@@ -98,8 +98,8 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
     const [surname, setSurname] = useState("");
     const [firstTwoLetters, setFirstTwoLetters] = useState("");
 
-    // const [deptCheck, setDeptCheck] = useState(false);
-    // const [dept, setDept] = useState(null);
+    const [deptCheck, setDeptCheck] = useState(false);
+    const [dept, setDept] = useState(null);
 
     // helper functions
     const updateDisplay = () => {
@@ -154,24 +154,22 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
                     ) {
                         // this section omitted by the user
                         return null;
-                    }
-                    // } else if (deptCheck && dept !== null) {
-                    //     //  dept constraint applied
-                    //     try {
-                    //         const [[deptConstraint]] = constraints;
-                    //         if (
-                    //             deptConstraint !== "ALL" &&
-                    //             deptConstraint !== dept.title
-                    //         ) {
-                    //             return null;
-                    //         }
-                    //     } catch (err) {
-                    //         // constraint data not avaliable
-                    //         // don't apply to this section.
-                    //         // TODO: change this behavior?
-                    //     }
-                    // }
-                    else if (surnameCheck && firstTwoLetters.length === 2) {
+                    } else if (deptCheck && dept !== null) {
+                        //  dept constraint applied
+                        try {
+                            const [[deptConstraint]] = constraints;
+                            if (
+                                deptConstraint !== "ALL" &&
+                                deptConstraint !== dept.title
+                            ) {
+                                return null;
+                            }
+                        } catch (err) {
+                            // constraint data not avaliable
+                            // don't apply to this section.
+                            // TODO: change this behavior?
+                        }
+                    } else if (surnameCheck && firstTwoLetters.length === 2) {
                         // surname constraint applied
                         try {
                             const [[, surStart, surEnd]] = constraints;
@@ -195,6 +193,7 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
 
         return candidateCourseSections;
     }
+
     function updateSchedules() {
         setLoading(true);
 
@@ -228,9 +227,18 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
         // 1. user adds or deletes course(s).
         // 2. user changes any don't fill areas in the UI.
         // 3. user fixes any course section
+        // 4. user applies surname constraint
+        // 5. user applies department constraint
 
         updateSchedules();
-    }, [manualCourses, mustCourses, dontFills, fixedSections, firstTwoLetters]);
+    }, [
+        manualCourses,
+        mustCourses,
+        dontFills,
+        fixedSections,
+        firstTwoLetters,
+        dept,
+    ]);
 
     useEffect(() => {
         // Insead of updating schedule in every `section check` change,
@@ -301,29 +309,21 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
         //
         // `firstTwoLetters.length === 2` condition prevents unnecassry renders when
         //  uncheking while there is no surname input
-        if (surnameCheck === false /*&& firstTwoLetters.length === 2*/) {
+        if (surnameCheck === false && firstTwoLetters.length === 2) {
             setSurname("");
         }
     }, [surnameCheck]);
 
+    useEffect(() => {
+        // when department constraint unchecked, clear dept section
+        //
+        // `dept !== null` condition prevents unnecarry update to the same value.
+        if (deptCheck === false && dept !== null) setDept(null);
+    }, [deptCheck]);
+
     // useEffect(() => {
     //     setDept(mustDept);
     // }, [mustDept]);
-
-    // useEffect(() => {
-    //     if (deptCheck === true && dept !== null) {
-    //         // updateTable();
-    //     } else if (deptCheck === false && dept !== null) {
-    //         // updateTable();
-    //         setDept(mustDept);
-    //     }
-    // }, [deptCheck]);
-
-    // useEffect(() => {
-    //     if (deptCheck) {
-    //         // updateTable();
-    //     }
-    // }, [dept]);
 
     // // handlers
     const handleNavigateClick = (direction) => {
@@ -625,7 +625,7 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
                         </Grid>
                     </Grid>
                 </Grid>
-                {/* 
+
                 <Grid item>
                     <Grid item container direction="column">
                         <Grid item>
@@ -646,7 +646,7 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
                         <Grid item>
                             <Collapse in={deptCheck} timeout={0}>
                                 <Autocomplete
-                                    options={data.departments}
+                                    options={departments}
                                     getOptionLabel={(department) =>
                                         department.title
                                     }
@@ -675,7 +675,7 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
                             </Collapse>
                         </Grid>
                     </Grid>
-                </Grid> */}
+                </Grid>
             </Grid>
         </Grid>
     );
