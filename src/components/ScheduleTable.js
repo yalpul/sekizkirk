@@ -241,8 +241,9 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
         // Drawback of this solution is, when the user opens the modal and not change any section option,
         // schedules will be updated when the modal closes.
 
-        if (openDialog !== null) return;
-        updateSchedules();
+        if (openDialog === null) {
+            updateSchedules();
+        }
     }, [openDialog]);
 
     useEffect(() => {
