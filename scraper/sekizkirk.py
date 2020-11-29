@@ -17,12 +17,10 @@ def parse_arguments():
         help='Do not write anything to stdout')
     parser.add_argument('--update-courses', action='store_true',\
         help='Force an update on course data')
-    parser.add_argument('--update-slots', action='store_true',\
-        help='Force an update on slots data')
     parser.add_argument('--musts', action='store_true',\
-        help='Update must courses')
+        help='Get must courses')
     parser.add_argument('--departments', action='store_true',\
-        help='Update department codes')
+        help='Get department codes')
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -48,6 +46,5 @@ if __name__ == '__main__':
                      cache_dir = data_path)
 
     ts = slots.slots(dp.get_codes(), dp.get_cookie(),\
-                     update_slots = args.update_slots,\
                      silent = args.silent,\
                      cache_dir = data_path) 

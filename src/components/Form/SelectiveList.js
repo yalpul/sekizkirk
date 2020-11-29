@@ -1,4 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
+
+import {
+    CoursesContext,
+    ADD_SELECTIVE,
+    CANCEL_SELECTIVES,
+} from "../CoursesContext";
 
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
@@ -9,6 +15,8 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import CancelIcon from "@material-ui/icons/Cancel";
 
 const useStyles = makeStyles((theme) => ({
     selectiveContainer: {
@@ -31,30 +39,41 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const SelectiveList = ({
-    selectiveCourses,
-    setMustCourses,
-    mustCourses,
-    setSelectiveCourses,
-}) => {
+const SelectiveList = () => {
     const classes = useStyles();
+    const { coursesState, dispatch } = useContext(CoursesContext);
+    const { selectiveCourses } = coursesState;
 
     const handleSelectiveClick = (course) => {
-        setMustCourses([...mustCourses].concat(course));
-        setSelectiveCourses([]);
+        dispatch({ type: ADD_SELECTIVE, payload: { course } });
     };
 
+    const handleCancelClick = () => {
+        dispatch({ type: CANCEL_SELECTIVES });
+    };
+
+    console.log("SelectiveList rendered.");
     return (
         <Grid item className={classes.selectiveContainer}>
             {selectiveCourses.length > 0 && (
                 <>
-                    <Typography
-                        variant="subtitle1"
-                        className={classes.selectiveHeader}
-                        color="secondary"
-                    >
-                        Selectives for this semester
-                    </Typography>
+                    <Grid container justify="space-between">
+                        <Grid item>
+                            <Typography
+                                variant="subtitle1"
+                                className={classes.selectiveHeader}
+                                color="secondary"
+                            >
+                                Selectives for this semester
+                            </Typography>
+                        </Grid>
+
+                        <Grid item>
+                            <IconButton onClick={handleCancelClick}>
+                                <CancelIcon />
+                            </IconButton>
+                        </Grid>
+                    </Grid>
                     <Divider />
                     <List dense>
                         {selectiveCourses.map((course) => {

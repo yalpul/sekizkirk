@@ -6,8 +6,8 @@ import json
 from dept_codes import dept_codes
 
 class slots:
-    def __init__(self, course_codes, cookie, update_slots=False,\
-                 silent=False, cache_dir='sekizkirk_cache/'):
+    def __init__(self, course_codes, cookie, silent=False,\
+            cache_dir='sekizkirk_cache/'):
         self.url = \
             'https://oibs2.metu.edu.tr/View_Program_Course_Details_64/main.php'
 
@@ -23,7 +23,7 @@ class slots:
         self.course_slots = {}
         self.cookie = cookie
         try:
-            self.import_data(update_slots)
+            self.import_data()
         except KeyboardInterrupt:
             print('\nAbort.')
             sys.exit()
@@ -150,22 +150,17 @@ class slots:
         self.course_slots = course_slots
         self.log('Course slots collected.')
 
-    # Try to read data from files if they exist. Otherwise get from oibs
-    def import_data(self, force_update):
+    # Get course slot data from OIBS
+    def import_data(self):
         import os
+        from datetime import datetime, timezone, timedelta
         slots_path = os.path.join(self.cache_dir, 'course_slots.json')
-        if os.path.exists(slots_path) and not force_update:
-            self.log('Slots found. Importing...')
-            with open(slots_path, 'r') as f:
-                self.course_slots = eval(f.read())
-        else:
-            from datetime import datetime, timezone, timedelta
-            self.collect_course_slots()
-            ankara_timezone = timezone(timedelta(hours=3))
-            timestamp = datetime.now(tz=ankara_timezone).strftime('%d-%m-%Y %H:%M')
-            slots = {
-                'tstamp': timestamp,
-                'data': self.course_slots,
-            }
-            with open(slots_path, 'w') as f:
-                f.write(json.dumps(slots))
+        self.collect_course_slots()
+        ankara_timezone = timezone(timedelta(hours=3))
+        timestamp = datetime.now(tz=ankara_timezone).strftime('%d-%m-%Y %H:%M')
+        slots = {
+            'tstamp': timestamp,
+            'data': self.course_slots,
+        }
+        with open(slots_path, 'w') as f:
+            f.write(json.dumps(slots))

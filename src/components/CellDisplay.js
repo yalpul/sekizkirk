@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+
+import { CoursesContext, FIX_SECTION, UNFIX_SECTION } from "./CoursesContext";
 
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
@@ -15,55 +17,32 @@ export default function CourseDisplay({
     courseCode,
     sectionID,
     classroom,
-    fixedSections,
-    setFixedSections,
-    sectionChecks,
-    setSectionChecks,
     isFavsActive,
 }) {
+    const {
+        coursesState: { fixedSections },
+        dispatch,
+    } = useContext(CoursesContext);
+
     const [isMouseOver, setIsMouseOver] = useState(false);
     const [isFixed, setIsFixed] = useState(false);
 
     const handleFix = () => {
-        setFixedSections({
-            ...fixedSections,
-            [courseCode]: {
-                fixedSection: sectionID,
-                prevChecks: sectionChecks[courseCode],
-            },
-        });
-
-        // only check the course's fixed section as true,
-        // uncheck the remaining
-        setSectionChecks({
-            ...sectionChecks,
-            [courseCode]: sectionChecks[courseCode].map(
-                (_, index) => sectionID === index
-            ),
-        });
+        dispatch({ type: FIX_SECTION, payload: { courseCode, sectionID } });
     };
 
     const handleUnfix = () => {
-        setFixedSections({ ...fixedSections, [courseCode]: undefined });
-
-        // load the previosly selected sections for the courses
-        setSectionChecks({
-            ...sectionChecks,
-            [courseCode]: fixedSections[courseCode].prevChecks,
-        });
+        dispatch({ type: UNFIX_SECTION, payload: { courseCode } });
     };
 
     useEffect(() => {
-        try {
-            // fix other nodes on the table of the same sections as well
-            if (sectionID === fixedSections[courseCode].fixedSection) {
-                setIsFixed(true);
-            }
-        } catch (e) {
-            // unfix all the nodes of the section
-            if (isFixed) {
-                setIsFixed(false);
-            }
+        if (
+            fixedSections[courseCode] &&
+            sectionID === fixedSections[courseCode].fixedSection
+        ) {
+            setIsFixed(true);
+        } else {
+            setIsFixed(false);
         }
     }, [fixedSections]);
 
