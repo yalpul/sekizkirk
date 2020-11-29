@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function ScheduleTable({ tableDisplay, openDialog }) {
+export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
     const classes = useStyles();
 
     const {
@@ -231,14 +231,7 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
         // 5. user applies department constraint
 
         updateSchedules();
-    }, [
-        manualCourses,
-        mustCourses,
-        dontFills,
-        fixedSections,
-        firstTwoLetters,
-        dept,
-    ]);
+    }, [manualCourses, mustCourses, dontFills, fixedSections, firstTwoLetters]);
 
     useEffect(() => {
         // Insead of updating schedule in every `section check` change,
@@ -317,13 +310,24 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
     useEffect(() => {
         // when department constraint unchecked, clear dept section
         //
-        // `dept !== null` condition prevents unnecarry update to the same value.
-        if (deptCheck === false && dept !== null) setDept(null);
+        // `dept !== null` condition prevents unnecarry update.
+        if (dept !== null) {
+            updateSchedules();
+        }
     }, [deptCheck]);
 
-    // useEffect(() => {
-    //     setDept(mustDept);
-    // }, [mustDept]);
+    useEffect(() => {
+        // avoids updating table when user select must department
+        // but not check the department constraint yet.
+        if (deptCheck) {
+            updateSchedules();
+        }
+    }, [dept]);
+
+    useEffect(() => {
+        // when user select must course, also set it as default department for constraint.
+        setDept(mustDept);
+    }, [mustDept]);
 
     // // handlers
     const handleNavigateClick = (direction) => {

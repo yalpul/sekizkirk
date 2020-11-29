@@ -48,13 +48,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const AddMusts = () => {
+const AddMusts = ({ dept, setDept }) => {
     const classes = useStyles();
     const { departments } = useContext(DataContext);
     const { dispatch } = useContext(CoursesContext);
 
     const [semester, setSemester] = useState("");
-    const [dept, setDept] = useState(null);
 
     const handleDepartmentChange = (event, value) => {
         setDept(value);

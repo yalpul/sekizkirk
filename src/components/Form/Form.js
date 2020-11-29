@@ -31,7 +31,14 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Form = ({ tableDisplay, setTableDisplay, openDialog, setOpenDialog }) => {
+const Form = ({
+    tableDisplay,
+    setTableDisplay,
+    openDialog,
+    setOpenDialog,
+    dept,
+    setDept,
+}) => {
     const classes = useStyles();
 
     console.log("Form rendered.");
@@ -51,7 +58,7 @@ const Form = ({ tableDisplay, setTableDisplay, openDialog, setOpenDialog }) => {
 
             <AddCourse />
 
-            <AddMusts />
+            <AddMusts dept={dept} setDept={setDept} />
 
             <CoursesList
                 openDialog={openDialog}
