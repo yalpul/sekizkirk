@@ -1,6 +1,7 @@
-import React, { useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 
-import DataContext from "./DataContext";
+import { DataContext } from "../DataContext";
+import { CoursesContext, ADD_MUSTS } from "../CoursesContext";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -47,9 +48,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const AddMusts = ({ setDept, setSemester, semester }) => {
+const AddMusts = ({ dept, setDept }) => {
     const classes = useStyles();
-    const data = useContext(DataContext);
+    const { departments } = useContext(DataContext);
+    const { dispatch } = useContext(CoursesContext);
+
+    const [semester, setSemester] = useState("");
 
     const handleDepartmentChange = (event, value) => {
         setDept(value);
@@ -59,6 +63,14 @@ const AddMusts = ({ setDept, setSemester, semester }) => {
         setSemester(event.target.value);
     };
 
+    useEffect(() => {
+        // both inputs are selected
+        if (dept !== null && semester !== "") {
+            dispatch({ type: ADD_MUSTS, payload: { dept, semester } });
+        }
+    }, [dept, semester]);
+
+    console.log("AddMusts rendered.");
     return (
         <Grid item className={classes.accordionContainer}>
             <Accordion className={classes.accordion}>
@@ -74,7 +86,7 @@ const AddMusts = ({ setDept, setSemester, semester }) => {
                     <Grid container justify="space-around" alignItems="center">
                         <Grid item className={classes.deptSelect}>
                             <Autocomplete
-                                options={data.departments}
+                                options={departments}
                                 getOptionLabel={(department) =>
                                     department.title
                                 }
@@ -93,6 +105,7 @@ const AddMusts = ({ setDept, setSemester, semester }) => {
                                 blurOnSelect
                                 autoHighlight
                                 noOptionsText="Not found."
+                                value={dept}
                                 className={classes.mustSelect}
                             />
                         </Grid>
@@ -150,4 +163,4 @@ const AddMusts = ({ setDept, setSemester, semester }) => {
     );
 };
 
-export default React.memo(AddMusts);
+export default AddMusts;
