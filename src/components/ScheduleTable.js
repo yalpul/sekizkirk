@@ -94,9 +94,9 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
     const [currentDisplay, setCurrentDisplay] = useState(null);
     const [lastShownSchedule, setLastShownSchedule] = useState(null);
 
-    // const [surnameCheck, setSurnameCheck] = useState(false);
-    // const [surname, setSurname] = useState("");
-    // const [firstTwoLetters, setFirstTwoLetters] = useState("");
+    const [surnameCheck, setSurnameCheck] = useState(false);
+    const [surname, setSurname] = useState("");
+    const [firstTwoLetters, setFirstTwoLetters] = useState("");
 
     // const [deptCheck, setDeptCheck] = useState(false);
     // const [dept, setDept] = useState(null);
@@ -170,20 +170,22 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
                     //         // don't apply to this section.
                     //         // TODO: change this behavior?
                     //     }
-                    // } else if (surnameCheck && firstTwoLetters.length === 2) {
-                    //     // surname constraint applied
-                    //     try {
-                    //         const [[_, surStart, surEnd]] = constraints;
-                    //         const letters = firstTwoLetters.toUpperCase();
-                    //         if (!(surStart <= letters && letters <= surEnd)) {
-                    //             return null;
-                    //         }
-                    //     } catch (err) {
-                    //         // constraint data not avaliable
-                    //         // don't apply to this section.
-                    //         // TODO: change this behavior?
-                    //     }
                     // }
+                    else if (surnameCheck && firstTwoLetters.length === 2) {
+                        // surname constraint applied
+                        try {
+                            const [[, surStart, surEnd]] = constraints;
+                            const letters = firstTwoLetters.toUpperCase();
+                            if (!(surStart <= letters && letters <= surEnd)) {
+                                return null;
+                            }
+                        } catch (err) {
+                            // constraint data not avaliable
+                            // don't apply to this section.
+                            // TODO: change this behavior?
+                        }
+                    }
+
                     return [course, sectionIndex];
                 })
                 .filter((slots) => slots !== null);
@@ -195,10 +197,6 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
     }
     function updateSchedules() {
         setLoading(true);
-        // terminate the previous worker,
-        // this is usefull only when user changes the schedule inputs quickly,
-        // so the previous calculation does not matter(don't wait it to finish)
-        // worker.terminate();
 
         const uniqueCourses = [...new Set([...mustCourses, ...manualCourses])];
         const candidateCourseSections = findCandidateCourseSections(
@@ -232,12 +230,16 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
         // 3. user fixes any course section
 
         updateSchedules();
-    }, [manualCourses, mustCourses, dontFills, fixedSections]);
+    }, [manualCourses, mustCourses, dontFills, fixedSections, firstTwoLetters]);
 
     useEffect(() => {
-        // 4. user closesDialog, we presume that `sectionChecks` are changed
+        // Insead of updating schedule in every `section check` change,
+        // Only update when user closes the `section modal`
+        // This prevents unnecessary updates when user unchecks or checks multiple sections at once.
+        //
+        // Drawback of this solution is, when the user opens the modal and not change any section option,
+        // schedules will be updated when the modal closes.
 
-        // NOTE: 4th points behaviour might be changed later.
         if (openDialog !== null) return;
         updateSchedules();
     }, [openDialog]);
@@ -281,64 +283,28 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
         }
     }, [favSchedules]);
 
-    // useEffect(() => {
-    //     // letters inside the paranthesis
-    //     const insideParanthesis = /^\((\w\w)\)/;
-    //     const match = surname.match(insideParanthesis);
-    //     if (match) {
-    //         setFirstTwoLetters(match[1]);
-    //     } else {
-    //         setFirstTwoLetters("");
-    //     }
-    // }, [surname]);
+    useEffect(() => {
+        // OIBS only checks surname constraints accourding to first two letters
+        // of the surname. Remaining letters doesn't count in calculations.
 
-    // useEffect(() => {
-    //     // updateTable();
-    // }, [firstTwoLetters]);
+        const insideParanthesis = /^\((\w\w)\)/;
+        const match = surname.match(insideParanthesis);
+        if (match) {
+            setFirstTwoLetters(match[1]);
+        } else {
+            setFirstTwoLetters("");
+        }
+    }, [surname]);
 
-    // useEffect(() => {
-    //     if (surnameCheck === false && firstTwoLetters.length === 2) {
-    //         // TODO: maybe apply this only if the table's previous state was surname constrained.
-    //         // updateTable();
-    //         setSurname("");
-    //     }
-    // }, [surnameCheck]);
-
-    // useEffect(() => {
-    //     const tempTable = hours.map(() => days.map(() => []));
-
-    //     const schedule = displayedSchedules[currentSchedule] || [];
-    //     schedule.forEach(([course, sectionID], index) => {
-    //         const backgroundColor = cellColors[index % cellColors.length];
-    //         updateTempTable(course, sectionID, tempTable, backgroundColor);
-    //     });
-
-    //     setDisplayedSlot(tempTable);
-    // }, [currentSchedule, displayedSchedules]);
-
-    // useEffect(() => {
-    //     // when new schedules created, show them immediatly
-    //     setDisplayedSchedules(possibleSchedules);
-    //     setLastScheduleIndex(null);
-    //     setIsFavsActive(false);
-    // }, [possibleSchedules]);
-
-    // useEffect(() => {
-    //     if (displayedSchedules.length > 0) {
-    //         if (isFavsActive) {
-    //             // when a fav is unselected, show next favorite
-    //             setCurrentSchedule(currentSchedule % displayedSchedules.length);
-    //         } else {
-    //             if (lastScheduleIndex !== null) {
-    //                 setCurrentSchedule(lastScheduleIndex);
-    //             } else {
-    //                 setCurrentSchedule(0);
-    //             }
-    //         }
-    //     } else {
-    //         setCurrentSchedule(null);
-    //     }
-    // }, [displayedSchedules]);
+    useEffect(() => {
+        // when surname constraint unchecked, clear surname section
+        //
+        // `firstTwoLetters.length === 2` condition prevents unnecassry renders when
+        //  uncheking while there is no surname input
+        if (surnameCheck === false /*&& firstTwoLetters.length === 2*/) {
+            setSurname("");
+        }
+    }, [surnameCheck]);
 
     // useEffect(() => {
     //     setDept(mustDept);
@@ -359,33 +325,6 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
     //     }
     // }, [dept]);
 
-    // useEffect(() => {
-    //     // updateTable();
-    // }, [dontFills, sectionChecks, allowCollision]);
-
-    // useEffect(() => {
-    //     if (isFavsActive) {
-    //         setDisplayedSchedules(Object.values(favSchedules));
-    //         setLastScheduleIndex(currentSchedule);
-    //         setCurrentSchedule(0);
-    //     } else {
-    //         setDisplayedSchedules(possibleSchedules);
-    //     }
-    // }, [isFavsActive]);
-
-    // useEffect(() => {
-    //     // handle unselecting favorite section when showing favorites
-    //     if (isFavsActive) {
-    //         setDisplayedSchedules(Object.values(favSchedules));
-    //     }
-
-    //     // save favorites for other sessions
-    //     window.localStorage.setItem(
-    //         "favSchedules",
-    //         JSON.stringify(favSchedules)
-    //     );
-    // }, [favSchedules]);
-
     // // handlers
     const handleNavigateClick = (direction) => {
         if (direction === "next") {
@@ -399,17 +338,19 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
         }
     };
 
-    // const handleSurnameChange = (event) => {
-    //     const value = event.target.value;
-    //     const regTest = /^\(\w\w\)/;
-    //     if (value.length === 2) {
-    //         setSurname(`(${value})`);
-    //     } else if (value.length > 2 && value.match(regTest) === null) {
-    //         setSurname("");
-    //     } else {
-    //         setSurname(value);
-    //     }
-    // };
+    const handleSurnameChange = (event) => {
+        const value = event.target.value;
+        const regTest = /^\(\w\w\)/;
+        if (value.length === 2) {
+            // wrap first two letters with paranthesis.
+            setSurname(`(${value})`);
+        } else if (value.length > 2 && value.match(regTest) === null) {
+            // clear input when user attempts to clear first two letters.
+            setSurname("");
+        } else {
+            setSurname(value);
+        }
+    };
 
     const handleCellClick = (hourIndex, dayIndex) => {
         // toggle clicked cells don't fill value
@@ -642,7 +583,7 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
             </Grid>
 
             {/* restristions */}
-            {/* <Grid
+            <Grid
                 item
                 container
                 direction="row"
@@ -684,7 +625,7 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
                         </Grid>
                     </Grid>
                 </Grid>
-
+                {/* 
                 <Grid item>
                     <Grid item container direction="column">
                         <Grid item>
@@ -734,8 +675,8 @@ export default function ScheduleTable({ tableDisplay, openDialog }) {
                             </Collapse>
                         </Grid>
                     </Grid>
-                </Grid>
-            </Grid> */}
+                </Grid> */}
+            </Grid>
         </Grid>
     );
 }
