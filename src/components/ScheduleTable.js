@@ -38,11 +38,13 @@ import {
 import { scheduleHash } from "../utils";
 import { days, hours, cellColors } from "../constants";
 import CellDisplay from "./CellDisplay";
+import ScrollTop from "./ScrollTop";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
         minHeight: "100vh",
         backgroundColor: theme.palette.common.sekizkirkGrey,
+        position: "relative", // for positining `scrollTop` component absolutely to the right bottom
     },
     tableContainer: {
         width: "80%",
@@ -390,6 +392,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
             direction="column"
             alignItems="center"
         >
+            <ScrollTop />
             {/* table  */}
             <Grid item className={classes.tableContainer}>
                 <TableContainer component={Paper}>
