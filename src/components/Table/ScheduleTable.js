@@ -26,17 +26,17 @@ import FavoriteIcon from "@material-ui/icons/Favorite";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Tooltip from "@material-ui/core/Tooltip";
 
-import { DataContext } from "./DataContext";
-import { CoursesContext } from "./CoursesContext";
+import { DataContext } from "../DataContext";
+import { CoursesContext } from "../CoursesContext";
 import {
     DisplayContext,
     UPDATE_POSSIBLE_SCHEDULES,
     DELETE_FROM_FAVS,
     ADD_TO_FAVS,
     TOGGLE_DONT_FILL,
-} from "./DisplayContext";
-import { scheduleHash } from "../utils";
-import { days, hours, cellColors } from "../constants";
+} from "../DisplayContext";
+import { scheduleHash } from "../../utils";
+import { days, hours, cellColors } from "../../constants";
 import CellDisplay from "./CellDisplay";
 import ScrollTop from "./ScrollTop";
 
@@ -204,7 +204,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
             uniqueCourses
         );
 
-        const worker = new Worker("../workers/scheduleWorker.js");
+        const worker = new Worker("../../workers/scheduleWorker.js");
         worker.addEventListener("message", (message) => {
             const schedules = message.data;
             dispatch({

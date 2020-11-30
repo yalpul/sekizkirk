@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 
-import { CoursesContext, FIX_SECTION, UNFIX_SECTION } from "./CoursesContext";
+import { CoursesContext, FIX_SECTION, UNFIX_SECTION } from "../CoursesContext";
 
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";

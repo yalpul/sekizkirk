@@ -8,7 +8,7 @@ import { ThemeProvider } from "@material-ui/core";
 import LandingPage from "./components/LandingPage";
 import Form from "./components/Form/Form";
 import theme from "./components/Theme";
-import ScheduleTable from "./components/ScheduleTable";
+import ScheduleTable from "./components/Table/ScheduleTable";
 import Footer from "./components/Footer";
 import About from "./components/About";
 import { DataProvider } from "./components/DataContext";
