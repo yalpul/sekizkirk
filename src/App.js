@@ -11,6 +11,7 @@ import LandingPage from "./components/LandingPage";
 import Form from "./components/Form/Form";
 import theme from "./components/Theme";
 import ScheduleTable from "./components/ScheduleTable";
+import Footer from "./components/Footer";
 
 const App = () => {
     const [tableDisplay, setTableDisplay] = useState("none");
@@ -41,6 +42,7 @@ const App = () => {
                             />
                         </DisplayProvider>
                     </CoursesProvider>
+                    <Footer display={tableDisplay} />
                 </DataProvider>
             </main>
         </ThemeProvider>
