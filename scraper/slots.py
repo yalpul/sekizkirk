@@ -94,9 +94,59 @@ class slots:
 
     # Convert constraint data to a standard form
     def normalize_constraints(self, constraints):
-        return [c[:3] for c in constraints if \
+        def distance(letter_pair):
+            # distance is defined as letter's distance to 'AA'
+            letters = {'A':0, 'B':1, 'C':2, 'Ç':3, 'D':4, 'E':5,
+                'F':6, 'G':7, 'Ğ':8, 'H':9, 'I':10, 'İ':11, 'J':12,
+                'K':13, 'L':14, 'M':15, 'N':16, 'O':17, 'Ö':18,
+                'P':19, 'Q':20, 'R':21, 'S':22, 'Ş':23, 'T':24, 'U':25,
+                'Ü':26, 'V':27, 'W':28, 'X':29, 'Y':30, 'Z':31
+            }
+            a, b = letter_pair
+            return letters[a]*len(letters) + letters[b]
+
+        def merge_surname_ranges(surname_list):
+            def intersects(range1, range2):
+                distance1, distance2 = [
+                    distance(i)
+                    for i in [range1[1], range2[0]]
+                ]
+                return distance1 + 1 >= distance2
+
+            final_list = []
+            current = surname_list[0]
+            for surname in surname_list[1:]:
+                if intersects(current, surname):
+                    current = [
+                        current[0],
+                        max(current[1], surname[1], key=distance)
+                    ]
+                else:
+                    final_list.append(current)
+                    current = surname
+            final_list.append(current)
+            return sorted(final_list,
+                    key=lambda x: distance(x[1])-distance(x[0]),
+                    reverse=True)
+
+        filtered_constrainsts = [c[:3] for c in constraints if \
             c[3] == '0.00' and c[4] == '4.00' and \
             c[1] != c[2]]
+
+        constraints = {}
+        for dept, begin, end in filtered_constrainsts:
+            if dept in constraints:
+                constraints[dept].append([begin, end])
+            else:
+                constraints[dept] = [[begin, end]]
+        for dept, surnames in constraints.items():
+            constraints[dept] = merge_surname_ranges(sorted(surnames))
+        if constraints and 'ALL' not in constraints:
+            all_constrains = []
+            for constraint in constraints.values():
+                all_constrains += constraint
+            constraints['ALL'] = merge_surname_ranges(sorted(all_constrains))
+        return constraints
 
     # Parse the constraints page
     def parse_constraints(self, html):
