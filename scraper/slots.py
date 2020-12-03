@@ -141,11 +141,11 @@ class slots:
                 constraints[dept] = [[begin, end]]
         for dept, surnames in constraints.items():
             constraints[dept] = merge_surname_ranges(sorted(surnames))
-        if constraints and 'ALL' not in constraints:
+        if constraints:
             all_constrains = []
             for constraint in constraints.values():
                 all_constrains += constraint
-            constraints['ALL'] = merge_surname_ranges(sorted(all_constrains))
+            constraints['NONE'] = merge_surname_ranges(sorted(all_constrains))
         return constraints
 
     # Parse the constraints page
