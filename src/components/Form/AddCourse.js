@@ -48,7 +48,6 @@ const AddCourse = () => {
         return Object.values(data.courses);
     }, [data]);
 
-    console.log("AddCourse rendered.");
     return (
         <Grid item container direction="row" justify="center">
             <Grid item>

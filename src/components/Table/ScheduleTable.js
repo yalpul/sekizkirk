@@ -26,23 +26,26 @@ import FavoriteIcon from "@material-ui/icons/Favorite";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Tooltip from "@material-ui/core/Tooltip";
 
-import { DataContext } from "./DataContext";
-import { CoursesContext } from "./CoursesContext";
+import { DataContext } from "../DataContext";
+import { CoursesContext } from "../CoursesContext";
 import {
     DisplayContext,
     UPDATE_POSSIBLE_SCHEDULES,
     DELETE_FROM_FAVS,
     ADD_TO_FAVS,
     TOGGLE_DONT_FILL,
-} from "./DisplayContext";
-import { scheduleHash } from "../utils";
-import { days, hours, cellColors } from "../constants";
+} from "../DisplayContext";
+import { scheduleHash } from "../../utils";
+import { days, hours, cellColors } from "../../constants";
 import CellDisplay from "./CellDisplay";
+import ScrollTop from "./ScrollTop";
+import { distance } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
         minHeight: "100vh",
         backgroundColor: theme.palette.common.sekizkirkGrey,
+        position: "relative", // for positining `scrollTop` component absolutely to the right bottom
     },
     tableContainer: {
         width: "80%",
@@ -145,45 +148,78 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                 .map((section, sectionIndex) => {
                     const [, sectionSlots, constraints] = section;
 
+                    const isConstraintsEmpty =
+                        Object.keys(constraints).length === 0;
+                    const applyDeptConstraint = deptCheck && dept !== null;
+                    const applySurnameContraint =
+                        surnameCheck && firstTwoLetters.length === 2;
+
                     if (sectionSlots.length === 0) {
                         // slots data not avaliable
                         return null;
-                    } else if (
+                    }
+
+                    if (
                         // sectionChecks[course.code] &&
                         sectionChecks[course.code][sectionIndex] === false
                     ) {
                         // this section omitted by the user
                         return null;
-                    } else if (deptCheck && dept !== null) {
-                        //  dept constraint applied
-                        try {
-                            const [[deptConstraint]] = constraints;
+                    }
+
+                    // only apply constraints if there is data avaiable for it.
+                    if (!isConstraintsEmpty) {
+                        if (applyDeptConstraint && applySurnameContraint) {
+                            let surnameList;
+                            const letters = firstTwoLetters.toUpperCase();
+
+                            if (constraints["ALL"])
+                                surnameList = constraints["ALL"];
+                            else if (constraints[dept.title])
+                                surnameList = constraints[dept.title];
+                            else return null;
+
+                            for (let [surStart, surEnd] of surnameList) {
+                                if (
+                                    distance(surStart[0], surStart[1]) <=
+                                        distance(letters[0], letters[1]) &&
+                                    distance(letters[0], letters[1]) <=
+                                        distance(surEnd[0], surEnd[1])
+                                ) {
+                                    return [course, sectionIndex];
+                                }
+                            }
+
+                            return null;
+                        } else if (applyDeptConstraint) {
+                            // pass only if selected department is included in constraints or
+                            // `ALL` included as wildcard.
                             if (
-                                deptConstraint !== "ALL" &&
-                                deptConstraint !== dept.title
+                                !constraints["ALL"] &&
+                                !constraints[dept.title]
                             ) {
                                 return null;
                             }
-                        } catch (err) {
-                            // constraint data not avaliable
-                            // don't apply to this section.
-                            // TODO: change this behavior?
-                        }
-                    } else if (surnameCheck && firstTwoLetters.length === 2) {
-                        // surname constraint applied
-                        try {
-                            const [[, surStart, surEnd]] = constraints;
+                        } else if (applySurnameContraint) {
+                            const surnameList = constraints["NONE"];
                             const letters = firstTwoLetters.toUpperCase();
-                            if (!(surStart <= letters && letters <= surEnd)) {
-                                return null;
+
+                            for (let [surStart, surEnd] of surnameList) {
+                                if (
+                                    distance(surStart[0], surStart[1]) <=
+                                        distance(letters[0], letters[1]) &&
+                                    distance(letters[0], letters[1]) <=
+                                        distance(surEnd[0], surEnd[1])
+                                ) {
+                                    return [course, sectionIndex];
+                                }
                             }
-                        } catch (err) {
-                            // constraint data not avaliable
-                            // don't apply to this section.
-                            // TODO: change this behavior?
+
+                            return null;
                         }
                     }
 
+                    // section passed all tests
                     return [course, sectionIndex];
                 })
                 .filter((slots) => slots !== null);
@@ -202,7 +238,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
             uniqueCourses
         );
 
-        const worker = new Worker("../workers/scheduleWorker.js");
+        const worker = new Worker("../../workers/scheduleWorker.js");
         worker.addEventListener("message", (message) => {
             const schedules = message.data;
             dispatch({
@@ -210,7 +246,6 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                 payload: { schedules },
             });
             setLoading(false);
-            console.log("update");
             worker.terminate();
         });
 
@@ -380,7 +415,6 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
         setIsFavsActive(!isFavsActive);
     };
 
-    console.log("ScheduleTable rendered.");
     return (
         <Grid
             container
@@ -390,6 +424,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
             direction="column"
             alignItems="center"
         >
+            <ScrollTop />
             {/* table  */}
             <Grid item className={classes.tableContainer}>
                 <TableContainer component={Paper}>

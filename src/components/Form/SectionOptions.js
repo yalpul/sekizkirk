@@ -40,7 +40,6 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
         dispatch({ type: TOGGLE_COLLISION, payload: { course } });
     };
 
-    console.log("SectionOptions rendered.");
     return (
         <Dialog
             open={index === openDialog}

@@ -70,7 +70,6 @@ const AddMusts = ({ dept, setDept }) => {
         }
     }, [dept, semester]);
 
-    console.log("AddMusts rendered.");
     return (
         <Grid item className={classes.accordionContainer}>
             <Accordion className={classes.accordion}>
