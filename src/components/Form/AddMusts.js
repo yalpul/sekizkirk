@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 
 const AddMusts = ({ dept, setDept }) => {
     const classes = useStyles();
-    const { departments } = useContext(DataContext);
+    const { departments, musts } = useContext(DataContext);
     const { dispatch } = useContext(CoursesContext);
 
     const [semester, setSemester] = useState("");
@@ -85,7 +85,10 @@ const AddMusts = ({ dept, setDept }) => {
                     <Grid container justify="space-around" alignItems="center">
                         <Grid item className={classes.deptSelect}>
                             <Autocomplete
-                                options={departments}
+                                options={departments.filter(
+                                    // only show departments that have musts data avaliable.
+                                    ({ code }) => musts[code] !== undefined
+                                )}
                                 getOptionLabel={(department) =>
                                     department.title
                                 }

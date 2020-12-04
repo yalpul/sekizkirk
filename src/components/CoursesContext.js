@@ -76,10 +76,16 @@ export const CoursesProvider = ({ children }) => {
                 semester - 1
             ];
 
+            // some must codes doesn't included in courses data,
+            // filter them.
+            const filteredMusts = mustCodes.filter(
+                (code) => courses[code] !== undefined
+            );
+
             // add sections checks and allow collision for must courses
             const sectionsForMusts = {};
             const collisionForMusts = {};
-            mustCodes.forEach((code) => {
+            filteredMusts.forEach((code) => {
                 const sections = courseSlots[code];
                 sectionsForMusts[code] = sections.map(() => true);
                 collisionForMusts[code] = false;
@@ -89,7 +95,7 @@ export const CoursesProvider = ({ children }) => {
             // must courses that are not used.
             return {
                 ...state,
-                mustCourses: mustCodes.map((code) => courses[code]),
+                mustCourses: filteredMusts.map((code) => courses[code]),
                 selectiveCourses: selectiveCodes.map((code) => courses[code]),
                 electiveCourses: [...electiveTypes],
                 sectionChecks: { ...sectionsForMusts, ...sectionChecks },
