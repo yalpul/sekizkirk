@@ -20,7 +20,6 @@ const App = () => {
     const [openDialog, setOpenDialog] = useState(null);
     const [dept, setDept] = useState(null);
 
-    console.log("app rendered.");
     return (
         <Router>
             <ThemeProvider theme={theme}>

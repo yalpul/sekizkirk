@@ -52,7 +52,6 @@ const SelectiveList = () => {
         dispatch({ type: CANCEL_SELECTIVES });
     };
 
-    console.log("SelectiveList rendered.");
     return (
         <Grid item className={classes.selectiveContainer}>
             {selectiveCourses.length > 0 && (

@@ -249,7 +249,6 @@ export const CoursesProvider = ({ children }) => {
     };
 
     const [coursesState, dispatch] = useReducer(reducer, initialState);
-    console.log(coursesState);
     return (
         <CoursesContext.Provider value={{ coursesState, dispatch }}>
             {children}

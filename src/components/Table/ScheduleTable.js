@@ -194,7 +194,6 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                         } else if (applyDeptConstraint) {
                             // pass only if selected department is included in constraints or
                             // `ALL` included as wildcard.
-                            console.log("i am dumb");
                             if (
                                 !constraints["ALL"] &&
                                 !constraints[dept.title]
@@ -247,7 +246,6 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                 payload: { schedules },
             });
             setLoading(false);
-            console.log("update");
             worker.terminate();
         });
 
@@ -417,7 +415,6 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
         setIsFavsActive(!isFavsActive);
     };
 
-    console.log("ScheduleTable rendered.");
     return (
         <Grid
             container

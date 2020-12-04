@@ -41,7 +41,6 @@ const Form = ({
 }) => {
     const classes = useStyles();
 
-    console.log("Form rendered.");
     return (
         <Grid
             container

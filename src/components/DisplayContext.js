@@ -75,7 +75,6 @@ export const DisplayProvider = ({ children }) => {
         );
     }, [favSchedules]);
 
-    console.log(displayState);
     return (
         <DisplayContext.Provider value={{ displayState, dispatch }}>
             {children}
