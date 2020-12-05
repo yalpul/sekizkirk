@@ -77,7 +77,10 @@ class slots:
             constraints_html = self.get_constraints_html(section)
             constraints = self.parse_constraints(constraints_html)
             standard_constraints = self.normalize_constraints(constraints)
-            idx = html.find('<TABLE>', idx)
+            inst_start = html.find(start_str, idx_end)
+            inst_end = html.find(end_str, inst_start)
+            instructor_name = html[inst_start+len(start_str):inst_end]
+            idx = html.find('<TABLE>', inst_end)
             time_slots= []
             for i in range(5):
                 record = []
@@ -89,7 +92,8 @@ class slots:
                     idx = idx2
                 if len(record) > 1:
                     time_slots += self.to_standard_form(record)
-            slots.append([section, time_slots, standard_constraints])
+            slots.append(
+                [section, time_slots, standard_constraints, instructor_name])
         return slots
 
     # Convert constraint data to a standard form
