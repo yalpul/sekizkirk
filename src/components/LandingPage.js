@@ -7,8 +7,6 @@ import Grid from "@material-ui/core/Grid";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
 
-import "../index.css";
-
 import Arrow from "../assets/arrow.svg";
 
 // Note: Positining with relative involved many trial-errors.
