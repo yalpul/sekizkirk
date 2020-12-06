@@ -82,10 +82,10 @@ WSGI_APPLICATION = 'sekizkirk.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sekizkirk_test',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'NAME': 'sekizkirk',
+        'USER': 'sekizkirk',
+        'PASSWORD': 'sekizkirk',
+        'HOST': '127.0.0.1',
         'PORT': 5432,
     }
 }
@@ -115,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Istanbul'
 
 USE_I18N = True
 
