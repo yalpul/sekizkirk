@@ -1,17 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="minimum-scale=1, initial-scale=1, width=device-width"
+        />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Sekizkirk</title>
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-    <title>Sekizkirk</title>
-</head>
+        <style>
+            @font-face {
+                font-family: "Agrandir";
+                src: local("Agrandir"),
+                    url("https://cash-f.squarecdn.com/static/fonts/agrandir/Agrandir-GrandHeavy.woff")
+                        format("woff");
+            }
 
-<body>
-    <div id="root">Not Rendered!</div>
-    <script src="index.js"></script>
-</body>
+            @font-face {
+                font-family: "CashMarket";
+                src: local("CashMarket"),
+                    url("https://cash-f.squarecdn.com/static/fonts/cash-market/v2/CashMarket-RegularRounded.woff2")
+                        format("woff");
+            }
 
+            html,
+            body {
+                max-width: 100%;
+                scroll-behavior: smooth;
+                overflow-x: hidden;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="root">Loading ...</div>
+        <script src="index.js"></script>
+    </body>
 </html>

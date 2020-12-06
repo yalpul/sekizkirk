@@ -32,7 +32,7 @@
         "format": "prettier --write src/**/*.{js,jsx}",
         "lint": "eslint src/**/*.{js,jsx} --quiet",
         "dev": "parcel src/index.html",
-        "build": "parcel build src/index.html",
+        "build": "parcel build src/index.html --no-source-maps",
         "preCommit": "yarn format && yarn lint"
     },
     "browserslist": [

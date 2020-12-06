@@ -42,6 +42,7 @@ const AddCourse = () => {
 
     const handleCourseAdd = () => {
         dispatch({ type: ADD_COURSE, payload: { course } });
+        setCourse(null);
     };
 
     const options = React.useMemo(() => {
@@ -59,6 +60,7 @@ const AddCourse = () => {
                     onInputChange={(event, value) => setCourseInput(value)}
                     onClose={() => setCourseInput("")} // prevent popup options
                     onChange={(event, value) => setCourse(value)}
+                    value={course}
                     renderInput={(params) => (
                         <TextField
                             {...params}

@@ -20,8 +20,6 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
 
 const useStyles = makeStyles((theme) => ({
     courseListContainer: {
@@ -59,6 +57,10 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
 
     const handleElectiveClick = (index) => {
         document.getElementById("course-select").focus();
+        dispatch({ type: ELECTIVE_SELECT, payload: { index } });
+    };
+
+    const handleElectiveDelete = (index) => {
         dispatch({ type: ELECTIVE_SELECT, payload: { index } });
     };
 
@@ -116,9 +118,14 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
                                 onClick={() => handleElectiveClick(index)}
                             >
                                 <ListItemText primary={`Add your ${type}`} />
-                                <ListItemIcon style={{ paddingLeft: "2.5em" }}>
-                                    <AddCircleIcon className="list-icon" />
-                                </ListItemIcon>
+                                <ListItemSecondaryAction>
+                                    <IconButton
+                                        edge="end"
+                                        onClick={handleElectiveDelete}
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </ListItemSecondaryAction>
                             </ListItem>
                         ))}
                     </List>

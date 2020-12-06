@@ -12,19 +12,18 @@ export const hours = [
     "16:40-17:30",
 ];
 
+// Found out, I am color blind :(
 export const cellColors = [
-    "#002E2E",
-    "#7A00CC",
-    "#29A329",
-    "#CCCC00",
-    "#00CCCC",
-    "#00008A",
-    "#666633",
-    "#002900",
-    "#005C5C",
-    "#00FF00",
-    "#E62EB8",
-    "#CC3300",
-    "#808080",
-    "#CC0000",
+    "#4E79A7",
+    "#D9CA68",
+    "#9C755F",
+    "#B07AA1",
+    "#DB8A74",
+    "#76B7B2", // sky blue
+    "#30815C", // dark green
+    "#A4A64E",
+    "#FF9DA7", // pink
+    "#BAB0AC", // grey
+    "#F28E2B", // orange
+    "#E15759", //  red
 ];
