@@ -238,6 +238,23 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
             uniqueCourses
         );
 
+        // if there are courses without any candidate sections,
+        // making a schedule is impossible. This accually means none of the
+        // sections of that course pass the constraint filters.
+        const nonEmptyCourses = candidateCourseSections.filter(
+            (courseSections) => courseSections.length !== 0
+        );
+        if (nonEmptyCourses.length !== candidateCourseSections.length) {
+            dispatch({
+                type: UPDATE_POSSIBLE_SCHEDULES,
+                payload: { schedules: [] },
+            });
+            setLoading(false);
+            return;
+        }
+
+        // All courses have candidate sections.
+        // Run worker to find possible schedules.
         const worker = new Worker("../../workers/scheduleWorker.js");
         worker.addEventListener("message", (message) => {
             const schedules = message.data;
