@@ -1,13 +1,12 @@
 import urllib.request as req
 import urllib.parse as parse
-import sys
+import os
 import json
 
 from dept_codes import dept_codes
 
 class slots:
-    def __init__(self, course_codes, cookie, silent=False,\
-            cache_dir='sekizkirk_cache/'):
+    def __init__(self, cache_path, cookie=None, course_codes=None, silent=True):
         self.url = \
             'https://oibs2.metu.edu.tr/View_Program_Course_Details_64/main.php'
 
@@ -18,15 +17,14 @@ class slots:
         self.constraint_form = {'submit_section' : None,
                                 'hidden_redir'     : 'Course_Info'}
         self.silent = silent
-        self.cache_dir = cache_dir
+        self.cache_path = cache_path
         self.course_codes = course_codes
         self.course_slots = {}
         self.cookie = cookie
-        try:
-            self.import_data()
-        except KeyboardInterrupt:
-            print('\nAbort.')
-            sys.exit()
+
+    # set the course codes array. slots will scrape the data of this list
+    def set_course_codes(self, course_codes):
+        self.course_codes = course_codes
 
     # Convert day-hour format to indexed format
     # ['Monday', '8:40', '10:30', <classroom>] to
@@ -210,16 +208,17 @@ class slots:
         self.log('Course slots collected.')
 
     # Get course slot data from OIBS
-    def import_data(self):
-        import os
-        from datetime import datetime, timezone, timedelta
-        slots_path = os.path.join(self.cache_dir, 'course_slots.json')
-        self.collect_course_slots()
-        ankara_timezone = timezone(timedelta(hours=3))
-        timestamp = datetime.now(tz=ankara_timezone).strftime('%d-%m-%Y %H:%M')
-        slots = {
-            'tstamp': timestamp,
-            'data': self.course_slots,
-        }
-        with open(slots_path, 'w') as f:
-            f.write(json.dumps(slots))
+    def import_data(self, force_update=False):
+        slots_path = self.cache_path
+        if os.path.exists(slots_path) and not force_update:
+            self.log('Course slots found. Importing...')
+            with open(slots_path, 'r') as f:
+                self.course_slots = json.loads(f.read())
+        else:
+            self.collect_course_slots()
+            with open(slots_path, 'w') as f:
+                f.write(json.dumps(self.course_slots))
+
+    # return slots data. data must be imported beforehand
+    def get_slots(self):
+        return self.course_slots

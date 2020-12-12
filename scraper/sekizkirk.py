@@ -2,10 +2,8 @@
 
 import os
 import sys
-import depts
-import musts
-import slots
 import json
+import scraper
 from argparse import ArgumentParser
 
 
@@ -15,46 +13,37 @@ def parse_arguments():
         default='sekizkirk_cache/')
     parser.add_argument('--silent', action='store_true',\
         help='Do not write anything to stdout')
-    parser.add_argument('--update-courses', action='store_true',\
-        help='Force an update on course data')
-    parser.add_argument('--musts', action='store_true',\
-        help='Get must courses')
-    parser.add_argument('--departments', action='store_true',\
-        help='Get department codes')
     return parser.parse_args()
 
-def sekizkirk_scrape(path='sekizkirk_cache', musts=False, departments=False, silent=True, update_courses=False):
+def sekizkirk_scrape(path='sekizkirk_cache', silent=False):
     data_path = os.path.join(os.getcwd(), path)
     if not os.path.exists(data_path):
         os.mkdir(data_path)
+    sc = scraper.scraper(cache_path=data_path, silent=silent)
+    sc.init_scraper()
 
-    if musts:
-        must_data = musts.get_all_musts(silent)
-        with open(os.path.join(data_path, 'musts.json'), 'w') as f:
-            f.write(json.dumps(must_data))
+    sc.scrape_musts()
+    must_data = sc.get_musts()
 
-    if departments:
-        departments = depts.depts.get_department_codes()
-        with open(os.path.join(data_path, 'departments.json'), 'w') as f:
-            f.write(json.dumps(departments))
+    with open(os.path.join(data_path, 'musts.json'), 'w') as f:
+        f.write(json.dumps(must_data))
 
+    departments = sc.get_dept_codes()
 
-    dp = depts.depts(update_courses = update_courses,\
-                     silent = silent,\
-                     cache_dir = data_path)
+    with open(os.path.join(data_path, 'departments.json'), 'w') as f:
+        f.write(json.dumps(departments))
 
-    ts = slots.slots(dp.get_codes(), dp.get_cookie(),\
-                     silent = silent,\
-                     cache_dir = data_path) 
+    try:
+        sc.update_data()
+    except KeyboardInterrupt:
+        print('\nAbort.')
+        sys.exit()
 
 if __name__ == '__main__':
     args = parse_arguments()
 
     sekizkirk_scrape(
         path=args.path,
-        musts=args.musts,
-        departments=args.departments,
         silent=args.silent,
-        update_courses=args.update_courses
     )
 
