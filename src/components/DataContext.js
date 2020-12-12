@@ -1,20 +1,23 @@
-import React, { createContext } from "react";
+import React, { useState, useEffect, createContext } from "react";
 
-import courseSlots from "../../data/course_slots.json";
-import musts from "../../data/musts.json";
-import departments from "../../data/departments.json";
-import courses from "../../data/courses.json";
-
-const data = {
-    musts,
-    courses,
-    departments,
-    courseSlots: courseSlots.data,
-    lastUpdate: courseSlots.tstamp,
-};
+const data_url = "/data.json";
 
 export const DataContext = createContext({});
 
 export const DataProvider = ({ children }) => {
+    const [data, setData] = useState({
+        musts: {},
+        courses: {},
+        departments: [],
+        courseSlots: {},
+        lastUpdate: "",
+    });
+
+    useEffect(() => {
+        fetch(data_url)
+            .then((response) => response.json())
+            .then((data) => setData(data));
+    }, []);
+
     return <DataContext.Provider value={data}>{children}</DataContext.Provider>;
 };
