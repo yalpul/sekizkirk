@@ -51,11 +51,21 @@ export default function SendButton({ schedule }) {
     const [notify, setNotify] = useState(false);
 
     const handleMailSend = () => {
-        const test_url = "http://localhost:8000/email/";
+        const test_url = "/email/";
+
+        // Format schedule load for backend processing
+        const load = {};
+        schedule.forEach((courseInfo) => {
+            const [course, sectionId] = courseInfo;
+            const { code } = course;
+
+            load[code] = sectionId;
+        });
+
         axios
             .post(test_url, {
                 email,
-                schedule,
+                schedule: load,
                 notify,
             })
             .then((response) => console.log(response))

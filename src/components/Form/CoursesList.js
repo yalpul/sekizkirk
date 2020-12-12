@@ -73,7 +73,6 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
         }
     }, [openDialog]);
 
-    console.log("course list update");
     return (
         <Grid item className={classes.courseListContainer}>
             {(courses.length > 0 || electiveCourses.length > 0) && (
