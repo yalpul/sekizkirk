@@ -39,6 +39,7 @@ import { scheduleHash } from "../../utils";
 import { days, hours, cellColors } from "../../constants";
 import CellDisplay from "./CellDisplay";
 import ScrollTop from "./ScrollTop";
+import SendButton from "./SendButton";
 import { distance } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
@@ -461,6 +462,11 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                                 alignItems="center"
                                 style={{ position: "relative" }}
                             >
+                                <SendButton
+                                    schedule={
+                                        displayedSchedules[currentSchedule]
+                                    }
+                                />
                                 {loading ? (
                                     <CircularProgress />
                                 ) : (
