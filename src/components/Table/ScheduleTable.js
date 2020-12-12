@@ -105,6 +105,16 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
     const [dept, setDept] = useState(null);
 
     // helper functions
+    const isSlotsDataAvaliable = (courseCode) => {
+        for (let section of courseSlots[courseCode]) {
+            const [, sectionSlots] = section;
+            if (sectionSlots.length !== 0) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     const updateDisplay = () => {
         const newDisplay = hours.map(() => days.map(() => []));
 
@@ -141,10 +151,17 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
 
     function findCandidateCourseSections(courses) {
         const candidateCourseSections = [];
-        courses.forEach((course, courseIndex) => {
+        courses.forEach((course) => {
+            if (!isSlotsDataAvaliable(course.code)) {
+                // sections slots data not avaliable for the course,
+                // don't include it into calculations.
+                // Otherwise, there would be no possible schedules.
+                return;
+            }
+
             // each course has its own array of sections
             const sections = courseSlots[course.code];
-            candidateCourseSections[courseIndex] = sections
+            const candidateSections = sections
                 .map((section, sectionIndex) => {
                     const [, sectionSlots, constraints] = section;
 
@@ -223,6 +240,8 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                     return [course, sectionIndex];
                 })
                 .filter((slots) => slots !== null);
+
+            candidateCourseSections.push(candidateSections);
         });
         // sort courses as their section number, ascending order
         candidateCourseSections.sort((a, b) => a.length - b.length);
