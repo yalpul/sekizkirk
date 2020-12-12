@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 
 import {
     CoursesContext,
@@ -43,6 +43,9 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
     const { coursesState, dispatch } = useContext(CoursesContext);
     const { mustCourses, manualCourses, electiveCourses } = coursesState;
 
+    const [coursesMouseOver, setCoursesMouseOver] = useState(null);
+    const [electivesMouseOver, setElectivesMouseOver] = useState(null);
+
     // find unique courses, same courses might be added manuelly as well as
     // included in the musts.
     const courses = [...new Set([...mustCourses, ...manualCourses])];
@@ -64,6 +67,13 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
         dispatch({ type: ELECTIVE_SELECT, payload: { index } });
     };
 
+    useEffect(() => {
+        if (openDialog === null) {
+            setCoursesMouseOver(null);
+        }
+    }, [openDialog]);
+
+    console.log("course list update");
     return (
         <Grid item className={classes.courseListContainer}>
             {(courses.length > 0 || electiveCourses.length > 0) && (
@@ -94,9 +104,25 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
                                     key={`${course.title}+${course.code}`}
                                     button
                                     onClick={() => setOpenDialog(index)}
+                                    ContainerProps={{
+                                        onMouseOver: () =>
+                                            setCoursesMouseOver(index),
+                                        onFocus: () =>
+                                            setCoursesMouseOver(index),
+                                        onMouseOut: () =>
+                                            setCoursesMouseOver(null),
+                                        onBlur: () => setCoursesMouseOver(null),
+                                    }}
                                 >
                                     <ListItemText primary={course.title} />
-                                    <ListItemSecondaryAction>
+                                    <ListItemSecondaryAction
+                                        style={{
+                                            display:
+                                                coursesMouseOver === index
+                                                    ? undefined
+                                                    : "none",
+                                        }}
+                                    >
                                         <IconButton
                                             edge="end"
                                             onClick={() =>
@@ -116,9 +142,24 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
                                 justify="space-between"
                                 className={classes.listItem}
                                 onClick={() => handleElectiveClick(index)}
+                                ContainerProps={{
+                                    onMouseOver: () =>
+                                        setElectivesMouseOver(index),
+                                    onFocus: () => setElectivesMouseOver(index),
+                                    onMouseOut: () =>
+                                        setElectivesMouseOver(null),
+                                    onBlur: () => setElectivesMouseOver(null),
+                                }}
                             >
                                 <ListItemText primary={`Add your ${type}`} />
-                                <ListItemSecondaryAction>
+                                <ListItemSecondaryAction
+                                    style={{
+                                        display:
+                                            electivesMouseOver === index
+                                                ? undefined
+                                                : "none",
+                                    }}
+                                >
                                     <IconButton
                                         edge="end"
                                         onClick={handleElectiveDelete}
@@ -139,6 +180,7 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
                     course={course}
                     openDialog={openDialog}
                     setOpenDialog={setOpenDialog}
+                    setMouse={setCoursesMouseOver}
                     key={`${course}+${index}`}
                 />
             ))}
