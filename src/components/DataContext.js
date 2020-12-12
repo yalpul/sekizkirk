@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext } from "react";
 
-const data_url = "https://sekizkirk.io/data.json";
+const data_url = "/data.json";
 
 export const DataContext = createContext({});
 
