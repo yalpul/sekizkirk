@@ -2,20 +2,35 @@ import json
 
 from django.http import HttpResponse
 
+from django.core.mail import send_mail
+
 from .models import Person, Course, Takes
 
 
 def index(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
+    try:
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            mail_addr = data['email']
 
-        person = Person(data['email'])
-        person.save()
-        for course in data['courses']:
-            takes = Takes(person, course)
-            takes.save()
+            person = Person(email=mail_addr)
+            person.save()
+            for courseid in data['courses']:
+                course = Course.objects.get(course=courseid)
+                takes = Takes(person=person, course=course)
+                takes.save()
 
 
-        # TODO: implement mail service here
+            sendmail(mail_addr)
 
-        return HttpResponse() 
+            return HttpResponse() 
+    except:
+        return HttpResponse(b'Error', status=404)
+
+def sendmail(mail_addr):
+    send_mail('Your schedule',
+        'We\'ve received your schedule and we will notify you when your courses change',
+        'support@sekizkirk.io',
+        [mail_addr],
+        fail_silently=False,
+    )
