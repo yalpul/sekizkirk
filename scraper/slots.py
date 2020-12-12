@@ -69,6 +69,7 @@ class slots:
         section_str = '<INPUT TYPE="submit" VALUE="'
         slots = []
         idx = 0
+        any_slots = False
         while True:
             idx = html.find(section_str, idx)
             if idx == -1: break
@@ -92,9 +93,13 @@ class slots:
                     idx = idx2
                 if len(record) > 1:
                     time_slots += self.to_standard_form(record)
-            slots.append(
-                [section, time_slots, standard_constraints, instructor_name])
-        return slots
+            if time_slots:
+                any_slots = True
+            slots.append([section, time_slots, standard_constraints, instructor_name])
+        if any_slots:
+            return slots
+        else:
+            return []
 
     # Convert constraint data to a standard form
     def normalize_constraints(self, constraints):
