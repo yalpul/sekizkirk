@@ -23,28 +23,38 @@ def parse_arguments():
         help='Get department codes')
     return parser.parse_args()
 
-if __name__ == '__main__':
-    args = parse_arguments()
-
-    data_path = os.path.join(os.getcwd(), args.path)
+def sekizkirk_scrape(path='sekizkirk_cache', musts=False, departments=False, silent=True, update_courses=False):
+    data_path = os.path.join(os.getcwd(), path)
     if not os.path.exists(data_path):
         os.mkdir(data_path)
 
-    if args.musts:
-        must_data = musts.get_all_musts(args.silent)
+    if musts:
+        must_data = musts.get_all_musts(silent)
         with open(os.path.join(data_path, 'musts.json'), 'w') as f:
             f.write(json.dumps(must_data))
 
-    if args.departments:
+    if departments:
         departments = depts.depts.get_department_codes()
         with open(os.path.join(data_path, 'departments.json'), 'w') as f:
             f.write(json.dumps(departments))
 
 
-    dp = depts.depts(update_courses = args.update_courses,\
-                     silent = args.silent,\
+    dp = depts.depts(update_courses = update_courses,\
+                     silent = silent,\
                      cache_dir = data_path)
 
     ts = slots.slots(dp.get_codes(), dp.get_cookie(),\
-                     silent = args.silent,\
+                     silent = silent,\
                      cache_dir = data_path) 
+
+if __name__ == '__main__':
+    args = parse_arguments()
+
+    sekizkirk_scrape(
+        path=args.path,
+        musts=args.musts,
+        departments=args.departments,
+        silent=args.silent,
+        update_courses=args.update_courses
+    )
+
