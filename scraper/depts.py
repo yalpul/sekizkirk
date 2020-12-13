@@ -3,7 +3,7 @@ import urllib.parse as parse
 import os
 import json
 
-from dept_codes import dept_codes
+from .dept_codes import dept_codes
 
 class depts:
     def __init__(self, cache_path, silent=True):

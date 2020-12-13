@@ -2,10 +2,10 @@
 
 import os
 import sys
-import depts
-import musts
-import slots
 import json
+from .depts import depts
+from .musts import musts
+from .slots import slots
 
 class scraper:
     def __init__(self, cache_path, silent=True):
@@ -16,9 +16,11 @@ class scraper:
         self.slots = []
         self.courses = []
         self.data = {}
+        self.musts_path = os.path.join(self.path, 'musts.json')
         self.courses_path = os.path.join(self.path, 'courses.json')
         self.slots_path = os.path.join(self.path, 'course_slots.json')
         self.data_path = os.path.join(self.path, 'data.json')
+        self.musts_scraper = None
         self.depts_scraper = None
         self.slots_scraper = None
 
@@ -26,27 +28,33 @@ class scraper:
         if not os.path.exists(self.path):
             os.mkdir(self.path)
 
-        self.depts_scraper = depts.depts(
+        self.musts_scraper = musts(
+            cache_path = self.musts_path,
+            silent = self.silent
+        )
+
+        self.depts_scraper = depts(
             cache_path = self.courses_path,
             silent = self.silent
         )
 
-        self.slots_scraper = slots.slots(
+        self.slots_scraper = slots(
             cache_path = self.slots_path,
             cookie = self.depts_scraper.get_cookie(),
             silent = self.silent
         )
         
-    def scrape_musts(self):
-        self.musts = musts.get_all_musts(silent=self.silent)
+    def scrape_musts(self, force_update=True):
+        self.musts_scraper.import_data(force_update=force_update)
+        self.musts = self.musts_scraper.get_musts()
 
     def get_musts(self):
         if not self.musts:
-            self.scrape_musts()
+            self.scrape_musts(force_update=False)
         return self.musts
 
     def get_dept_codes(self):
-        self.dept_codes = depts.depts.get_department_codes()
+        self.dept_codes = depts.get_department_codes()
 
     def scrape_courses(self, force_update=True):
         self.depts_scraper.import_data(force_update=force_update)

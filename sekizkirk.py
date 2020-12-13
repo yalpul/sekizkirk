@@ -3,7 +3,7 @@
 import os
 import sys
 import json
-import scraper
+from scraper.scraper import scraper
 from argparse import ArgumentParser
 
 
@@ -19,14 +19,8 @@ def sekizkirk_scrape(path='sekizkirk_cache', silent=False):
     data_path = os.path.join(os.getcwd(), path)
     if not os.path.exists(data_path):
         os.mkdir(data_path)
-    sc = scraper.scraper(cache_path=data_path, silent=silent)
+    sc = scraper(cache_path=data_path, silent=silent)
     sc.init_scraper()
-
-    sc.scrape_musts()
-    must_data = sc.get_musts()
-
-    with open(os.path.join(data_path, 'musts.json'), 'w') as f:
-        f.write(json.dumps(must_data))
 
     departments = sc.get_dept_codes()
 
