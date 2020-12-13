@@ -15,6 +15,7 @@
                 src: local("Agrandir"),
                     url("https://cash-f.squarecdn.com/static/fonts/agrandir/Agrandir-GrandHeavy.woff")
                         format("woff");
+                font-display: swap;
             }
 
             @font-face {
@@ -22,6 +23,7 @@
                 src: local("CashMarket"),
                     url("https://cash-f.squarecdn.com/static/fonts/cash-market/v2/CashMarket-RegularRounded.woff2")
                         format("woff");
+                font-display: swap;
             }
 
             html,
@@ -34,7 +36,7 @@
     </head>
 
     <body>
-        <div id="root">Loading ...</div>
+        <div id="root" style="background-color: #000; height: 100vh;"></div>
         <script src="index.js"></script>
     </body>
 </html>
