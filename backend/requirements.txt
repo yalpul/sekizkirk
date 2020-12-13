@@ -1,4 +1,4 @@
 django==3.1
 django-cors-headers==3.5
 psycopg2-binary>=2.8
-gunicorn
+gunicorn>=20.0.4
