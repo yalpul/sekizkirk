@@ -15,8 +15,12 @@ import IconButton from "@material-ui/core/IconButton";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import Tooltip from "@material-ui/core/Tooltip";
-import { DialogContentText, Typography } from "@material-ui/core";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import Typography from "@material-ui/core/Typography";
 import InfoIcon from "@material-ui/icons/Info";
+import LinearProgress from "@material-ui/core/LinearProgress";
+import Alert from "@material-ui/lab/Alert";
+import Snackbar from "@material-ui/core/Snackbar";
 
 const useStyles = makeStyles((theme) => ({
     button: {
@@ -48,9 +52,18 @@ export default function SendButton({ schedule }) {
     const [validEmail, setValidEmail] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     const [email, setEmail] = useState("");
+
     const [notify, setNotify] = useState(false);
+    const [sending, setSending] = useState(false);
+    const [alert, setAlert] = useState({
+        open: false,
+        message: "",
+        severity: "",
+    });
 
     const handleMailSend = () => {
+        setSending(true);
+
         const test_url = "/email/";
 
         // Format schedule load for backend processing
@@ -62,14 +75,48 @@ export default function SendButton({ schedule }) {
             load[code] = sectionId;
         });
 
+        let message, severity;
         axios
             .post(test_url, {
                 email,
                 schedule: load,
                 notify,
             })
-            .then((response) => console.log(response))
-            .catch((error) => console.log(error));
+            .then((response) => {
+                message = "Email sent succesfully.";
+                severity = "success";
+            })
+            .catch((error) => {
+                if (error.response === undefined) {
+                    // error occured while sending the request
+                    message =
+                        "Connection couldn't be established with the email server. Please try again later.";
+                    severity = "error";
+                } else {
+                    // error occured on the server
+                    (message =
+                        "An error occurred on the server while sending the email. Please try again later."),
+                        (severity = "error");
+                }
+            })
+            .finally(() => {
+                setAlert({
+                    open: true,
+                    message,
+                    severity,
+                });
+
+                setOpen(false);
+                setSending(false);
+            });
+    };
+
+    const handleClose = (event, reason) => {
+        if (reason === "clickaway") {
+            return;
+        }
+
+        setAlert({ open: false, message: "" });
     };
 
     useEffect(() => {
@@ -109,108 +156,132 @@ export default function SendButton({ schedule }) {
                     Get Your Schedule
                 </DialogTitle>
                 <DialogContent>
-                    <Grid container direction="column" align="center">
-                        <Grid
-                            item
-                            style={{
-                                marginTop: "-1em",
-                                marginBottom: "2em",
-                                alignSelf: "start",
-                            }}
-                        >
-                            <DialogContentText>
-                                We can send your schedule via email.
-                            </DialogContentText>
-                        </Grid>
-
-                        <Grid item container align="center" justify="center">
-                            <Grid item>
-                                <TextField
-                                    variant="outlined"
-                                    label="your email"
-                                    type="email"
-                                    error={showError}
-                                    helperText={
-                                        showError
-                                            ? "enter a valid email adress"
-                                            : ""
-                                    }
-                                    value={email}
-                                    onChange={(event) =>
-                                        setEmail(event.target.value)
-                                    }
-                                    onFocus={() => setIsFocused(true)}
-                                    onBlur={() => setIsFocused(false)}
-                                />
+                    {sending ? (
+                        <LinearProgress />
+                    ) : (
+                        <Grid container direction="column" align="center">
+                            <Grid
+                                item
+                                style={{
+                                    marginTop: "-1em",
+                                    marginBottom: "2em",
+                                    alignSelf: "start",
+                                }}
+                            >
+                                <DialogContentText>
+                                    We can send your schedule via email.
+                                </DialogContentText>
                             </Grid>
 
                             <Grid
                                 item
-                                style={{
-                                    marginTop: "0.25em",
-                                    marginLeft: "1em",
-                                }}
+                                container
+                                align="center"
+                                justify="center"
                             >
-                                <IconButton
-                                    className={classes.sendIcon}
-                                    disabled={!validEmail}
-                                    onClick={handleMailSend}
-                                >
-                                    <SendIcon />
-                                </IconButton>
-                            </Grid>
-                        </Grid>
-
-                        <Grid item>
-                            <Grid container alignItems="center">
                                 <Grid item>
-                                    <FormControlLabel
-                                        style={{ marginTop: "2em" }}
-                                        control={
-                                            <Checkbox
-                                                checked={notify}
-                                                onChange={(event) =>
-                                                    setNotify(
-                                                        event.target.checked
-                                                    )
-                                                }
-                                                name="notify notify"
-                                                color="primary"
-                                            />
+                                    <TextField
+                                        variant="outlined"
+                                        label="your email"
+                                        type="email"
+                                        error={showError}
+                                        helperText={
+                                            showError
+                                                ? "enter a valid email adress"
+                                                : ""
                                         }
-                                        label="Notify me upon changes in my course hours."
+                                        value={email}
+                                        onChange={(event) =>
+                                            setEmail(event.target.value)
+                                        }
+                                        onFocus={() => setIsFocused(true)}
+                                        onBlur={() => setIsFocused(false)}
                                     />
                                 </Grid>
 
                                 <Grid
                                     item
                                     style={{
-                                        marginTop: "35px",
+                                        marginTop: "0.25em",
+                                        marginLeft: "1em",
                                     }}
                                 >
-                                    <Tooltip
-                                        title="Schedule changes in registration weeks are unfortunate but possible.
+                                    <IconButton
+                                        className={classes.sendIcon}
+                                        disabled={!validEmail}
+                                        onClick={handleMailSend}
+                                    >
+                                        <SendIcon />
+                                    </IconButton>
+                                </Grid>
+                            </Grid>
+
+                            <Grid item>
+                                <Grid container alignItems="center">
+                                    <Grid item>
+                                        <FormControlLabel
+                                            style={{ marginTop: "2em" }}
+                                            control={
+                                                <Checkbox
+                                                    checked={notify}
+                                                    onChange={(event) =>
+                                                        setNotify(
+                                                            event.target.checked
+                                                        )
+                                                    }
+                                                    name="notify notify"
+                                                    color="primary"
+                                                />
+                                            }
+                                            label="Notify me upon changes in my course hours."
+                                        />
+                                    </Grid>
+
+                                    <Grid
+                                        item
+                                        style={{
+                                            marginTop: "35px",
+                                        }}
+                                    >
+                                        <Tooltip
+                                            title="Schedule changes in registration weeks are unfortunate but possible.
                                         We'll inform you about the updates.
                                         "
-                                        arrow
-                                    >
-                                        <InfoIcon
-                                            style={{
-                                                color:
-                                                    theme.palette.secondary
-                                                        .light,
-                                            }}
-                                        />
-                                    </Tooltip>
+                                            arrow
+                                        >
+                                            <InfoIcon
+                                                style={{
+                                                    color:
+                                                        theme.palette.secondary
+                                                            .light,
+                                                }}
+                                            />
+                                        </Tooltip>
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         </Grid>
-                    </Grid>
+                    )}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)}>cancel</Button>
+                    {!sending && (
+                        <Button onClick={() => setOpen(false)}>cancel</Button>
+                    )}
                 </DialogActions>
             </Dialog>
+            <Snackbar
+                open={alert.open}
+                autoHideDuration={5000}
+                onClose={handleClose}
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity={alert.severity}
+                    variant="filled"
+                >
+                    {alert.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 }
