@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import { DataContext } from "../DataContext";
 import {
@@ -21,12 +21,16 @@ import Tooltip from "@material-ui/core/Tooltip";
 import HelpIcon from "@material-ui/icons/Help";
 import FormControl from "@material-ui/core/FormControl";
 import Button from "@material-ui/core/Button";
+import FilterListIcon from "@material-ui/icons/FilterList";
 import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
 
 const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
     const { courseSlots } = useContext(DataContext);
     const { coursesState, dispatch } = useContext(CoursesContext);
     const { sectionChecks, allowCollision, fixedSections } = coursesState;
+
+    const [showInstructors, setShowInstructors] = useState(false);
 
     const handleUnselectAll = (course) => {
         dispatch({ type: UNSELECT_ALL_SECTIONS, payload: { course } });
@@ -106,6 +110,29 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
                                             Unselect All
                                         </Button>
                                     </Grid>
+
+                                    <Grid item>
+                                        {!fixedSections[course.code] && (
+                                            <Tooltip
+                                                title="filter by instructor"
+                                                arrow
+                                                enterDelay={500}
+                                            >
+                                                <IconButton
+                                                    aria-label="filter"
+                                                    color="secondary"
+                                                    onClick={() =>
+                                                        setShowInstructors(
+                                                            !showInstructors
+                                                        )
+                                                    }
+                                                >
+                                                    <FilterListIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        )}
+                                    </Grid>
+
                                     <Grid item>
                                         {fixedSections[course.code] && (
                                             <Tooltip
