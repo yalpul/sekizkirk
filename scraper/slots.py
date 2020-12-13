@@ -1,13 +1,12 @@
 import urllib.request as req
 import urllib.parse as parse
-import sys
+import os
 import json
 
-from dept_codes import dept_codes
+from .dept_codes import dept_codes
 
 class slots:
-    def __init__(self, course_codes, cookie, silent=False,\
-            cache_dir='sekizkirk_cache/'):
+    def __init__(self, cache_path, cookie=None, course_codes=None, silent=True):
         self.url = \
             'https://oibs2.metu.edu.tr/View_Program_Course_Details_64/main.php'
 
@@ -18,15 +17,14 @@ class slots:
         self.constraint_form = {'submit_section' : None,
                                 'hidden_redir'     : 'Course_Info'}
         self.silent = silent
-        self.cache_dir = cache_dir
+        self.cache_path = cache_path
         self.course_codes = course_codes
         self.course_slots = {}
         self.cookie = cookie
-        try:
-            self.import_data()
-        except KeyboardInterrupt:
-            print('\nAbort.')
-            sys.exit()
+
+    # set the course codes array. slots will scrape the data of this list
+    def set_course_codes(self, course_codes):
+        self.course_codes = course_codes
 
     # Convert day-hour format to indexed format
     # ['Monday', '8:40', '10:30', <classroom>] to
@@ -69,6 +67,7 @@ class slots:
         section_str = '<INPUT TYPE="submit" VALUE="'
         slots = []
         idx = 0
+        any_slots = False
         while True:
             idx = html.find(section_str, idx)
             if idx == -1: break
@@ -77,7 +76,10 @@ class slots:
             constraints_html = self.get_constraints_html(section)
             constraints = self.parse_constraints(constraints_html)
             standard_constraints = self.normalize_constraints(constraints)
-            idx = html.find('<TABLE>', idx)
+            inst_start = html.find(start_str, idx_end)
+            inst_end = html.find(end_str, inst_start)
+            instructor_name = html[inst_start+len(start_str):inst_end]
+            idx = html.find('<TABLE>', inst_end)
             time_slots= []
             for i in range(5):
                 record = []
@@ -89,8 +91,13 @@ class slots:
                     idx = idx2
                 if len(record) > 1:
                     time_slots += self.to_standard_form(record)
-            slots.append([section, time_slots, standard_constraints])
-        return slots
+            if time_slots:
+                any_slots = True
+            slots.append([section, time_slots, standard_constraints, instructor_name])
+        if any_slots:
+            return slots
+        else:
+            return []
 
     # Convert constraint data to a standard form
     def normalize_constraints(self, constraints):
@@ -201,16 +208,17 @@ class slots:
         self.log('Course slots collected.')
 
     # Get course slot data from OIBS
-    def import_data(self):
-        import os
-        from datetime import datetime, timezone, timedelta
-        slots_path = os.path.join(self.cache_dir, 'course_slots.json')
-        self.collect_course_slots()
-        ankara_timezone = timezone(timedelta(hours=3))
-        timestamp = datetime.now(tz=ankara_timezone).strftime('%d-%m-%Y %H:%M')
-        slots = {
-            'tstamp': timestamp,
-            'data': self.course_slots,
-        }
-        with open(slots_path, 'w') as f:
-            f.write(json.dumps(slots))
+    def import_data(self, force_update=False):
+        slots_path = self.cache_path
+        if os.path.exists(slots_path) and not force_update:
+            self.log('Course slots found. Importing...')
+            with open(slots_path, 'r') as f:
+                self.course_slots = json.loads(f.read())
+        else:
+            self.collect_course_slots()
+            with open(slots_path, 'w') as f:
+                f.write(json.dumps(self.course_slots))
+
+    # return slots data. data must be imported beforehand
+    def get_slots(self):
+        return self.course_slots

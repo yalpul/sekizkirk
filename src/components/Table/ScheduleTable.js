@@ -104,17 +104,6 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
     const [deptCheck, setDeptCheck] = useState(false);
     const [dept, setDept] = useState(null);
 
-    // helper functions
-    const isSlotsDataAvaliable = (courseCode) => {
-        for (let section of courseSlots[courseCode]) {
-            const [, sectionSlots] = section;
-            if (sectionSlots.length !== 0) {
-                return true;
-            }
-        }
-        return false;
-    };
-
     const updateDisplay = () => {
         const newDisplay = hours.map(() => days.map(() => []));
 
@@ -152,7 +141,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
     function findCandidateCourseSections(courses) {
         const candidateCourseSections = [];
         courses.forEach((course) => {
-            if (!isSlotsDataAvaliable(course.code)) {
+            if (courseSlots[course.code].length === 0) {
                 // sections slots data not avaliable for the course,
                 // don't include it into calculations.
                 // Otherwise, there would be no possible schedules.

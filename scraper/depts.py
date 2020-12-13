@@ -1,13 +1,12 @@
 import urllib.request as req
 import urllib.parse as parse
-import sys
+import os
 import json
 
-from dept_codes import dept_codes
+from .dept_codes import dept_codes
 
 class depts:
-    def __init__(self, update_courses=False,\
-                 silent=False, cache_dir='sekizkirk_cache/'):
+    def __init__(self, cache_path, silent=True):
         self.url = \
             'https://oibs2.metu.edu.tr/View_Program_Course_Details_64/main.php'
 
@@ -20,14 +19,9 @@ class depts:
         self.course_codes = []
         self.course_names = []
         self.courses = {}
-        self.cache_dir = cache_dir
+        self.cache_path = cache_path
         self.dept_form['select_semester'] = self.get_current_semester()
         self.log(f"Semester: {self.dept_form['select_semester']}")
-        try:
-            self.import_data(update_courses)
-        except KeyboardInterrupt:
-            print('\nAbort.')
-            sys.exit()
 
     def log(self, msg, progress=False):
         if not self.silent:
@@ -102,9 +96,8 @@ class depts:
         return self.courses
 
     # Try to read data from files if they exist. Otherwise get from oibs
-    def import_data(self, force_update):
-        import os
-        courses_path = os.path.join(self.cache_dir, 'courses.json')
+    def import_data(self, force_update=False):
+        courses_path = self.cache_path
         if os.path.exists(courses_path) and not force_update:
             self.log('Course codes found. Importing...')
             with open(courses_path, 'r') as f:
@@ -114,6 +107,10 @@ class depts:
             self.courses = self.merge_course_data()
             with open(courses_path, 'w') as f:
                 f.write(json.dumps(self.courses))
+
+    # return course data. data must be imported beforehand
+    def get_courses(self):
+        return self.courses
 
     def get_codes(self):
         return self.courses.keys()
