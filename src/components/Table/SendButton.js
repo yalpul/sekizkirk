@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import axios from "axios";
 
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -44,27 +44,94 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+// initial statae
+const initState = {
+    // only one of the sending and alertOpen
+    // can be true at the same time
+    dialogOpen: false,
+    sending: false,
+    alertOpen: false,
+    message: "",
+    severity: "",
+};
+
+// actions
+const OPEN_DIALOG = "OPEN_DIALOG";
+const CLOSE_DIALOG = "CLOSE_DIALOG";
+const SENDING = "SENDING";
+const CLOSE_ALERT = "CLOSE_ALERT";
+const DISPLAY_SUCCESS = "DISPLAY_ALERT";
+const DISPLAY_FAILURE = "DISPLAY_FAILURE";
+
+const reducer = (state, action) => {
+    if (action.type === OPEN_DIALOG) {
+        return {
+            ...initState,
+            dialogOpen: true,
+        };
+    }
+
+    if (action.type === CLOSE_DIALOG) {
+        return {
+            ...initState,
+            dialogOpen: false,
+        };
+    }
+
+    if (action.type === SENDING) {
+        return {
+            ...initState,
+            dialogOpen: true,
+            sending: true,
+        };
+    }
+
+    if (action.type === CLOSE_ALERT) {
+        return initState;
+    }
+
+    if (action.type === DISPLAY_SUCCESS) {
+        const { message } = action.payload;
+
+        return {
+            dialogOpen: false, // close the dialog when feedback given
+            sending: true, // prevents quick popup of dialog when before closing it.
+            alertOpen: true,
+            message,
+            severity: "success",
+        };
+    }
+
+    if (action.type === DISPLAY_FAILURE) {
+        const { message } = action.payload;
+        return {
+            dialogOpen: false, // close the dialog when feedback given
+            sending: true, // prevents quick popup of dialog when before closing it.
+            alertOpen: true,
+            message,
+            severity: "error",
+        };
+    }
+
+    return state;
+};
+
 export default function SendButton({ schedule }) {
     const classes = useStyles();
     const theme = useTheme();
 
-    const [open, setOpen] = useState(false);
     const [validEmail, setValidEmail] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     const [email, setEmail] = useState("");
-
     const [notify, setNotify] = useState(false);
-    const [sending, setSending] = useState(false);
-    const [alert, setAlert] = useState({
-        open: false,
-        message: "",
-        severity: "",
-    });
+
+    const [
+        { dialogOpen, sending, alertOpen, message, severity },
+        dispatch,
+    ] = useReducer(reducer, initState);
 
     const handleMailSend = () => {
-        setSending(true);
-
-        const test_url = "/email/";
+        const test_url = "http://localhost:8000/email/";
 
         // Format schedule load for backend processing
         const load = {};
@@ -75,7 +142,8 @@ export default function SendButton({ schedule }) {
             load[code] = sectionId;
         });
 
-        let message, severity;
+        dispatch({ type: SENDING });
+
         axios
             .post(test_url, {
                 email,
@@ -83,40 +151,40 @@ export default function SendButton({ schedule }) {
                 notify,
             })
             .then((response) => {
-                message = "Email sent succesfully.";
-                severity = "success";
+                dispatch({
+                    type: DISPLAY_SUCCESS,
+                    payload: { message: "Email send succesfully." },
+                });
             })
             .catch((error) => {
                 if (error.response === undefined) {
                     // error occured while sending the request
-                    message =
-                        "Connection couldn't be established with the email server. Please try again later.";
-                    severity = "error";
+                    dispatch({
+                        type: DISPLAY_FAILURE,
+                        payload: {
+                            message:
+                                "Connection couldn't be established with the email server. Please try again later.",
+                        },
+                    });
                 } else {
                     // error occured on the server
-                    (message =
-                        "An error occurred on the server while sending the email. Please try again later."),
-                        (severity = "error");
+                    dispatch({
+                        type: DISPLAY_FAILURE,
+                        payload: {
+                            message:
+                                " An error occurred on the server while sending the email. Please try again later. ",
+                        },
+                    });
                 }
-            })
-            .finally(() => {
-                setAlert({
-                    open: true,
-                    message,
-                    severity,
-                });
-
-                setOpen(false);
-                setSending(false);
             });
     };
 
-    const handleClose = (event, reason) => {
+    const handleAlertClose = (event, reason) => {
         if (reason === "clickaway") {
             return;
         }
 
-        setAlert({ open: false, message: "" });
+        dispatch({ type: CLOSE_ALERT });
     };
 
     useEffect(() => {
@@ -134,7 +202,7 @@ export default function SendButton({ schedule }) {
                 endIcon={<SendIcon />}
                 className={classes.button}
                 size="small"
-                onClick={() => setOpen(true)}
+                onClick={() => dispatch({ type: OPEN_DIALOG })}
             >
                 <Typography
                     variant="body1"
@@ -144,9 +212,10 @@ export default function SendButton({ schedule }) {
                     Send
                 </Typography>
             </Button>
+
             <Dialog
-                open={open}
-                onClose={() => setOpen(false)}
+                open={dialogOpen}
+                onClose={() => dispatch({ type: CLOSE_DIALOG })}
                 aria-labelledby="form-dialog-title"
             >
                 <DialogTitle
@@ -265,21 +334,26 @@ export default function SendButton({ schedule }) {
                 </DialogContent>
                 <DialogActions>
                     {!sending && (
-                        <Button onClick={() => setOpen(false)}>cancel</Button>
+                        <Button
+                            onClick={() => dispatch({ type: CLOSE_DIALOG })}
+                        >
+                            cancel
+                        </Button>
                     )}
                 </DialogActions>
             </Dialog>
+
             <Snackbar
-                open={alert.open}
+                open={alertOpen}
                 autoHideDuration={5000}
-                onClose={handleClose}
+                onClose={handleAlertClose}
             >
                 <Alert
-                    onClose={handleClose}
-                    severity={alert.severity}
+                    onClose={handleAlertClose}
+                    severity={severity}
                     variant="filled"
                 >
-                    {alert.message}
+                    {message}
                 </Alert>
             </Snackbar>
         </>
