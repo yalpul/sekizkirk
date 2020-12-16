@@ -25,6 +25,7 @@ export const TOGGLE_COLLISION = "TOGGLE_COLLISION";
 export const CANCEL_SELECTIVES = "CANCEL_SELECTIVES";
 export const FIX_SECTION = "FIX_SECTION";
 export const UNFIX_SECTION = "UNFIX_SECTION";
+export const TOGGLE_INSTRUCTOR = "TOGGLE_INSTRUCTOR";
 
 export const CoursesContext = createContext({});
 
@@ -247,6 +248,27 @@ export const CoursesProvider = ({ children }) => {
                 sectionChecks: {
                     ...sectionChecks,
                     [courseCode]: fixedSections[courseCode].prevChecks,
+                },
+            };
+        }
+
+        if (action.type === TOGGLE_INSTRUCTOR) {
+            const { courseCode, instructorName, active } = action.payload;
+            const { sectionChecks } = state;
+
+            const temp = [...sectionChecks[courseCode]];
+            courseSlots[courseCode].forEach((slot, index) => {
+                const [, , , name] = slot;
+                if (name === instructorName) {
+                    temp[index] = active;
+                }
+            });
+
+            return {
+                ...state,
+                sectionChecks: {
+                    ...sectionChecks,
+                    [courseCode]: temp,
                 },
             };
         }

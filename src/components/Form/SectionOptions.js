@@ -6,6 +6,7 @@ import {
     UNSELECT_ALL_SECTIONS,
     TOGGLE_CHECK,
     TOGGLE_COLLISION,
+    TOGGLE_INSTRUCTOR,
 } from "../CoursesContext";
 
 import { useTheme, makeStyles } from "@material-ui/core/styles";
@@ -36,6 +37,9 @@ const useStyles = makeStyles((theme) => ({
         color: "#fff",
         marginRight: "0.5em",
         marginBottom: "0.5em",
+        "&:focus": {
+            backgroundColor: theme.palette.common.sekizkirkGrey,
+        },
     },
 }));
 
@@ -67,6 +71,15 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
         const temp = [...instructorActive];
         temp[index] = !temp[index];
         setInstructorActive(temp);
+
+        dispatch({
+            type: TOGGLE_INSTRUCTOR,
+            payload: {
+                courseCode: course.code,
+                instructorName: instructors[index],
+                active: temp[index],
+            },
+        });
     };
 
     useEffect(() => {
