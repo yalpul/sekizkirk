@@ -131,7 +131,7 @@ export default function SendButton({ schedule }) {
     ] = useReducer(reducer, initState);
 
     const handleMailSend = () => {
-        const test_url = "http://localhost:8000/email/";
+        const test_url = "/email/";
 
         // Format schedule load for backend processing
         const load = {};
