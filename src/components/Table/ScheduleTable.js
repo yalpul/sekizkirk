@@ -71,6 +71,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+let worker = new Worker("../../workers/scheduleWorker.js");
+
 export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
     const classes = useStyles();
 
@@ -240,6 +242,9 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
     }
 
     function updateSchedules() {
+        // terminate pending workers if updateSchedules invoked consecutive
+        worker.terminate();
+
         setLoading(true);
 
         const uniqueCourses = [...new Set([...mustCourses, ...manualCourses])];
@@ -264,7 +269,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
 
         // All courses have candidate sections.
         // Run worker to find possible schedules.
-        const worker = new Worker("../../workers/scheduleWorker.js");
+        worker = new Worker("../../workers/scheduleWorker.js");
         worker.addEventListener("message", (message) => {
             const schedules = message.data;
             dispatch({
