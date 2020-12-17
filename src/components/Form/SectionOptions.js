@@ -23,7 +23,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import HelpIcon from "@material-ui/icons/Help";
 import FormControl from "@material-ui/core/FormControl";
 import Button from "@material-ui/core/Button";
-import FilterListIcon from "@material-ui/icons/FilterList";
+import TuneIcon from "@material-ui/icons/Tune";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import Chip from "@material-ui/core/Chip";
@@ -57,8 +57,8 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
         fixedSections,
     } = coursesState;
 
-    const [instructors, setInstuctors] = useState([]);
     const [showInstructors, setShowInstructors] = useState(false);
+    const [instructors, setInstuctors] = useState([]);
     const [instructorActive, setInstructorActive] = useState([]);
 
     const handleUnselectAll = (course) => {
@@ -201,7 +201,7 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
                                                                 )
                                                             }
                                                         >
-                                                            <FilterListIcon />
+                                                            <TuneIcon />
                                                         </IconButton>
                                                     </Tooltip>
                                                 )}
