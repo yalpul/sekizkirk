@@ -63,6 +63,57 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
 
     const handleCheck = (course, index) => {
         dispatch({ type: TOGGLE_CHECK, payload: { course, index } });
+
+        /**
+         *
+         * logic for changing instuctor activation when
+         * section check is changed. NOTE: refactor this, it's so dame ugly.
+         */
+        const [, , , targetInstructorName] = courseSlots[course.code][index];
+        const newSectionStatus = !sectionChecks[course.code][index];
+
+        let sectionsShareSameActivation = true;
+        let targetActivation;
+        if (newSectionStatus === true) {
+            instructorSections[targetInstructorName].forEach((sectionID) => {
+                if (
+                    sectionID !== index &&
+                    sectionChecks[course.code][sectionID] === false
+                ) {
+                    // there are still sections to be checked for the instuctor,
+                    // don't activate it.
+                    sectionsShareSameActivation = false;
+                }
+            });
+            targetActivation = true;
+        } else if (newSectionStatus === false) {
+            instructorSections[targetInstructorName].forEach((sectionID) => {
+                if (
+                    sectionID !== index &&
+                    sectionChecks[course.code][sectionID] === true
+                ) {
+                    // there are still sections to be unchecked for the instructor,
+                    // don't deactivate it.
+                    sectionsShareSameActivation = false;
+                }
+            });
+            targetActivation = false;
+        }
+
+        if (sectionsShareSameActivation === true) {
+            setInstructorsActive(
+                instructorsActive.map(([name, isActive]) => {
+                    if (
+                        name === targetInstructorName &&
+                        isActive !== targetActivation
+                    ) {
+                        return [name, !isActive];
+                    }
+                    return [name, isActive];
+                })
+            );
+        }
+        /** */
     };
 
     const handleCollisionCheck = (course) => {
