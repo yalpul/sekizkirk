@@ -273,15 +273,12 @@ export const CoursesProvider = ({ children }) => {
         }
 
         if (action.type === TOGGLE_INSTRUCTOR) {
-            const { courseCode, instructorName, active } = action.payload;
+            const { courseCode, instructorSections, isActive } = action.payload;
             const { sectionChecks } = state;
 
             const temp = [...sectionChecks[courseCode]];
-            courseSlots[courseCode].forEach((slot, index) => {
-                const [, , , name] = slot;
-                if (name === instructorName) {
-                    temp[index] = active;
-                }
+            instructorSections.forEach((sectionId) => {
+                temp[sectionId] = isActive;
             });
 
             return {

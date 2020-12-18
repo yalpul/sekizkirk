@@ -52,13 +52,13 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
     const { sectionChecks, allowCollision, fixedSections } = coursesState;
 
     const [showInstructors, setShowInstructors] = useState(false);
-    const [instructors, setInstuctors] = useState([]);
-    const [instructorActive, setInstructorActive] = useState([]);
+    const [instructorSections, setInstructorSections] = useState({});
+    const [instructorsActive, setInstructorsActive] = useState([]);
 
     const handleUnselectAll = (course) => {
         dispatch({ type: UNSELECT_ALL_SECTIONS, payload: { course } });
 
-        setInstructorActive(instructors.map(() => false));
+        setInstructorsActive(instructorsActive.map(([name]) => [name, false]));
     };
 
     const handleCheck = (course, index) => {
@@ -69,37 +69,50 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
         dispatch({ type: TOGGLE_COLLISION, payload: { course } });
     };
 
-    const handleInstructorClick = (index) => {
-        const temp = [...instructorActive];
-        temp[index] = !temp[index];
-        setInstructorActive(temp);
+    const handleInstructorClick = (targetIndex) => {
+        const [targetName, currentIsActive] = instructorsActive[targetIndex];
+        const changedIsActive = !currentIsActive;
 
+        // toggle the clicked insturctors `active` state
+        setInstructorsActive(
+            instructorsActive.map(([name, isActive], i) => {
+                if (targetIndex === i) {
+                    return [name, changedIsActive];
+                }
+                return [name, isActive];
+            })
+        );
+
+        // send the toggled instructors sections for activated or deactivated.
         dispatch({
             type: TOGGLE_INSTRUCTOR,
             payload: {
                 courseCode: course.code,
-                instructorName: instructors[index],
-                active: temp[index],
+                instructorSections: instructorSections[targetName],
+                isActive: changedIsActive,
             },
         });
     };
 
     useEffect(() => {
-        const getInstructors = () => {
-            // unique instructors
-            return [
-                ...new Set(
-                    courseSlots[course.code].map((slot) => {
-                        const [, , , instructorName] = slot;
-                        return instructorName;
-                    })
-                ),
-            ];
-        };
+        // fetch instructor data when component mounts.
+        const instructorSections = {};
 
-        const instructors = getInstructors();
-        setInstuctors(instructors);
-        setInstructorActive(instructors.map(() => true));
+        courseSlots[course.code].forEach((slots, index) => {
+            const [, , , instructorName] = slots;
+            try {
+                instructorSections[instructorName].push(index);
+            } catch (e) {
+                if (e instanceof TypeError) {
+                    instructorSections[instructorName] = [index];
+                }
+            }
+        });
+
+        setInstructorSections(instructorSections);
+        setInstructorsActive(
+            Object.keys(instructorSections).map((name) => [name, true])
+        );
     }, []);
 
     return (
@@ -221,17 +234,15 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
                                     >
                                         {!fixedSections[course.code] &&
                                             showInstructors &&
-                                            instructors.map(
-                                                (instructor, index) => (
+                                            instructorsActive.map(
+                                                ([name, isActive], index) => (
                                                     <Chip
-                                                        label={instructor}
-                                                        key={instructor}
+                                                        label={name}
+                                                        key={name}
                                                         className={classes.chip}
                                                         clickable
                                                         style={{
-                                                            backgroundColor: instructorActive[
-                                                                index
-                                                            ]
+                                                            backgroundColor: isActive
                                                                 ? theme.palette
                                                                       .primary
                                                                       .light
