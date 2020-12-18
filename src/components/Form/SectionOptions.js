@@ -57,6 +57,8 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
 
     const handleUnselectAll = (course) => {
         dispatch({ type: UNSELECT_ALL_SECTIONS, payload: { course } });
+
+        setInstructorActive(instructors.map(() => false));
     };
 
     const handleCheck = (course, index) => {
