@@ -49,13 +49,7 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
 
     const { courseSlots } = useContext(DataContext);
     const { coursesState, dispatch } = useContext(CoursesContext);
-    const {
-        manuelCourses,
-        mustCourses,
-        sectionChecks,
-        allowCollision,
-        fixedSections,
-    } = coursesState;
+    const { sectionChecks, allowCollision, fixedSections } = coursesState;
 
     const [showInstructors, setShowInstructors] = useState(false);
     const [instructors, setInstuctors] = useState([]);
@@ -104,8 +98,7 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
         const instructors = getInstructors();
         setInstuctors(instructors);
         setInstructorActive(instructors.map(() => true));
-        setShowInstructors(false);
-    }, [manuelCourses, mustCourses]);
+    }, []);
 
     return (
         <Dialog

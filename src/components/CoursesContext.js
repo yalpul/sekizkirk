@@ -5,6 +5,7 @@ import { DataContext } from "./DataContext";
 const initialState = {
     manualCourses: [],
     mustCourses: [],
+    uniqueCourses: [],
     selectiveCourses: [],
     electiveCourses: [],
     sectionChecks: {},
@@ -39,20 +40,17 @@ export const CoursesProvider = ({ children }) => {
             const {
                 manualCourses,
                 mustCourses,
+                uniqueCourses,
                 sectionChecks,
                 allowCollision,
             } = state;
             const { course } = action.payload;
 
             // if course already included in the courses don't modify the state
-            if (
-                course === null ||
-                manualCourses.includes(course) ||
-                mustCourses.includes(course)
-            )
-                return state;
+            if (course === null || uniqueCourses.includes(course)) return state;
 
             const sections = courseSlots[course.code];
+            const newManuals = [course, ...manualCourses];
 
             return {
                 ...state,
@@ -64,12 +62,13 @@ export const CoursesProvider = ({ children }) => {
                     ...allowCollision,
                     [course.code]: false, // don't allow collisions by default
                 },
-                manualCourses: [course, ...manualCourses],
+                manualCourses: newManuals,
+                uniqueCourses: [...new Set([...mustCourses, ...newManuals])],
             };
         }
 
         if (action.type === ADD_MUSTS) {
-            const { sectionChecks, allowCollision } = state;
+            const { sectionChecks, allowCollision, manualCourses } = state;
             const { dept, semester } = action.payload;
 
             // see the musts.json for structure of the data
@@ -92,11 +91,16 @@ export const CoursesProvider = ({ children }) => {
                 collisionForMusts[code] = false;
             });
 
+            const newMustCourses = filteredMusts.map((code) => courses[code]);
+
             // TODO: should we delete the sectionChecks and allowChecks for the
             // must courses that are not used.
             return {
                 ...state,
-                mustCourses: filteredMusts.map((code) => courses[code]),
+                mustCourses: newMustCourses,
+                uniqueCourses: [
+                    ...new Set([...newMustCourses, ...manualCourses]),
+                ],
                 selectiveCourses: selectiveCodes.map((code) => courses[code]),
                 electiveCourses: [...electiveTypes],
                 sectionChecks: { ...sectionsForMusts, ...sectionChecks },
@@ -108,18 +112,25 @@ export const CoursesProvider = ({ children }) => {
         }
 
         if (action.type === DELETE_COURSE) {
+            const { mustCourses, manualCourses } = state;
             const { course } = action.payload;
 
             // same course might be included in both manual courses and must courses.
             // delete it from both.
+            const newMustCourses = mustCourses.filter(
+                (mustCourse) => mustCourse !== course
+            );
+            const newManualCourses = manualCourses.filter(
+                (manualCourse) => manualCourse !== course
+            );
+
             return {
                 ...state,
-                mustCourses: state.mustCourses.filter(
-                    (mustCourse) => mustCourse !== course
-                ),
-                manualCourses: state.manualCourses.filter(
-                    (manualCourse) => manualCourse !== course
-                ),
+                mustCourses: newMustCourses,
+                manualCourses: newManualCourses,
+                uniqueCourses: [
+                    ...new Set([...newMustCourses, ...newManualCourses]),
+                ],
             };
         }
 
@@ -141,16 +152,25 @@ export const CoursesProvider = ({ children }) => {
         }
 
         if (action.type === ADD_SELECTIVE) {
-            const { mustCourses, sectionChecks, allowCollision } = state;
+            const {
+                mustCourses,
+                sectionChecks,
+                allowCollision,
+                manualCourses,
+            } = state;
             const { course } = action.payload;
 
             const sections = courseSlots[course.code];
 
             // add selected course to the musts,
             // clear selectiveCourses
+            const newMustCourses = [...mustCourses, course];
             return {
                 ...state,
-                mustCourses: [...mustCourses, course],
+                mustCourses: newMustCourses,
+                uniqueCourses: [
+                    ...new Set([...newMustCourses, ...manualCourses]),
+                ],
                 selectiveCourses: [],
                 sectionChecks: {
                     ...sectionChecks,
