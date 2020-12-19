@@ -78,8 +78,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
 
     const {
         coursesState: {
-            manualCourses,
-            mustCourses,
+            uniqueCourses,
             allowCollision,
             fixedSections,
             sectionChecks,
@@ -246,8 +245,6 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
         worker.terminate();
 
         setLoading(true);
-
-        const uniqueCourses = [...new Set([...mustCourses, ...manualCourses])];
         const candidateCourseSections = findCandidateCourseSections(
             uniqueCourses
         );
@@ -297,7 +294,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
         // 5. user applies department constraint
 
         updateSchedules();
-    }, [manualCourses, mustCourses, dontFills, fixedSections, firstTwoLetters]);
+    }, [uniqueCourses, dontFills, fixedSections, firstTwoLetters]);
 
     useEffect(() => {
         // Insead of updating schedule in every `section check` change,

@@ -41,14 +41,10 @@ const useStyles = makeStyles((theme) => ({
 const CoursesList = ({ openDialog, setOpenDialog }) => {
     const classes = useStyles();
     const { coursesState, dispatch } = useContext(CoursesContext);
-    const { mustCourses, manualCourses, electiveCourses } = coursesState;
+    const { uniqueCourses, electiveCourses } = coursesState;
 
     const [coursesMouseOver, setCoursesMouseOver] = useState(null);
     const [electivesMouseOver, setElectivesMouseOver] = useState(null);
-
-    // find unique courses, same courses might be added manuelly as well as
-    // included in the musts.
-    const courses = [...new Set([...mustCourses, ...manualCourses])];
 
     const handleClearAll = () => {
         dispatch({ type: DELETE_ALL });
@@ -75,7 +71,7 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
 
     return (
         <Grid item className={classes.courseListContainer}>
-            {(courses.length > 0 || electiveCourses.length > 0) && (
+            {(uniqueCourses.length > 0 || electiveCourses.length > 0) && (
                 <>
                     <Grid
                         container
@@ -97,7 +93,7 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
                     </Grid>
                     <Divider />
                     <List>
-                        {courses.map((course, index) => {
+                        {uniqueCourses.map((course, index) => {
                             return course ? (
                                 <ListItem
                                     key={`${course.title}+${course.code}`}
@@ -173,16 +169,18 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
             )}
 
             {/* modals for course options */}
-            {courses.map((course, index) => (
-                <SectionOptions
-                    index={index}
-                    course={course}
-                    openDialog={openDialog}
-                    setOpenDialog={setOpenDialog}
-                    setMouse={setCoursesMouseOver}
-                    key={`${course}+${index}`}
-                />
-            ))}
+            {uniqueCourses.map((course, index) => {
+                return (
+                    <SectionOptions
+                        index={index}
+                        course={course}
+                        openDialog={openDialog}
+                        setOpenDialog={setOpenDialog}
+                        setMouse={setCoursesMouseOver}
+                        key={course.code}
+                    />
+                );
+            })}
         </Grid>
     );
 };
