@@ -35,6 +35,8 @@ const letters = {
 
 const alphabetLength = 32;
 
+export const insideParanthesisRegex = /^\(([\u0041-\u015f]{2})\)/;
+
 export const distance = (firstLetter, secondLetter) => {
     return letters[firstLetter] * alphabetLength + letters[secondLetter];
 };

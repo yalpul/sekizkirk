@@ -40,7 +40,7 @@ import { days, hours, cellColors } from "../../constants";
 import CellDisplay from "./CellDisplay";
 import ScrollTop from "./ScrollTop";
 import SendButton from "./SendButton";
-import { distance } from "./utils";
+import { distance, insideParanthesisRegex } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
     mainContainer: {
@@ -179,7 +179,9 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                     if (!isConstraintsEmpty) {
                         if (applyDeptConstraint && applySurnameContraint) {
                             let surnameList;
-                            const letters = firstTwoLetters.toUpperCase();
+                            const letters = firstTwoLetters.toLocaleUpperCase(
+                                "TR"
+                            );
 
                             if (constraints["ALL"])
                                 surnameList = constraints["ALL"];
@@ -352,8 +354,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
         // OIBS only checks surname constraints accourding to first two letters
         // of the surname. Remaining letters doesn't count in calculations.
 
-        const insideParanthesis = /^\((\w\w)\)/;
-        const match = surname.match(insideParanthesis);
+        const match = surname.match(insideParanthesisRegex);
         if (match) {
             setFirstTwoLetters(match[1]);
         } else {
@@ -408,11 +409,13 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
 
     const handleSurnameChange = (event) => {
         const value = event.target.value;
-        const regTest = /^\(\w\w\)/;
         if (value.length === 2) {
             // wrap first two letters with paranthesis.
             setSurname(`(${value})`);
-        } else if (value.length > 2 && value.match(regTest) === null) {
+        } else if (
+            value.length > 2 &&
+            value.match(insideParanthesisRegex) === null
+        ) {
             // clear input when user attempts to clear first two letters.
             setSurname("");
         } else {
