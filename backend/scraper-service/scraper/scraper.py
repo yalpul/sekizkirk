@@ -100,3 +100,14 @@ class scraper:
         if not self.data:
             self.update_data()
         return self.data
+
+    def get_slots_of_course_section(self, course, section):
+        try:
+            sections = self.slots[course]
+            for sec in sections:
+                if sec[0] == section:
+                    return sec[1]
+            return None
+        except:
+            return None
+
