@@ -1,10 +1,24 @@
 import express from "express";
+import mjml2html from "mjml";
+
+import { template } from "./mjmlTemplate";
+import { getContext } from "./utils";
 
 const app = express();
+app.use(express.json());
+
 const port = 3000;
 
-app.get("/", (req, res) => {
-  res.send({ message: "hello changed again" });
+app.post("/", (req, res) => {
+  // load elements in the form `[<hour index>, <day index>, <name>]`
+  const load = req.body;
+
+  const context = getContext(load);
+
+  const mjml = template(context);
+  const html = mjml2html(mjml);
+
+  res.json({ data: html.html });
 });
 
 export const start = () => {
