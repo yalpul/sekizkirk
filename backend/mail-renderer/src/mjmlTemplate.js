@@ -1,7 +1,7 @@
 import Handlebars, { compile } from "handlebars";
 
 Handlebars.registerHelper("safeVal", function (value, safeValue) {
-  var out = value || safeValue;
+  const out = value || safeValue;
   return new Handlebars.SafeString(out);
 });
 
@@ -9,7 +9,7 @@ export const template = compile(`
   <mjml>
   <mj-head>
     <mj-title>Sekizkirk.io - Here is your schedule.</mj-title>
-    <mj-font name="Agrandir" href="./font.css" />
+    <mj-font name="Agrandir" href="./css/font.css" />
     <mj-style>
       .table-container div { margin-top: 10px !important; } .day-cell { color:
       #000000de; padding: 10px !important; font-family: "Agrandir"; font-weight:

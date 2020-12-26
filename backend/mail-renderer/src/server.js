@@ -1,5 +1,6 @@
 import express from "express";
 import mjml2html from "mjml";
+import fs from "fs";
 
 import { template } from "./mjmlTemplate";
 import { getContext } from "./utils";
@@ -10,13 +11,14 @@ app.use(express.json());
 const port = 3000;
 
 app.post("/", (req, res) => {
-  // load elements in the form `[<hour index>, <day index>, <name>]`
   const load = req.body;
 
-  const context = getContext(load);
+  const context = getContext(load.data);
 
   const mjml = template(context);
-  const html = mjml2html(mjml);
+  const html = mjml2html(mjml, { minify: true });
+
+  fs.writeFileSync("index.html", html.html);
 
   res.json({ data: html.html });
 });

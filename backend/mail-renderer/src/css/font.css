@@ -1,0 +1,6 @@
+@font-face {
+  font-family: "Agrandir";
+  src: local("Agrandir"),
+    url("https://cash-f.squarecdn.com/static/fonts/agrandir/Agrandir-GrandHeavy.woff")
+      format("woff");
+}
