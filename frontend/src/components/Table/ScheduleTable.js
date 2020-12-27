@@ -20,7 +20,6 @@ import Collapse from "@material-ui/core/Collapse";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import Button from "@material-ui/core/Button";
-import NotInterestedIcon from "@material-ui/icons/NotInterested";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -40,6 +39,7 @@ import { days, hours, cellColors } from "../../constants";
 import CellDisplay from "./CellDisplay";
 import ScrollTop from "./ScrollTop";
 import SendButton from "./SendButton";
+import DontFillButton from "./DontFillButton";
 import { distance, insideParanthesisRegex } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
@@ -55,12 +55,6 @@ const useStyles = makeStyles((theme) => ({
     },
     restristionsContainer: {
         marginBottom: "1.5em",
-    },
-    cellButton: {
-        borderRadius: 5,
-        padding: 0,
-        height: "3.5em",
-        width: "95%",
     },
     showFavButton: {
         position: "absolute",
@@ -575,44 +569,19 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                                                 >
                                                     {day.length === 0 ? (
                                                         // no course to displayed at this slot
-                                                        <Button
-                                                            className={
-                                                                classes.cellButton
+                                                        <DontFillButton
+                                                            handleCellClick={
+                                                                handleCellClick
                                                             }
-                                                            onClick={() =>
-                                                                handleCellClick(
-                                                                    hourIndex,
-                                                                    dayIndex
-                                                                )
+                                                            hourIndex={
+                                                                hourIndex
                                                             }
-                                                            disabled={
+                                                            dayIndex={dayIndex}
+                                                            isFavsActive={
                                                                 isFavsActive
                                                             }
-                                                            disableRipple
-                                                            style={{
-                                                                backgroundColor:
-                                                                    dontFill &&
-                                                                    !isFavsActive
-                                                                        ? "#000"
-                                                                        : undefined,
-                                                                color:
-                                                                    dontFill &&
-                                                                    !isFavsActive
-                                                                        ? "#b80f0a"
-                                                                        : "#FFF",
-                                                            }}
-                                                            startIcon={
-                                                                dontFill &&
-                                                                !isFavsActive ? (
-                                                                    <NotInterestedIcon />
-                                                                ) : undefined
-                                                            }
-                                                        >
-                                                            {dontFill &&
-                                                            !isFavsActive
-                                                                ? "Don't Fill"
-                                                                : undefined}
-                                                        </Button>
+                                                            dontFill={dontFill}
+                                                        />
                                                     ) : (
                                                         day.map(
                                                             ({
