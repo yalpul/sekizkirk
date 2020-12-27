@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 
 import { CoursesContext, FIX_SECTION, UNFIX_SECTION } from "../CoursesContext";
 
+import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
@@ -9,6 +10,10 @@ import NotInterestedIcon from "@material-ui/icons/NotInterested";
 import LockIcon from "@material-ui/icons/Lock";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
 import Tooltip from "@material-ui/core/Tooltip";
+
+const useStyles = makeStyles(() => ({
+    noCollision: {},
+}));
 
 export default function CourseDisplay({
     name,
@@ -18,6 +23,7 @@ export default function CourseDisplay({
     sectionID,
     classroom,
     isFavsActive,
+    collision,
 }) {
     const {
         coursesState: { fixedSections },
@@ -51,7 +57,11 @@ export default function CourseDisplay({
             container
             key={name}
             style={{
-                backgroundColor: bg,
+                backgroundColor: !collision ? bg : undefined,
+                backgroundImage: collision
+                    ? `linear-gradient(180deg, #000000 17.05%, #b80f0a 17.05%, #b80f0a 50%, #000000 50%, #000000 67.05%, #b80f0a 67.05%, #b80f0a 100%)`
+                    : undefined,
+                backgroundSize: collision ? "88.00px 88.00px;" : undefined,
                 color: "#FFF",
                 height: "3.5em",
                 borderRadius: 5,
