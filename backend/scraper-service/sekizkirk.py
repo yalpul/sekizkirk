@@ -12,7 +12,24 @@ def handle_reqs(sc):
     from http.server import BaseHTTPRequestHandler, HTTPServer
     class handler(BaseHTTPRequestHandler):
         def do_GET(self):
-            print(self.path)
+            try:
+                queries = self.path.split('q?')[1]
+                result = []
+                for query in queries.split('&'):
+                    course, section = query.split('=')
+                    section = int(section)
+                    slots = sc.get_slots_of_course_section(course, section)
+                    result.append(slots)
+                result_json = bytes(json.dumps(result), 'utf-8')
+            except:
+                result_json = b'{}'
+            finally:
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(result_json)
+            
+
     h = HTTPServer(('', 8000), handler)
     try:
         h.serve_forever()
@@ -70,6 +87,7 @@ def sekizkirk_scrape(period : 'hour', path='sekizkirk_cache', silent=False):
     while True:
         time.sleep(period_sec)
         sc.scrape_slots()
+        sc.update_data()
 
 if __name__ == '__main__':
     args = parse_arguments()
