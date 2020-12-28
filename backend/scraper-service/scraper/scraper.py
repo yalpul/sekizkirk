@@ -54,7 +54,9 @@ class scraper:
         return self.musts
 
     def get_dept_codes(self):
-        self.dept_codes = depts.get_department_codes()
+        if not self.dept_codes:
+            self.dept_codes = depts.get_department_codes()
+        return self.dept_codes
 
     def scrape_courses(self, force_update=True):
         self.depts_scraper.import_data(force_update=force_update)
@@ -98,3 +100,14 @@ class scraper:
         if not self.data:
             self.update_data()
         return self.data
+
+    def get_slots_of_course_section(self, course, section):
+        try:
+            sections = self.slots[course]
+            for sec in sections:
+                if sec[0] == section:
+                    return sec[1]
+            return None
+        except:
+            return None
+

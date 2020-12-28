@@ -34,12 +34,29 @@ def index(request):
     except:
         return HttpResponse(status=500) 
 
-def sendmail(mail_addr, schedule):
+
+def make_ascii_table(schedule):
+    table = [[''] * 5 for _ in range(10)]
     for course, section in schedule.items():
-        print(course, section)
-        slots = jsondata.get_slots()[course][section]
+        section_no, slots, _, _ = jsondata.get_slots()[course][section]
+        for slot in slots:
+            day, hour = slot[:2]
+            table[hour][day] = jsondata.get_courses()[course]['title'].split(' - ')[0] + '/' + str(section_no)
+
+    table_str = '\n' + ' ' * 10 + '|  Monday   |  Tuesday  | Wednesday | Thursday  |  Friday   |'
+    table_str += '\n' + '_' * 71 + '\n'
+    table = [[f'{table[i][j]:>11}' for j in range(5)] for i in range(9)]
+    for i in range(9):
+        table_str +=  f'|{8+i:6}:40|'+'|'.join(table[i])+'|'
+        table_str += '\n' + '_' * 71 + '\n'
+    table_str += '\n'
+    return table_str
+
+
+def sendmail(mail_addr, schedule):
+    sched = make_ascii_table(schedule)
     send_mail('Your schedule',
-        'We\'ve received your schedule and we will notify you when your courses change'+'\nHere is your schedule: ' + str(slots),
+        'We\'ve received your schedule and we will notify you when your courses change'+'\nHere is your schedule: \n' + sched,
         'support@sekizkirk.io',
         [mail_addr],
         fail_silently=False,
