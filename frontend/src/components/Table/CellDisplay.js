@@ -59,9 +59,9 @@ export default function CourseDisplay({
             style={{
                 backgroundColor: !collision ? bg : undefined,
                 backgroundImage: collision
-                    ? `linear-gradient(180deg, #000000 17.05%, #b80f0a 17.05%, #b80f0a 50%, #000000 50%, #000000 67.05%, #b80f0a 67.05%, #b80f0a 100%)`
+                    ? `linear-gradient(45deg, #b80f0a 28.57%, #000000 28.57%, #000000 50%, #b80f0a 50%, #b80f0a 78.57%, #000000 78.57%, #000000 100%)`
                     : undefined,
-                backgroundSize: collision ? "88.00px 88.00px;" : undefined,
+                backgroundSize: collision ? "49.50px 49.50px" : undefined,
                 color: "#FFF",
                 height: "3.5em",
                 borderRadius: 5,
