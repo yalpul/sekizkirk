@@ -7,6 +7,13 @@ import time
 import threading
 from scraper.scraper import scraper
 from argparse import ArgumentParser, ArgumentTypeError
+import urllib.request as req
+
+def notify_course_takers(courses):
+    url = 'http://web:8000/notify/'
+    courses_serial = bytes(json.dumps(courses), 'ascii')
+    response = req.urlopen(url, courses_serial)
+    
 
 def handle_reqs(sc):
     from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -24,7 +31,10 @@ def handle_reqs(sc):
             except:
                 result_json = b'{}'
             finally:
-                self.send_response(200)
+                if result_json == b'{}':
+                    self.send_response(404)
+                else:
+                    self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(result_json)
@@ -84,10 +94,17 @@ def sekizkirk_scrape(period : 'hour', path='sekizkirk_cache', silent=False):
     req_handler_thread = threading.Thread(target=handle_reqs, args=(sc,), daemon=True)
     req_handler_thread.start()
 
+
     while True:
         time.sleep(period_sec)
+        old_slots = sc.get_slots()
         sc.scrape_slots()
         sc.update_data()
+        new_slots = sc.get_slots()
+        changed_courses = sc.changed_courses(old_slots, new_slots)
+        if changed_courses:
+            notify_course_takers(changed_courses)
+
 
 if __name__ == '__main__':
     args = parse_arguments()
