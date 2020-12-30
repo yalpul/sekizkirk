@@ -1,11 +1,5 @@
 version: '3'
 services:
-  #sekizkirk:
-  #  image: sekizkirk:prod
-  #  volumes:
-  #    - ./dist:/sekizkirkapp/dist
-  #    - ./data:/sekizkirkapp/data
-  #  command: "/bin/sh -c 'yarn build; while :; do sleep 7d; python3 scraper/sekizkirk.py --silent --path ./data; yarn build; done;'"
   smtp:
       image: industrieco/exim-relay
       restart: always
@@ -22,7 +16,7 @@ services:
           - POSTGRES_USER=postgres
           - POSTGRES_PASSWORD=postgres
   web:
-      image: sekizkirk_be:1.0
+      image: sekizkirk_be:1.1
       command: gunicorn sekizkirk.wsgi:application --bind 0.0.0.0:8000
       volumes:
           - /tmp/sk:/sekizkirk_cache
@@ -30,6 +24,21 @@ services:
           - 8000
       depends_on:
           - db
+
+  scraper:
+      build: scraper-service
+      command: python sekizkirk.py --path /sekizkirk_cache --period 1w --silent
+      volumes:
+          - /tmp/sk:/sekizkirk_cache
+      expose:
+          - 8001
+      depends_on:
+          - web
+
+  renderer:
+      build: mail-renderer
+      expose:
+          - 3000
 
   nginx:
     image: nginx

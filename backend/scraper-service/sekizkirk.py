@@ -40,7 +40,7 @@ def handle_reqs(sc):
                 self.wfile.write(result_json)
             
 
-    h = HTTPServer(('', 8000), handler)
+    h = HTTPServer(('0.0.0.0', 8001), handler)
     try:
         h.serve_forever()
     except:

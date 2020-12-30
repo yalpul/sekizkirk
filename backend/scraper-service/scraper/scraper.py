@@ -111,3 +111,15 @@ class scraper:
         except:
             return None
 
+    def changed_courses(self, old, new):
+        changed_courses = []
+        for course in old.keys():
+            if course not in new:
+                changed_courses.append(course)
+                continue
+            old_slots = old[course]
+            new_slots = new[course]
+            if old_slots != new_slots:
+                changed_courses.append(course)
+        return changed_courses
+
