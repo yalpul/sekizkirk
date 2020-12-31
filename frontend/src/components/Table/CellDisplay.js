@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext } from "react";
 
 import { CoursesContext, FIX_SECTION, UNFIX_SECTION } from "../CoursesContext";
 
-import { makeStyles } from "@material-ui/core/styles";
+import { useTheme } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
@@ -10,10 +11,6 @@ import NotInterestedIcon from "@material-ui/icons/NotInterested";
 import LockIcon from "@material-ui/icons/Lock";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
 import Tooltip from "@material-ui/core/Tooltip";
-
-const useStyles = makeStyles(() => ({
-    noCollision: {},
-}));
 
 export default function CourseDisplay({
     name,
@@ -25,6 +22,9 @@ export default function CourseDisplay({
     isFavsActive,
     collision,
 }) {
+    const theme = useTheme();
+    const matchSM = useMediaQuery(theme.breakpoints.down("sm"));
+
     const {
         coursesState: { fixedSections },
         dispatch,
@@ -76,12 +76,17 @@ export default function CourseDisplay({
         >
             <Grid
                 item
-                xs={2}
+                md={2}
+                xs={6}
                 style={{
                     paddingLeft: "10px",
                     visibility:
                         isFavsActive || isFixed || !isMouseOver
                             ? "hidden"
+                            : undefined,
+                    display:
+                        matchSM && (isFavsActive || isFixed || !isMouseOver)
+                            ? "none"
                             : undefined,
                 }}
             >
@@ -95,7 +100,17 @@ export default function CourseDisplay({
                 </Tooltip>
             </Grid>
 
-            <Grid item xs={8}>
+            <Grid
+                item
+                md={8}
+                xs={12}
+                style={{
+                    display:
+                        matchSM && isMouseOver && !isFixed && !isFavsActive
+                            ? "none"
+                            : undefined,
+                }}
+            >
                 <Typography variant="body1" align="center">
                     {name}
                     <br />
@@ -105,11 +120,16 @@ export default function CourseDisplay({
 
             <Grid
                 item
-                xs={2}
+                md={2}
+                xs={6}
                 style={{
                     visibility:
                         isFavsActive || (!isFixed && !isMouseOver)
                             ? "hidden"
+                            : undefined,
+                    display:
+                        matchSM && (isFavsActive || (!isFixed && !isMouseOver))
+                            ? "none"
                             : undefined,
                 }}
             >

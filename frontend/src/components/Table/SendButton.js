@@ -30,6 +30,9 @@ const useStyles = makeStyles((theme) => ({
         color: "#FFF",
         backgroundColor: theme.palette.primary.main,
         marginLeft: "2em",
+        [theme.breakpoints.down("xs")]: {
+            marginLeft: "1em",
+        },
         "&:hover": {
             backgroundColor: theme.palette.primary.light,
         },
@@ -220,7 +223,7 @@ export default function SendButton({ schedule }) {
             >
                 <DialogTitle
                     id="form-dialog-title"
-                    style={{ paddingBottom: 0 }}
+                    style={{ paddingBottom: 0, whiteSpace: "nowrap" }}
                 >
                     Get Your Schedule
                 </DialogTitle>
@@ -247,6 +250,7 @@ export default function SendButton({ schedule }) {
                                 container
                                 align="center"
                                 justify="center"
+                                wrap="nowrap"
                             >
                                 <Grid item>
                                     <TextField
@@ -286,7 +290,11 @@ export default function SendButton({ schedule }) {
                             </Grid>
 
                             <Grid item>
-                                <Grid container alignItems="center">
+                                <Grid
+                                    container
+                                    alignItems="center"
+                                    wrap="nowrap"
+                                >
                                     <Grid item>
                                         <FormControlLabel
                                             style={{ marginTop: "2em" }}
