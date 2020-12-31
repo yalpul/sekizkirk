@@ -557,7 +557,10 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                                     <TableRow key={`${hour}+${hourIndex}`}>
                                         <TableCell
                                             component="th"
-                                            style={{ width: "150px" }}
+                                            style={{
+                                                width: "150px",
+                                                whiteSpace: "nowrap",
+                                            }}
                                             align="center"
                                         >
                                             {hours[hourIndex]}
