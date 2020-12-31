@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
+import { useTheme } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 import Grid from "@material-ui/core/Grid";
 import Table from "@material-ui/core/Table";
@@ -69,6 +71,8 @@ let worker = new Worker("../../workers/scheduleWorker.js");
 
 export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
     const classes = useStyles();
+    const theme = useTheme();
+    const matchXS = useMediaQuery(theme.breakpoints.down("xs"));
 
     const {
         coursesState: {
@@ -661,11 +665,13 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
             <Grid
                 item
                 container
-                direction="row"
-                justify="center"
+                direction={matchXS ? "column" : "row"}
+                justify={matchXS ? "flex-start" : "center"}
+                alignItems={matchXS ? "center" : undefined}
                 className={classes.restristionsContainer}
             >
-                <Grid item>
+                {/* surname restriction */}
+                <Grid item style={{ width: matchXS ? "200px" : undefined }}>
                     <Grid item container direction="column">
                         <Grid item>
                             <FormControlLabel
@@ -675,7 +681,6 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                                         onChange={() => {
                                             setSurnameCheck(!surnameCheck);
                                         }}
-                                        name="checkedB"
                                         color="primary"
                                     />
                                 }
@@ -701,7 +706,8 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                     </Grid>
                 </Grid>
 
-                <Grid item>
+                {/* department restriction */}
+                <Grid item style={{ width: matchXS ? "200px" : undefined }}>
                     <Grid item container direction="column">
                         <Grid item>
                             <FormControlLabel
@@ -711,7 +717,6 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                                         onChange={() => {
                                             setDeptCheck(!deptCheck);
                                         }}
-                                        name="checkedB"
                                         color="primary"
                                     />
                                 }
