@@ -6,18 +6,14 @@ Accepts `POST` to the `/`, `post body` should formed as:
 
 ```JSON
 {
-"data": [
+  "data": [
     {
-      "name": "<displayNameForCourse>",
-      "slots": [
-        {
-          "hourIndex": "<indexOfTheHour>",
-          "dayIndex": "<indexOfTheDay>
-        },
-        ....
-      ]
+      "name":"<displayNameForSlot>",
+      "slot": {"hourInex" : <indexOfTheHour>, "dayIndex: <indexOfTheDay>},
+      "courseIndex": <indexOftheCourse>
     },
     ....
+  ]
 }
 ```
 
