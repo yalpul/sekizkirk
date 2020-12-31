@@ -52,6 +52,9 @@ const useStyles = makeStyles((theme) => ({
     },
     tableContainer: {
         width: "80%",
+        [theme.breakpoints.down("xs")]: {
+            width: "100%",
+        },
         marginTop: "1.5em",
         marginBottom: "1em",
     },
