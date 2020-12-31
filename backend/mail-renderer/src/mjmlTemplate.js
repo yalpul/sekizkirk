@@ -47,7 +47,6 @@ export const template = compile(`
             <th class="day-cell">Thu</th>
             <th class="day-cell">Fri</th>
           </tr>
-          class="day-cell"
 
           <!-- 8:40 -->
           <tr>
