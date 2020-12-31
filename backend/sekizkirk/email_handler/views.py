@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 
 from .models import Person, Course, Takes
-from .form_validator import form_validator
+from .utils import form_validator
 
 
 def index(request):
