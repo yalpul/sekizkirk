@@ -16,17 +16,15 @@ services:
           - POSTGRES_USER=postgres
           - POSTGRES_PASSWORD=postgres
   web:
-      build: sekizkirk
+      build: backend/sekizkirk
       command: gunicorn sekizkirk.wsgi:application --bind 0.0.0.0:8000
-      volumes:
-          - /tmp/sk:/sekizkirk_cache
       expose:
           - 8000
       depends_on:
           - db
 
   scraper:
-      build: scraper-service
+      build: backend/scraper-service
       command: python sekizkirk.py --path /sekizkirk_cache --period 1w --silent
       volumes:
           - /tmp/sk:/sekizkirk_cache
@@ -36,9 +34,19 @@ services:
           - web
 
   renderer:
-      build: mail-renderer
+      build: backend/mail-renderer
       expose:
           - 3000
+      environment:
+          - NODE_ENV=production
+
+  sekizkirk_fe:
+      build: frontend
+      command: sleep infinity
+      volumes:
+        - static_files:/sekizkirk_fe/dist
+      environment:
+          - NODE_ENV=production
 
   nginx:
     image: nginx
@@ -46,20 +54,23 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx:/etc/nginx/conf.d
-      - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./nginx/certbot/www:/var/www/certbot
-      - ./dist:/etc/nginx/html
+      - ./nginx:/etc/nginx/conf.d
+      - /etc/certbot/conf:/etc/letsencrypt
+      - /etc/certbot/www:/var/www/certbot
+      - static_files:/etc/nginx/html
+      - /tmp/sk/data.json:/etc/nginx/html/data.json
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     depends_on:
       - web
-
+      - sekizkirk_fe
 
   certbot:
     volumes:
-      - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./nginx/certbot/www:/var/www/certbot
+      - /etc/certbot/conf:/etc/letsencrypt
+      - /etc/certbot/www:/var/www/certbot
     image: certbot/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 
+volumes:
+    static_files:
