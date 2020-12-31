@@ -36,7 +36,7 @@ def index(request):
         raise
         return HttpResponse(status=500) 
 
-def get_slots(course, section):
+def get_course_info(course, section):
     get_url = 'http://scraper:8001/q?' + course + '=' + str(section)
     response = req.urlopen(get_url).read().decode('utf-8')
     return json.loads(response)
@@ -44,20 +44,28 @@ def get_slots(course, section):
 def prepare_html(sched):
     post_url = 'http://renderer:3000/'
     slots_data = []
+    idx = 0
     for course, section in sched.items():
-        slots = get_slots(course, section)
-        slots_idx_form = [{'hourIndex':y,'dayIndex':x} for x,y in slots[0]]
-        slots_data.append(
-            {
-                'name' : course+'/'+str(section),
-                'slots' : slots_idx_form
-            }
-        )
+        real_section, slots, title = get_course_info(course, section)[0]
+        for slot in slots:
+            classroom = '' if len(slot) <= 2 else '\n'+slot[2]
+            name = title+'/'+str(real_section)+classroom
+            x,y = slot[:2]
+            slots_data.append(
+                {
+                    'name' : name,
+                    'slot' : {'hourIndex':y, 'dayIndex':x},
+                    'courseIndex' : idx
+                }
+            )
+        idx += 1
     data = {'data' : slots_data}
     data_encoded = bytes(json.dumps(data), 'utf-8')
-    response = req.urlopen(post_url, data_encoded)
-    html = response.read().decode('utf-8')
-    return html
+    request = req.Request(post_url, headers={'Content-Type':'application/json'})
+    response = req.urlopen(request, data_encoded)
+    html_json = response.read().decode('utf-8')
+    html = json.loads(html_json)
+    return html['data']
 
 
 def sendmail(mail_addr, schedule):
@@ -67,5 +75,5 @@ def sendmail(mail_addr, schedule):
         'support@sekizkirk.io',
         [mail_addr],
         fail_silently=False,
-        html_content=html_email
+        html_message=html_email
     )

@@ -102,12 +102,20 @@ class scraper:
         return self.data
 
     def get_slots_of_course_section(self, course, section):
+        '''
+        expects a course id and a section index.
+        returns: the actual section number, slots, course title
+        section index is the index within the course slots list
+        return the actual section, slots and course title
+        '''
         try:
             sections = self.slots[course]
-            for sec in sections:
-                if sec[0] == section:
-                    return sec[1]
-            return None
+            sec = sections[section]
+            course_title = self.courses[course]['title']
+            title = course_title.split(' - ')[0]
+
+            actual_section, slots = sec[0], sec[1]
+            return actual_section, slots, title
         except:
             return None
 
