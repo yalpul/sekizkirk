@@ -24,6 +24,9 @@ const useStyles = makeStyles((theme) => ({
     aboutLink: {
         position: "absolute",
         right: "10%",
+        [theme.breakpoints.down("xs")]: {
+            right: "5%",
+        },
     },
     linkText: {
         fontSize: "1.5em",
