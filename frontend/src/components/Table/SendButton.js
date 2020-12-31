@@ -30,6 +30,9 @@ const useStyles = makeStyles((theme) => ({
         color: "#FFF",
         backgroundColor: theme.palette.primary.main,
         marginLeft: "2em",
+        [theme.breakpoints.down("xs")]: {
+            marginLeft: "1em",
+        },
         "&:hover": {
             backgroundColor: theme.palette.primary.light,
         },
