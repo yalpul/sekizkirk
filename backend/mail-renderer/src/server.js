@@ -1,6 +1,5 @@
 import express from "express";
 import mjml2html from "mjml";
-import fs from "fs";
 
 import { template } from "./mjmlTemplate";
 import { getContext } from "./utils";
@@ -17,8 +16,6 @@ app.post("/", (req, res) => {
 
   const mjml = template(context);
   const html = mjml2html(mjml, { minify: true });
-
-  fs.writeFileSync("index.html", html.html);
 
   res.json({ data: html.html });
 });
