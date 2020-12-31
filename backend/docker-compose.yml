@@ -16,7 +16,7 @@ services:
           - POSTGRES_USER=postgres
           - POSTGRES_PASSWORD=postgres
   web:
-      image: sekizkirk_be:1.1
+      build: sekizkirk
       command: gunicorn sekizkirk.wsgi:application --bind 0.0.0.0:8000
       volumes:
           - /tmp/sk:/sekizkirk_cache
