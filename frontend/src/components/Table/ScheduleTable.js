@@ -788,7 +788,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                     </Grid>
                 </Grid>
 
-                <Grid item>
+                <Grid item style={{ width: matchXS ? "200px" : undefined }}>
                     <FormControlLabel
                         control={
                             <Checkbox
