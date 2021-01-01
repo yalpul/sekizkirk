@@ -799,7 +799,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                                 color="primary"
                             />
                         }
-                        label="Allow Collision for All"
+                        label="Allow Collision"
                     />
                 </Grid>
             </Grid>
