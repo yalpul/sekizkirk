@@ -129,4 +129,5 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
-EMAIL_HOST = "sekizkirk.io"
+EMAIL_HOST = "smtp"
+EMAIL_PORT = 8025

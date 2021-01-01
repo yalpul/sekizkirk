@@ -36,8 +36,9 @@ def index(request):
                 course, created = Course.objects.get_or_create(course=courseid)
                 if created:
                     course.save()
-                takes = Takes(person=person, course=course)
-                takes.save()
+                takes, created = Takes.objects.get_or_create(person=person, course=course)
+                if created:
+                    takes.save()
 
             sendmail(mail_addr, schedule)
         except:

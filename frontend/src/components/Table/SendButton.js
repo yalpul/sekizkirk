@@ -156,7 +156,7 @@ export default function SendButton({ schedule }) {
             .then((response) => {
                 dispatch({
                     type: DISPLAY_SUCCESS,
-                    payload: { message: "Email send succesfully." },
+                    payload: { message: "Email sent succesfully" },
                 });
             })
             .catch((error) => {
