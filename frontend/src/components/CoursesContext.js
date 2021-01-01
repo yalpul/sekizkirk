@@ -27,6 +27,7 @@ export const CANCEL_SELECTIVES = "CANCEL_SELECTIVES";
 export const FIX_SECTION = "FIX_SECTION";
 export const UNFIX_SECTION = "UNFIX_SECTION";
 export const TOGGLE_INSTRUCTOR = "TOGGLE_INSTRUCTOR";
+export const TOGGLE_GLOBAL_COLLISION = "TOOGLE_GLOBAL_COLLISION";
 
 export const CoursesContext = createContext({});
 
@@ -287,6 +288,22 @@ export const CoursesProvider = ({ children }) => {
                     ...sectionChecks,
                     [courseCode]: temp,
                 },
+            };
+        }
+
+        if (action.type === TOGGLE_GLOBAL_COLLISION) {
+            const { globalCollision } = action.payload;
+            const { allowCollision } = state;
+
+            // convert all manual collision options to match global collision option.
+            const temp = {};
+            Object.keys(allowCollision).forEach(
+                (courseCode) => (temp[courseCode] = globalCollision)
+            );
+
+            return {
+                ...state,
+                allowCollision: temp,
             };
         }
 
