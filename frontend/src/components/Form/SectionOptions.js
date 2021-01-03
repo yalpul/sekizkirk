@@ -199,7 +199,7 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
                                         }
                                     />
                                 }
-                                label="Allow Collision"
+                                label="Allow collision for this course"
                             />
                         </FormControl>
                     </Grid>

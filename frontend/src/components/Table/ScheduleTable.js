@@ -28,7 +28,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Tooltip from "@material-ui/core/Tooltip";
 
 import { DataContext } from "../DataContext";
-import { CoursesContext } from "../CoursesContext";
+import { CoursesContext, TOGGLE_GLOBAL_COLLISION } from "../CoursesContext";
 import {
     DisplayContext,
     UPDATE_POSSIBLE_SCHEDULES,
@@ -84,11 +84,12 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
             fixedSections,
             sectionChecks,
         },
+        dispatch: coursesDispatch,
     } = useContext(CoursesContext);
 
     const {
         displayState: { possibleSchedules, dontFills, favSchedules },
-        dispatch,
+        dispatch: displayDispatch,
     } = useContext(DisplayContext);
 
     const { courseSlots, departments } = useContext(DataContext);
@@ -106,6 +107,8 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
 
     const [deptCheck, setDeptCheck] = useState(false);
     const [dept, setDept] = useState(null);
+
+    const [globalCollision, setGlobalCollision] = useState(false);
 
     const updateDisplay = () => {
         const newDisplay = hours.map(() => days.map(() => []));
@@ -259,7 +262,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
             (courseSections) => courseSections.length !== 0
         );
         if (nonEmptyCourses.length !== candidateCourseSections.length) {
-            dispatch({
+            displayDispatch({
                 type: UPDATE_POSSIBLE_SCHEDULES,
                 payload: { schedules: [] },
             });
@@ -272,7 +275,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
         worker = new Worker("../../workers/scheduleWorker.js");
         worker.addEventListener("message", (message) => {
             const schedules = message.data;
-            dispatch({
+            displayDispatch({
                 type: UPDATE_POSSIBLE_SCHEDULES,
                 payload: { schedules },
             });
@@ -395,6 +398,25 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
         setDept(mustDept);
     }, [mustDept]);
 
+    useEffect(() => {
+        coursesDispatch({
+            type: TOGGLE_GLOBAL_COLLISION,
+            payload: { globalCollision },
+        });
+    }, [globalCollision]);
+
+    useEffect(() => {
+        // `allowCollisions` can be changed through manually allowing collisions,
+        // i.e. on invidiual courses, or globally.
+        // When the `openDialog` is null, this means no course options are opened in modal,
+        // thus indicates global toggle applied.
+        // This prevents updating schedule on manual collision toggle. In that case schedules updates
+        // when modal are closed.
+        if (openDialog === null) {
+            updateSchedules();
+        }
+    }, [allowCollision]);
+
     // // handlers
     const handleNavigateClick = (direction) => {
         if (direction === "next") {
@@ -426,21 +448,24 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
 
     const handleCellClick = (hourIndex, dayIndex) => {
         // toggle clicked cells don't fill value
-        dispatch({ type: TOGGLE_DONT_FILL, payload: { hourIndex, dayIndex } });
+        displayDispatch({
+            type: TOGGLE_DONT_FILL,
+            payload: { hourIndex, dayIndex },
+        });
     };
 
     const handleFavClick = () => {
         const schedule = possibleSchedules[currentSchedule];
         const hash = scheduleHash(schedule);
 
-        dispatch({ type: ADD_TO_FAVS, payload: { hash, schedule } });
+        displayDispatch({ type: ADD_TO_FAVS, payload: { hash, schedule } });
     };
 
     const handleUnfavClick = () => {
         const schedule = displayedSchedules[currentSchedule];
         const hash = scheduleHash(schedule);
 
-        dispatch({ type: DELETE_FROM_FAVS, payload: { hash } });
+        displayDispatch({ type: DELETE_FROM_FAVS, payload: { hash } });
     };
 
     const handleToggleFavs = () => {
@@ -761,6 +786,21 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                             </Collapse>
                         </Grid>
                     </Grid>
+                </Grid>
+
+                <Grid item style={{ width: matchXS ? "200px" : undefined }}>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={globalCollision}
+                                onChange={() => {
+                                    setGlobalCollision(!globalCollision);
+                                }}
+                                color="primary"
+                            />
+                        }
+                        label="Allow Collision"
+                    />
                 </Grid>
             </Grid>
         </Grid>

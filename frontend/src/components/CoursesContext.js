@@ -11,6 +11,7 @@ const initialState = {
     sectionChecks: {},
     allowCollision: {},
     fixedSections: {},
+    globalCollision: false,
 };
 
 // available action types in this reducer
@@ -27,6 +28,7 @@ export const CANCEL_SELECTIVES = "CANCEL_SELECTIVES";
 export const FIX_SECTION = "FIX_SECTION";
 export const UNFIX_SECTION = "UNFIX_SECTION";
 export const TOGGLE_INSTRUCTOR = "TOGGLE_INSTRUCTOR";
+export const TOGGLE_GLOBAL_COLLISION = "TOOGLE_GLOBAL_COLLISION";
 
 export const CoursesContext = createContext({});
 
@@ -43,6 +45,7 @@ export const CoursesProvider = ({ children }) => {
                 uniqueCourses,
                 sectionChecks,
                 allowCollision,
+                globalCollision,
             } = state;
             const { course } = action.payload;
 
@@ -60,7 +63,7 @@ export const CoursesProvider = ({ children }) => {
                 },
                 allowCollision: {
                     ...allowCollision,
-                    [course.code]: false, // don't allow collisions by default
+                    [course.code]: globalCollision, // default value determined by global collision.
                 },
                 manualCourses: newManuals,
                 uniqueCourses: [...new Set([...mustCourses, ...newManuals])],
@@ -68,7 +71,12 @@ export const CoursesProvider = ({ children }) => {
         }
 
         if (action.type === ADD_MUSTS) {
-            const { sectionChecks, allowCollision, manualCourses } = state;
+            const {
+                sectionChecks,
+                allowCollision,
+                manualCourses,
+                globalCollision,
+            } = state;
             const { dept, semester } = action.payload;
 
             // see the musts.json for structure of the data
@@ -88,7 +96,7 @@ export const CoursesProvider = ({ children }) => {
             filteredMusts.forEach((code) => {
                 const sections = courseSlots[code];
                 sectionsForMusts[code] = sections.map(() => true);
-                collisionForMusts[code] = false;
+                collisionForMusts[code] = globalCollision;
             });
 
             const newMustCourses = filteredMusts.map((code) => courses[code]);
@@ -157,6 +165,7 @@ export const CoursesProvider = ({ children }) => {
                 sectionChecks,
                 allowCollision,
                 manualCourses,
+                globalCollision,
             } = state;
             const { course } = action.payload;
 
@@ -178,7 +187,7 @@ export const CoursesProvider = ({ children }) => {
                 },
                 allowCollision: {
                     ...allowCollision,
-                    [course.code]: false, // don't allow collisions by default
+                    [course.code]: globalCollision,
                 },
             };
         }
@@ -287,6 +296,23 @@ export const CoursesProvider = ({ children }) => {
                     ...sectionChecks,
                     [courseCode]: temp,
                 },
+            };
+        }
+
+        if (action.type === TOGGLE_GLOBAL_COLLISION) {
+            const { globalCollision } = action.payload;
+            const { allowCollision } = state;
+
+            // convert all manual collision options to match global collision option.
+            const temp = {};
+            Object.keys(allowCollision).forEach(
+                (courseCode) => (temp[courseCode] = globalCollision)
+            );
+
+            return {
+                ...state,
+                allowCollision: temp,
+                globalCollision,
             };
         }
 
