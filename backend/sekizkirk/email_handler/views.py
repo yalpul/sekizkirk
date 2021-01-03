@@ -49,8 +49,12 @@ def index(request):
         return HttpResponse(status=405)
 
 
-def get_course_info(course, section):
-    get_url = "http://scraper:8001/q?" + course + "=" + str(section)
+def get_course_info(course_list):
+    query = []
+    for course, section in course_list:
+        query.append(course + '=' + str(section))
+    query = '&'.join(query)
+    get_url = "http://scraper:8001/q?" + query
     response = req.urlopen(get_url).read().decode("utf-8")
     return json.loads(response)
 
@@ -59,8 +63,8 @@ def prepare_html(sched):
     post_url = "http://renderer:3000/"
     slots_data = []
     idx = 0
-    for course, section in sched.items():
-        real_section, slots, title = get_course_info(course, section)[0]
+    course_info_list = get_course_info(sched.items())
+    for real_section, slots, title in course_info_list:
         for slot in slots:
             classroom = "" if len(slot) <= 2 else "\n" + slot[2]
             name = title + "/" + str(real_section) + classroom
