@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const CoursesList = ({ openDialog, setOpenDialog }) => {
+const CoursesList = ({ openDialog, setOpenDialog, course }) => {
     const classes = useStyles();
     const { coursesState, dispatch } = useContext(CoursesContext);
     const { uniqueCourses, electiveCourses } = coursesState;
@@ -50,6 +50,7 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
     const [coursesMouseOver, setCoursesMouseOver] = useState(null);
     const [electivesMouseOver, setElectivesMouseOver] = useState(null);
     const [electiveClicked, setElectiveClicked] = useState(null);
+    const [courseSelectFocused, setCourseSelectFocused] = useState(false);
 
     const handleClearAll = () => {
         dispatch({ type: DELETE_ALL });
@@ -62,7 +63,6 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
     const handleElectiveClick = (index) => {
         document.getElementById("course-select").focus();
         setElectiveClicked(index);
-        // dispatch({ type: ELECTIVE_SELECT, payload: { index } });
     };
 
     const handleElectiveDelete = (index) => {
@@ -74,6 +74,40 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
             setCoursesMouseOver(null);
         }
     }, [openDialog]);
+
+    useEffect(() => {
+        document
+            .getElementById("course-select")
+            .addEventListener("blur", () => {
+                setCourseSelectFocused(false);
+            });
+
+        document
+            .getElementById("course-select")
+            .addEventListener("focus", () => {
+                setCourseSelectFocused(true);
+            });
+    }, []);
+
+    useEffect(() => {
+        // remove gloving effect on elective courses when
+        // focus removed from course select and no courses selected
+        if (
+            courseSelectFocused === false &&
+            course === null &&
+            electiveClicked !== null
+        ) {
+            setElectiveClicked(null);
+        }
+    }, [courseSelectFocused, course]);
+
+    useEffect(() => {
+        // if unique courses changed while elective clicked,
+        // it means a course added for elective
+        if (electiveClicked !== null) {
+            handleElectiveDelete(electiveClicked);
+        }
+    }, [uniqueCourses]);
 
     return (
         <Grid item className={classes.courseListContainer}>
