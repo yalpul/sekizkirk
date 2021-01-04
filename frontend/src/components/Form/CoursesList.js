@@ -36,6 +36,10 @@ const useStyles = makeStyles((theme) => ({
             color: theme.palette.primary.dark,
         },
     },
+    glowingItem: {
+        borderRadius: "10px",
+        boxShadow: `0 0 20px ${theme.palette.primary.main}`,
+    },
 }));
 
 const CoursesList = ({ openDialog, setOpenDialog }) => {
@@ -45,6 +49,7 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
 
     const [coursesMouseOver, setCoursesMouseOver] = useState(null);
     const [electivesMouseOver, setElectivesMouseOver] = useState(null);
+    const [electiveClicked, setElectiveClicked] = useState(null);
 
     const handleClearAll = () => {
         dispatch({ type: DELETE_ALL });
@@ -56,7 +61,8 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
 
     const handleElectiveClick = (index) => {
         document.getElementById("course-select").focus();
-        dispatch({ type: ELECTIVE_SELECT, payload: { index } });
+        setElectiveClicked(index);
+        // dispatch({ type: ELECTIVE_SELECT, payload: { index } });
     };
 
     const handleElectiveDelete = (index) => {
@@ -142,7 +148,11 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
                                 key={`${type}+${index}`}
                                 button
                                 justify="space-between"
-                                className={classes.listItem}
+                                className={`${classes.listItem} ${
+                                    index === electiveClicked
+                                        ? classes.glowingItem
+                                        : undefined
+                                }`}
                                 onClick={() => handleElectiveClick(index)}
                                 ContainerProps={{
                                     onMouseOver: () =>
