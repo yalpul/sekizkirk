@@ -79,17 +79,24 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
                         alignItems="center"
                         justify="space-between"
                     >
-                        <Typography variant="h6">To be scheduled..</Typography>
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            endIcon={<ClearAllIcon />}
-                            size="small"
-                            style={{ marginRight: "1em" }}
-                            onClick={handleClearAll}
-                        >
-                            Clear
-                        </Button>
+                        <Grid item>
+                            <Typography variant="h6">
+                                To be scheduled..
+                            </Typography>
+                        </Grid>
+
+                        <Grid item>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                endIcon={<ClearAllIcon />}
+                                size="small"
+                                style={{ marginRight: "1em" }}
+                                onClick={handleClearAll}
+                            >
+                                Clear
+                            </Button>
+                        </Grid>
                     </Grid>
                     <Divider />
                     <List>
