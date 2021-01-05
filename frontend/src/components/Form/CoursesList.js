@@ -6,6 +6,7 @@ import {
     DELETE_ALL,
     ELECTIVE_SELECT,
 } from "../CoursesContext";
+import { DataContext } from "../DataContext";
 import SectionOptions from "./SectionOptions";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -20,6 +21,9 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import InfoIcon from "@material-ui/icons/Info";
+import Tooltip from "@material-ui/core/Tooltip";
 
 const useStyles = makeStyles((theme) => ({
     courseListContainer: {
@@ -42,6 +46,7 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
     const classes = useStyles();
     const { coursesState, dispatch } = useContext(CoursesContext);
     const { uniqueCourses, electiveCourses } = coursesState;
+    const { courseSlots } = useContext(DataContext);
 
     const [coursesMouseOver, setCoursesMouseOver] = useState(null);
     const [electivesMouseOver, setElectivesMouseOver] = useState(null);
@@ -94,11 +99,18 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
                     <Divider />
                     <List>
                         {uniqueCourses.map((course, index) => {
+                            const dataNotAvaliable =
+                                courseSlots[course.code].length === 0;
+
                             return course ? (
                                 <ListItem
                                     key={`${course.title}+${course.code}`}
-                                    button
-                                    onClick={() => setOpenDialog(index)}
+                                    button={dataNotAvaliable ? false : true}
+                                    onClick={
+                                        dataNotAvaliable
+                                            ? null
+                                            : () => setOpenDialog(index)
+                                    }
                                     ContainerProps={{
                                         onMouseOver: () =>
                                             setCoursesMouseOver(index),
@@ -109,7 +121,17 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
                                         onBlur: () => setCoursesMouseOver(null),
                                     }}
                                 >
-                                    <ListItemText primary={course.title} />
+                                    {dataNotAvaliable && (
+                                        <ListItemIcon>
+                                            <Tooltip title="lorem ipsum" arrow>
+                                                <InfoIcon color="secondary" />
+                                            </Tooltip>
+                                        </ListItemIcon>
+                                    )}
+                                    <ListItemText
+                                        primary={course.title}
+                                        inset={dataNotAvaliable ? false : true}
+                                    />
                                     <ListItemSecondaryAction
                                         style={{
                                             display:
@@ -146,7 +168,10 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
                                     onBlur: () => setElectivesMouseOver(null),
                                 }}
                             >
-                                <ListItemText primary={`Add your ${type}`} />
+                                <ListItemText
+                                    primary={`Add your ${type}`}
+                                    inset
+                                />
                                 <ListItemSecondaryAction
                                     style={{
                                         display:
