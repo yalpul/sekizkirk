@@ -209,8 +209,12 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
                             <FormLabel component="legend" focused={false}>
                                 <Grid container direction="column">
                                     <Grid item>
-                                        <Grid container alignItems="center">
-                                            <Grid item>
+                                        <Grid
+                                            container
+                                            alignItems="center"
+                                            wrap="nowrap"
+                                        >
+                                            <Grid item xs={4} sm="auto">
                                                 <Typography>
                                                     Course Sections
                                                 </Typography>
@@ -222,6 +226,8 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
                                                     marginLeft: "0.5em",
                                                     marginRight: "0.5em",
                                                 }}
+                                                xs={6}
+                                                sm="auto"
                                             >
                                                 <Button
                                                     variant="outlined"
@@ -242,7 +248,7 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
                                                 </Button>
                                             </Grid>
 
-                                            <Grid item>
+                                            <Grid item xs={2} sm="auto">
                                                 {!fixedSections[
                                                     course.code
                                                 ] && (
