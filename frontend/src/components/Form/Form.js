@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import AddCourse from "./AddCourse";
 import AddMusts from "./AddMusts";
@@ -40,6 +40,7 @@ const Form = ({
     setDept,
 }) => {
     const classes = useStyles();
+    const [course, setCourse] = useState(null);
 
     return (
         <Grid
@@ -55,13 +56,14 @@ const Form = ({
                 </Typography>
             </Grid>
 
-            <AddCourse />
+            <AddCourse course={course} setCourse={setCourse} />
 
             <AddMusts dept={dept} setDept={setDept} />
 
             <CoursesList
                 openDialog={openDialog}
                 setOpenDialog={setOpenDialog}
+                course={course}
             />
 
             <SelectiveList />

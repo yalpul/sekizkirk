@@ -32,13 +32,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const AddCourse = () => {
+const AddCourse = ({ course, setCourse }) => {
     const data = useContext(DataContext);
     const { dispatch } = useContext(CoursesContext);
     const classes = useStyles();
 
     const [courseInput, setCourseInput] = useState("");
-    const [course, setCourse] = useState(null);
 
     const handleCourseAdd = () => {
         dispatch({ type: ADD_COURSE, payload: { course } });

@@ -36,15 +36,21 @@ const useStyles = makeStyles((theme) => ({
             color: theme.palette.primary.dark,
         },
     },
+    glowingItem: {
+        borderRadius: "10px",
+        boxShadow: `0 0 20px ${theme.palette.primary.main}`,
+    },
 }));
 
-const CoursesList = ({ openDialog, setOpenDialog }) => {
+const CoursesList = ({ openDialog, setOpenDialog, course }) => {
     const classes = useStyles();
     const { coursesState, dispatch } = useContext(CoursesContext);
     const { uniqueCourses, electiveCourses } = coursesState;
 
     const [coursesMouseOver, setCoursesMouseOver] = useState(null);
     const [electivesMouseOver, setElectivesMouseOver] = useState(null);
+    const [electiveClicked, setElectiveClicked] = useState(null);
+    const [courseSelectFocused, setCourseSelectFocused] = useState(false);
 
     const handleClearAll = () => {
         dispatch({ type: DELETE_ALL });
@@ -56,7 +62,7 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
 
     const handleElectiveClick = (index) => {
         document.getElementById("course-select").focus();
-        dispatch({ type: ELECTIVE_SELECT, payload: { index } });
+        setElectiveClicked(index);
     };
 
     const handleElectiveDelete = (index) => {
@@ -69,6 +75,40 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
         }
     }, [openDialog]);
 
+    useEffect(() => {
+        document
+            .getElementById("course-select")
+            .addEventListener("blur", () => {
+                setCourseSelectFocused(false);
+            });
+
+        document
+            .getElementById("course-select")
+            .addEventListener("focus", () => {
+                setCourseSelectFocused(true);
+            });
+    }, []);
+
+    useEffect(() => {
+        // remove gloving effect on elective courses when
+        // focus removed from course select and no courses selected
+        if (
+            courseSelectFocused === false &&
+            course === null &&
+            electiveClicked !== null
+        ) {
+            setElectiveClicked(null);
+        }
+    }, [courseSelectFocused, course]);
+
+    useEffect(() => {
+        // if unique courses changed while elective clicked,
+        // it means a course added for elective
+        if (electiveClicked !== null) {
+            handleElectiveDelete(electiveClicked);
+        }
+    }, [uniqueCourses]);
+
     return (
         <Grid item className={classes.courseListContainer}>
             {(uniqueCourses.length > 0 || electiveCourses.length > 0) && (
@@ -79,17 +119,24 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
                         alignItems="center"
                         justify="space-between"
                     >
-                        <Typography variant="h6">To be scheduled..</Typography>
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            endIcon={<ClearAllIcon />}
-                            size="small"
-                            style={{ marginRight: "1em" }}
-                            onClick={handleClearAll}
-                        >
-                            Clear
-                        </Button>
+                        <Grid item>
+                            <Typography variant="h6">
+                                To be scheduled..
+                            </Typography>
+                        </Grid>
+
+                        <Grid item>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                endIcon={<ClearAllIcon />}
+                                size="small"
+                                style={{ marginRight: "1em" }}
+                                onClick={handleClearAll}
+                            >
+                                Clear
+                            </Button>
+                        </Grid>
                     </Grid>
                     <Divider />
                     <List>
@@ -135,7 +182,11 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
                                 key={`${type}+${index}`}
                                 button
                                 justify="space-between"
-                                className={classes.listItem}
+                                className={`${classes.listItem} ${
+                                    index === electiveClicked
+                                        ? classes.glowingItem
+                                        : undefined
+                                }`}
                                 onClick={() => handleElectiveClick(index)}
                                 ContainerProps={{
                                     onMouseOver: () =>
