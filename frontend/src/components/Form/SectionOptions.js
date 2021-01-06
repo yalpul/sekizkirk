@@ -10,6 +10,7 @@ import {
 } from "../CoursesContext";
 
 import { useTheme, makeStyles } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Grid from "@material-ui/core/Grid";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -49,6 +50,7 @@ const useStyles = makeStyles((theme) => ({
 const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
     const classes = useStyles();
     const theme = useTheme();
+    const matchedXS = useMediaQuery(theme.breakpoints.down("xs"));
 
     const { courseSlots } = useContext(DataContext);
     const { coursesState, dispatch } = useContext(CoursesContext);
@@ -399,7 +401,10 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={2000}
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: matchedXS ? "center" : "right",
+                }}
                 onClose={handleSnackbarClose}
             >
                 <MuiAlert onClose={handleSnackbarClose} severity="info">
