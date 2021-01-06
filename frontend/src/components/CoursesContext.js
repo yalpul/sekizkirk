@@ -53,7 +53,7 @@ export const CoursesProvider = ({ children }) => {
             if (course === null || uniqueCourses.includes(course)) return state;
 
             const sections = courseSlots[course.code];
-            const newManuals = [course, ...manualCourses];
+            const newManuals = [...manualCourses, course];
 
             return {
                 ...state,

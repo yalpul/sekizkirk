@@ -56,7 +56,7 @@ const SelectiveList = () => {
         <Grid item className={classes.selectiveContainer}>
             {selectiveCourses.length > 0 && (
                 <>
-                    <Grid container justify="space-between">
+                    <Grid container justify="space-between" wrap="nowrap">
                         <Grid item>
                             <Typography
                                 variant="subtitle1"
