@@ -123,7 +123,10 @@ const CoursesList = ({ openDialog, setOpenDialog }) => {
                                 >
                                     {dataNotAvaliable && (
                                         <ListItemIcon>
-                                            <Tooltip title="lorem ipsum" arrow>
+                                            <Tooltip
+                                                title="This course does not have any sections. It will not be included in schedule table."
+                                                arrow
+                                            >
                                                 <InfoIcon color="secondary" />
                                             </Tooltip>
                                         </ListItemIcon>
