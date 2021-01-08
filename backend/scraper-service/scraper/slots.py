@@ -109,7 +109,7 @@ class slots:
                 'P':19, 'Q':20, 'R':21, 'S':22, 'Ş':23, 'T':24, 'U':25,
                 'Ü':26, 'V':27, 'W':28, 'X':29, 'Y':30, 'Z':31
             }
-            a, b = letter_pair
+            a, b = letter_pair.upper()
             return letters[a]*len(letters) + letters[b]
 
         def merge_surname_ranges(surname_list):

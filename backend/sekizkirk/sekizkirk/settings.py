@@ -129,5 +129,9 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
-EMAIL_HOST = "smtp"
-EMAIL_PORT = 8025
+email_addr = os.environ['EMAIL_ADDR']
+EMAIL_HOST_USER = email_addr.split('@')[0]
+EMAIL_HOST = os.environ['EMAIL_HOST']
+DEFAULT_FROM_EMAIL = email_addr
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_PASS']
+EMAIL_USE_TLS = True

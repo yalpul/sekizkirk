@@ -91,7 +91,7 @@ def sendmail(mail_addr, schedule):
     send_mail(
         "Your schedule",
         "Please enable content to see the schedule",
-        "support@sekizkirk.io",
+        None, # email address comes from settings.DEFAULT_FROM_EMAIL
         [mail_addr],
         fail_silently=False,
         html_message=html_email,
