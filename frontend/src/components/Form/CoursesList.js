@@ -42,7 +42,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const CoursesList = ({ openDialog, setOpenDialog, course }) => {
+const CoursesList = ({
+    openDialog,
+    setOpenDialog,
+    course,
+    setDept,
+    setSemester,
+}) => {
     const classes = useStyles();
     const { coursesState, dispatch } = useContext(CoursesContext);
     const { uniqueCourses, electiveCourses } = coursesState;
@@ -54,6 +60,10 @@ const CoursesList = ({ openDialog, setOpenDialog, course }) => {
 
     const handleClearAll = () => {
         dispatch({ type: DELETE_ALL });
+
+        // clear must inputs
+        setDept(null);
+        setSemester("");
     };
 
     const handleDeleteCourse = (course) => {

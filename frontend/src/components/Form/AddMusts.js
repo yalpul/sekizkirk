@@ -48,12 +48,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const AddMusts = ({ dept, setDept }) => {
+const AddMusts = ({ dept, setDept, semester, setSemester }) => {
     const classes = useStyles();
-    const { departments, musts } = useContext(DataContext);
+    const { departments, musts, semester: semester_name } = useContext(
+        DataContext
+    );
     const { dispatch } = useContext(CoursesContext);
-
-    const [semester, setSemester] = useState("");
 
     const handleDepartmentChange = (event, value) => {
         setDept(value);
@@ -134,7 +134,11 @@ const AddMusts = ({ dept, setDept }) => {
                                         Fall
                                     </ListSubheader>
                                     {[1, 3, 5, 7].map((sem) => (
-                                        <MenuItem key={sem} value={sem}>
+                                        <MenuItem
+                                            key={sem}
+                                            value={sem}
+                                            disabled={semester_name !== "fall"}
+                                        >
                                             {sem}
                                         </MenuItem>
                                     ))}
@@ -150,7 +154,9 @@ const AddMusts = ({ dept, setDept }) => {
                                         <MenuItem
                                             key={sem}
                                             value={sem}
-                                            disabled
+                                            disabled={
+                                                semester_name !== "spring"
+                                            }
                                         >
                                             {sem}
                                         </MenuItem>

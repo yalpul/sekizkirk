@@ -41,6 +41,7 @@ const Form = ({
 }) => {
     const classes = useStyles();
     const [course, setCourse] = useState(null);
+    const [semester, setSemester] = useState("");
 
     return (
         <Grid
@@ -58,12 +59,19 @@ const Form = ({
 
             <AddCourse course={course} setCourse={setCourse} />
 
-            <AddMusts dept={dept} setDept={setDept} />
+            <AddMusts
+                dept={dept}
+                setDept={setDept}
+                semester={semester}
+                setSemester={setSemester}
+            />
 
             <CoursesList
                 openDialog={openDialog}
                 setOpenDialog={setOpenDialog}
                 course={course}
+                setDept={setDept}
+                setSemester={setSemester}
             />
 
             <SelectiveList />
