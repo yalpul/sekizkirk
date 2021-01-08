@@ -1,0 +1,65 @@
+version: '3'
+services:
+  db:
+      image: postgres:12.0-alpine
+      expose:
+          - 5432
+      environment:
+          - POSTGRES_DB=sekizkirk
+          - POSTGRES_USER=postgres
+          - POSTGRES_PASSWORD=postgres
+  web:
+      build: backend/sekizkirk
+      command: gunicorn sekizkirk.wsgi:application --bind 0.0.0.0:8000
+      restart: always
+      expose:
+          - 8000
+      environment:
+          - EMAIL_HOST=${EMAIL_HOST}
+          - EMAIL_ADDR=${EMAIL_ADDR}
+          - EMAIL_PASS=${EMAIL_PASS}
+      depends_on:
+          - db
+
+  scraper:
+      build: backend/scraper-service
+      command: python sekizkirk.py --path /sekizkirk_cache --period 1w --silent
+      restart: always
+      volumes:
+          - /tmp/sk:/sekizkirk_cache
+      expose:
+          - 8001
+      depends_on:
+          - web
+
+  renderer:
+      build: backend/mail-renderer
+      restart: always
+      expose:
+          - 3000
+      environment:
+          - NODE_ENV=production
+
+  sekizkirk_fe:
+      build: frontend
+      command: sleep infinity
+      volumes:
+        - static_files:/sekizkirk_fe/dist
+      environment:
+          - NODE_ENV=production
+
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - static_files:/etc/nginx/html
+      - /tmp/sk/data.json:/etc/nginx/html/data.json
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    depends_on:
+      - web
+      - sekizkirk_fe
+
+volumes:
+    static_files:
