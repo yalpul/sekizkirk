@@ -204,6 +204,7 @@ export default function SendButton({ schedule }) {
                 variant="contained"
                 endIcon={<SendIcon />}
                 className={classes.button}
+                disabled={schedule === undefined}
                 size="small"
                 onClick={() => dispatch({ type: OPEN_DIALOG })}
             >
