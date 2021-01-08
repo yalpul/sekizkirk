@@ -13,6 +13,7 @@ class scraper:
         self.silent = silent
         self.musts = []
         self.dept_codes = []
+        self.semester = None
         self.slots = []
         self.courses = []
         self.data = {}
@@ -38,12 +39,25 @@ class scraper:
             silent = self.silent
         )
 
+        self.semester = self.depts_scraper.get_current_semester()
+
         self.slots_scraper = slots(
             cache_path = self.slots_path,
             cookie = self.depts_scraper.get_cookie(),
             silent = self.silent
         )
         
+    def get_semester(self):
+        semester_num = self.semester[-1]
+        if semester_num == '1':
+            return 'fall'
+        elif semester_num == '2':
+            return 'spring'
+        elif semester_num == '3':
+            return 'summer'
+        else:
+            return None
+
     def scrape_musts(self, force_update=True):
         self.musts_scraper.import_data(force_update=force_update)
         self.musts = self.musts_scraper.get_musts()
@@ -90,7 +104,8 @@ class scraper:
             "courses" : self.get_courses(),
             "departments" : self.get_dept_codes(),
             "courseSlots" : self.get_slots(),
-            "lastUpdate" : self.get_timestamp()
+            "lastUpdate" : self.get_timestamp(),
+            "semester" : self.get_semester()
         }
 
         with open(self.data_path, 'w') as f:

@@ -20,21 +20,25 @@ class depts:
         self.course_names = []
         self.courses = {}
         self.cache_path = cache_path
-        self.dept_form['select_semester'] = self.get_current_semester()
+        self.dept_form['select_semester'] = self.scrape_semester()
         self.log(f"Semester: {self.dept_form['select_semester']}")
 
     def log(self, msg, progress=False):
         if not self.silent:
             print(msg, end='\r' if progress else '\n')
 
-    # Fall:1, Spring:2 ex. 20191, 20182 etc.
     def get_current_semester(self):
-        import time
-        year, month = time.localtime(time.time())[:2]
-        if month <= 6:
-            return str(year-1)+'2'
-        else:
-            return str(year)+'1'
+        return self.dept_form['select_semester']
+
+    # Fall:1, Spring:2 ex. 20191, 20182 etc.
+    def scrape_semester(self):
+        html = req.urlopen(self.url).read().decode('utf-8', errors='ignore')
+        semester_begin = html.find('select_semester')
+        first_child_str = 'option value="'
+        first_child_str_i = html.find(first_child_str, semester_begin)
+        semester_str_end = html.find('"', first_child_str_i+len(first_child_str))
+        semester = html[first_child_str_i+len(first_child_str):semester_str_end]
+        return semester
 
     # Extract courses offered by the department given the department page
     def parse_courses(self, html):
