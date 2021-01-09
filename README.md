@@ -1,15 +1,24 @@
 ## Installation
 
-First install dependencies using:
+Docker and docker-compose must be installed.
 
-`yarn install`
+To build all the images and run the containers, run
 
-Then establish data files using:
+`docker-compose up -d`
 
-`python scraper/sekizkirk.py --path ./data`, this creates `data` folder in the root directory.
+You need to have a `.env` file in the directory. Its contents should be the following:
 
-**Note:** If you are going to exract data files into another folder, also change import statements in the `src/index.js` file.
+```
+EMAIL_HOST=
+EMAIL_ADDR=
+EMAIL_PASS=
+```
 
-Now you can run development server using:
+You also need the course data folder since scraping all the data can take a very long time.
+Place the course data in `/tmp/sk/`
 
-`yarn dev`
+After the containers are up and running. You should run these commands to create the database schemas.
+```
+docker-compose exec web python manage.py makemigrations
+docker-compose exec web python manage.py migrate
+```

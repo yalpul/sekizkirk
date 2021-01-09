@@ -25,6 +25,7 @@ class scraper:
         self.depts_scraper = None
         self.slots_scraper = None
 
+    # scraper must be inited first. It initializes its underlying scrapers
     def init_scraper(self):
         if not os.path.exists(self.path):
             os.mkdir(self.path)
@@ -47,6 +48,7 @@ class scraper:
             silent = self.silent
         )
         
+    # convert semester to string form ie `20201 -> fall`
     def get_semester(self):
         semester_num = self.semester[-1]
         if semester_num == '1':
@@ -58,10 +60,12 @@ class scraper:
         else:
             return None
 
+    # run the scraper to get musts data
     def scrape_musts(self, force_update=True):
         self.musts_scraper.import_data(force_update=force_update)
         self.musts = self.musts_scraper.get_musts()
 
+    # return the musts data
     def get_musts(self):
         if not self.musts:
             self.scrape_musts(force_update=False)
@@ -72,25 +76,30 @@ class scraper:
             self.dept_codes = depts.get_department_codes()
         return self.dept_codes
 
+    # runs the scraper to get the courses data
     def scrape_courses(self, force_update=True):
         self.depts_scraper.import_data(force_update=force_update)
         self.courses = self.depts_scraper.get_courses()
         self.slots_scraper.set_course_codes(self.depts_scraper.get_codes())
 
+    # returns the courses data
     def get_courses(self):
         if not self.courses:
             self.scrape_courses(force_update=False)
         return self.courses
 
+    # runs the slots scraper and updates the slots values
     def scrape_slots(self, force_update=True):
         self.slots_scraper.import_data(force_update=force_update)
         self.slots = self.slots_scraper.get_slots()
 
+    # returns the scraped slots data
     def get_slots(self):
         if not self.slots:
             self.scrape_slots(force_update=False)
         return self.slots
         
+    # returns the timestamp in UTC-3 (Ankara) format
     def get_timestamp(self):
         from datetime import datetime, timezone, timedelta
         ankara_timezone = timezone(timedelta(hours=3))
@@ -98,6 +107,7 @@ class scraper:
         timestamp = datetime.now(tz=ankara_timezone).strftime(fmt)
         return timestamp
 
+    # update the data. it includes all of the values, slots, musts, etc
     def update_data(self):
         self.data = {
             "musts" : self.get_musts(),
@@ -134,6 +144,7 @@ class scraper:
         except:
             return None
 
+    # compare two slots data and determine the changed courses
     def changed_courses(self, old, new):
         changed_courses = []
         for course in old.keys():
