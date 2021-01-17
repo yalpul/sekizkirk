@@ -16,6 +16,14 @@ export default function CourseDisplay({ day, dontFillHandler, isFavsActive }) {
     const theme = useTheme();
     const matchSM = useMediaQuery(theme.breakpoints.down("sm"));
 
+    const {
+        coursesState: { fixedSections },
+        dispatch,
+    } = useContext(CoursesContext);
+
+    const [isMouseOver, setIsMouseOver] = useState(false);
+    const [isFixed, setIsFixed] = useState(false);
+
     if (day.length === 1) {
         // no collisions
         var collision = false;
@@ -25,13 +33,8 @@ export default function CourseDisplay({ day, dontFillHandler, isFavsActive }) {
         collision = true;
     }
 
-    const {
-        coursesState: { fixedSections },
-        dispatch,
-    } = useContext(CoursesContext);
-
-    const [isMouseOver, setIsMouseOver] = useState(false);
-    const [isFixed, setIsFixed] = useState(false);
+    const hideDontfill = isFavsActive || isFixed || !isMouseOver;
+    const hideFix = collision || isFavsActive || (!isFixed && !isMouseOver);
 
     const handleFix = () => {
         dispatch({ type: FIX_SECTION, payload: { courseCode, sectionID } });
@@ -80,14 +83,8 @@ export default function CourseDisplay({ day, dontFillHandler, isFavsActive }) {
                 xs={6}
                 style={{
                     paddingLeft: collision ? undefined : "10px",
-                    visibility:
-                        isFavsActive || isFixed || !isMouseOver
-                            ? "hidden"
-                            : undefined,
-                    display:
-                        matchSM && (isFavsActive || isFixed || !isMouseOver)
-                            ? "none"
-                            : undefined,
+                    visibility: hideDontfill ? "hidden" : undefined,
+                    display: matchSM && hideDontfill ? "none" : undefined,
                 }}
             >
                 <Tooltip title="don't fill" arrow>
@@ -112,17 +109,13 @@ export default function CourseDisplay({ day, dontFillHandler, isFavsActive }) {
                 }}
             >
                 {day.map(({ name, classroom }, index) => (
-                    <>
-                        <Typography
-                            variant="body1"
-                            align="center"
-                            key={`${name}-${index}`}
-                        >
+                    <React.Fragment key={`${name}${index}`}>
+                        <Typography variant="body1" align="center">
                             {name}
                             <br />
                             {classroom ? classroom : null}
                         </Typography>
-                    </>
+                    </React.Fragment>
                 ))}
             </Grid>
 
@@ -131,17 +124,8 @@ export default function CourseDisplay({ day, dontFillHandler, isFavsActive }) {
                 md={2}
                 xs={6}
                 style={{
-                    visibility:
-                        collision || isFavsActive || (!isFixed && !isMouseOver)
-                            ? "hidden"
-                            : undefined,
-                    display:
-                        matchSM &&
-                        (collision ||
-                            isFavsActive ||
-                            (!isFixed && !isMouseOver))
-                            ? "none"
-                            : undefined,
+                    visibility: hideFix ? "hidden" : undefined,
+                    display: matchSM && hideFix ? "none" : undefined,
                 }}
             >
                 {!isFixed ? (
