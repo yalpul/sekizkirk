@@ -21,6 +21,7 @@ export const DELETE_COURSE = "DELETE_COURSE";
 export const DELETE_ALL = "DELETE_ALL";
 export const ELECTIVE_SELECT = "ELECTIVE_SELECT";
 export const ADD_SELECTIVE = "ADD_SELECTIVE";
+export const SELECT_ALL_SECTIONS = "SELECT_ALL_SECTIONS";
 export const UNSELECT_ALL_SECTIONS = "UNSELECT_ALL_SECTIONS";
 export const TOGGLE_CHECK = "TOGGLE_CHECK";
 export const TOGGLE_COLLISION = "TOGGLE_COLLISION";
@@ -188,6 +189,20 @@ export const CoursesProvider = ({ children }) => {
                 allowCollision: {
                     ...allowCollision,
                     [course.code]: globalCollision,
+                },
+            };
+        }
+
+        if (action.type === SELECT_ALL_SECTIONS) {
+            const { sectionChecks } = state;
+            const { course } = action.payload;
+
+            return {
+                ...state,
+                sectionChecks: {
+                    ...sectionChecks,
+                    // check all the sections for given course
+                    [course.code]: sectionChecks[course.code].map(() => true),
                 },
             };
         }

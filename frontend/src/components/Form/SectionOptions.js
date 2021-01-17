@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { DataContext } from "../DataContext";
 import {
     CoursesContext,
+    SELECT_ALL_SECTIONS,
     UNSELECT_ALL_SECTIONS,
     TOGGLE_CHECK,
     TOGGLE_COLLISION,
@@ -60,11 +61,22 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
     const [instructorSections, setInstructorSections] = useState({});
     const [instructorsActive, setInstructorsActive] = useState([]);
     const [openSnackbar, setOpenSnacbar] = useState(false);
+    const [isSelectAll, setIsSelectAll] = useState(false);
 
-    const handleUnselectAll = (course) => {
-        dispatch({ type: UNSELECT_ALL_SECTIONS, payload: { course } });
-
-        setInstructorsActive(instructorsActive.map(([name]) => [name, false]));
+    const handleSectionToggle = (course) => {
+        if (isSelectAll === true) {
+            dispatch({ type: SELECT_ALL_SECTIONS, payload: { course } });
+            setInstructorsActive(
+                instructorsActive.map(([name]) => [name, true])
+            );
+            setIsSelectAll(false);
+        } else {
+            dispatch({ type: UNSELECT_ALL_SECTIONS, payload: { course } });
+            setInstructorsActive(
+                instructorsActive.map(([name]) => [name, false])
+            );
+            setIsSelectAll(true);
+        }
     };
 
     const handleCheck = (course, index) => {
@@ -262,7 +274,7 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
                                                         size="small"
                                                         color="secondary"
                                                         onClick={() =>
-                                                            handleUnselectAll(
+                                                            handleSectionToggle(
                                                                 course
                                                             )
                                                         }
@@ -272,7 +284,9 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
                                                             ]
                                                         }
                                                     >
-                                                        Unselect All
+                                                        {isSelectAll
+                                                            ? "Select All"
+                                                            : "Unselect All"}
                                                     </Button>
                                                 </Grid>
 
