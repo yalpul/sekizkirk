@@ -188,6 +188,21 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
         );
     }, []);
 
+    useEffect(() => {
+        // handle toggle button status if all instructors manually unselected or selected,
+        // this also covers manual toggle of sections.
+        const instructorStatus = instructorsActive.map(([, status]) => status);
+
+        const isAllTrue = instructorStatus.every((status) => status === true);
+        const isAllFalse = instructorStatus.every((status) => status === false);
+
+        if (isAllTrue && isSelectAll === true) {
+            setIsSelectAll(false);
+        } else if (isAllFalse && isSelectAll === false) {
+            setIsSelectAll(true);
+        }
+    }, [instructorsActive]);
+
     return (
         <>
             <Dialog
