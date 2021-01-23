@@ -9,7 +9,32 @@ from django.core.mail import send_mail
 
 from .models import Person, Course, Takes
 from .utils import form_validator
+from .utils import notify_validator
+from .utils import create_people_course_map
 
+
+def notify(request):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+    if request.content_type != 'application/json':
+        return HttpResponse(status=400)
+    try:
+        data = json.loads(request.body)
+        changed_courses = notify_validator(data)
+    except json.JSONDecodeError:
+        return HttpResponse(status=400)
+    except:
+        return HttpResponse(status=400)
+
+    try:
+        # a map of student and a list of courses that he takes
+        # and the courses are changed
+        people_course_map = create_people_course_map(changed_courses)
+        send_notify_mail(people_course_map)
+
+    except:
+        return HttpResponse(status=400)
+        
 
 def index(request):
     if request.method == "POST":
@@ -96,3 +121,13 @@ def sendmail(mail_addr, schedule):
         fail_silently=False,
         html_message=html_email,
     )
+
+def send_notify_mail(people_course_map):
+    for student, courses in people_course_map.items():
+        text = 'Your changed courses: ' + ','.join(courses)
+        send_Mail(
+            'Course Change Notification',
+            text,
+            [student],
+            fail_silently=False
+        )

@@ -1,5 +1,6 @@
 from django.core.validators import validate_email
 
+from .models import Person, Course, Takes
 
 def form_validator(data):
     """
@@ -28,3 +29,20 @@ def form_validator(data):
             assert ch.isdigit() == True
 
     return (mail_addr, schedule, notify)
+
+def notify_validator(data):
+    return data['courseList']
+
+def create_people_course_map(changed_courses):
+    student_map = {}
+    for course in changed_courses:
+        course_id = Course.objects.get(course=course)
+        students = Takes.objects.filter(course=course_id)
+        for entry in students:
+            student_email = entry.person.email
+            if student_email in student_map:
+                student_map[student_email].append(course)
+            else:
+                student_map[student_email] = [course]
+    return student_map
+

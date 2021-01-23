@@ -10,7 +10,7 @@ from argparse import ArgumentParser, ArgumentTypeError
 import urllib.request as req
 
 def notify_course_takers(courses):
-    url = 'http://web:8000/notify/'
+    url = 'http://web:8000/email/notify/'
     courses_serial = bytes(json.dumps(courses), 'ascii')
     response = req.urlopen(url, courses_serial)
     
