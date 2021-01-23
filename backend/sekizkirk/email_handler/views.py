@@ -12,6 +12,11 @@ from .utils import form_validator
 from .utils import notify_validator
 from .utils import create_people_course_map
 
+def unsubscribe(request, uuid):
+    print(uuid)
+    return HttpResponse(f'your id -> {uuid}')    
+
+    
 
 def notify(request):
     if request.method != 'POST':
@@ -67,6 +72,7 @@ def index(request):
 
             sendmail(mail_addr, schedule)
         except:
+            raise 
             return HttpResponse(status=500)
 
         return HttpResponse(status=200)
@@ -131,3 +137,4 @@ def send_notify_mail(people_course_map):
             [student],
             fail_silently=False
         )
+
