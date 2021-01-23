@@ -617,22 +617,10 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                                                             }
                                                             dontFill={dontFill}
                                                         />
-                                                    ) : day.length === 1 ? (
+                                                    ) : (
                                                         // slot has only one course, i.e, no collisions
                                                         <CellDisplay
-                                                            key={day[0].name}
-                                                            name={day[0].name}
-                                                            bg={day[0].bg}
-                                                            courseCode={
-                                                                day[0]
-                                                                    .courseCode
-                                                            }
-                                                            sectionID={
-                                                                day[0].sectionID
-                                                            }
-                                                            classroom={
-                                                                day[0].classroom
-                                                            }
+                                                            day={day}
                                                             isFavsActive={
                                                                 isFavsActive
                                                             }
@@ -642,45 +630,7 @@ export default function ScheduleTable({ tableDisplay, openDialog, mustDept }) {
                                                                     dayIndex
                                                                 )
                                                             }
-                                                            collision={false}
                                                         />
-                                                    ) : (
-                                                        day.map(
-                                                            ({
-                                                                name,
-                                                                bg,
-                                                                courseCode,
-                                                                sectionID,
-                                                                classroom,
-                                                            }) => (
-                                                                <CellDisplay
-                                                                    key={name}
-                                                                    name={name}
-                                                                    bg={bg}
-                                                                    courseCode={
-                                                                        courseCode
-                                                                    }
-                                                                    sectionID={
-                                                                        sectionID
-                                                                    }
-                                                                    classroom={
-                                                                        classroom
-                                                                    }
-                                                                    isFavsActive={
-                                                                        isFavsActive
-                                                                    }
-                                                                    dontFillHandler={() =>
-                                                                        handleCellClick(
-                                                                            hourIndex,
-                                                                            dayIndex
-                                                                        )
-                                                                    }
-                                                                    collision={
-                                                                        true
-                                                                    }
-                                                                />
-                                                            )
-                                                        )
                                                     )}
                                                 </TableCell>
                                             );

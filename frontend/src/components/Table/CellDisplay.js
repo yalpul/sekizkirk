@@ -12,16 +12,7 @@ import LockIcon from "@material-ui/icons/Lock";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
 import Tooltip from "@material-ui/core/Tooltip";
 
-export default function CourseDisplay({
-    name,
-    bg,
-    dontFillHandler,
-    courseCode,
-    sectionID,
-    classroom,
-    isFavsActive,
-    collision,
-}) {
+export default function CourseDisplay({ day, dontFillHandler, isFavsActive }) {
     const theme = useTheme();
     const matchSM = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -32,6 +23,18 @@ export default function CourseDisplay({
 
     const [isMouseOver, setIsMouseOver] = useState(false);
     const [isFixed, setIsFixed] = useState(false);
+
+    if (day.length === 1) {
+        // no collisions
+        var collision = false;
+        var [{ courseCode, sectionID, bg }] = day;
+    } else {
+        // collision
+        collision = true;
+    }
+
+    const hideDontfill = isFavsActive || isFixed || !isMouseOver;
+    const hideFix = collision || isFavsActive || (!isFixed && !isMouseOver);
 
     const handleFix = () => {
         dispatch({ type: FIX_SECTION, payload: { courseCode, sectionID } });
@@ -55,7 +58,6 @@ export default function CourseDisplay({
     return (
         <Grid
             container
-            key={name}
             style={{
                 backgroundColor: !collision ? bg : undefined,
                 backgroundImage: collision
@@ -63,7 +65,8 @@ export default function CourseDisplay({
                     : undefined,
                 backgroundSize: collision ? "49.50px 49.50px" : undefined,
                 color: "#FFF",
-                height: "3.5em",
+                minHeight: "3.5em",
+                height: "100%",
                 borderRadius: 5,
                 width: "98%",
             }}
@@ -79,15 +82,9 @@ export default function CourseDisplay({
                 md={2}
                 xs={6}
                 style={{
-                    paddingLeft: "10px",
-                    visibility:
-                        isFavsActive || isFixed || !isMouseOver
-                            ? "hidden"
-                            : undefined,
-                    display:
-                        matchSM && (isFavsActive || isFixed || !isMouseOver)
-                            ? "none"
-                            : undefined,
+                    paddingLeft: collision ? undefined : "10px",
+                    visibility: hideDontfill ? "hidden" : undefined,
+                    display: matchSM && hideDontfill ? "none" : undefined,
                 }}
             >
                 <Tooltip title="don't fill" arrow>
@@ -111,11 +108,15 @@ export default function CourseDisplay({
                             : undefined,
                 }}
             >
-                <Typography variant="body1" align="center">
-                    {name}
-                    <br />
-                    {classroom ? classroom : null}
-                </Typography>
+                {day.map(({ name, classroom }, index) => (
+                    <React.Fragment key={`${name}${index}`}>
+                        <Typography variant="body1" align="center">
+                            {name}
+                            <br />
+                            {classroom ? classroom : null}
+                        </Typography>
+                    </React.Fragment>
+                ))}
             </Grid>
 
             <Grid
@@ -123,14 +124,8 @@ export default function CourseDisplay({
                 md={2}
                 xs={6}
                 style={{
-                    visibility:
-                        isFavsActive || (!isFixed && !isMouseOver)
-                            ? "hidden"
-                            : undefined,
-                    display:
-                        matchSM && (isFavsActive || (!isFixed && !isMouseOver))
-                            ? "none"
-                            : undefined,
+                    visibility: hideFix ? "hidden" : undefined,
+                    display: matchSM && hideFix ? "none" : undefined,
                 }}
             >
                 {!isFixed ? (
