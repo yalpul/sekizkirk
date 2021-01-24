@@ -20,7 +20,7 @@ def unsubscribe(request, uuid):
         print(f'{uuid}({student.email}) unsubbed')
         return HttpResponse(f'You have successfully unsubscribed. We will no longer send notification mails to {student.email}.')
     except:
-        return HttpResponse(f'{uuid} does not match any record in our database')    
+        return HttpResponse(status=404)    
 
     
 
