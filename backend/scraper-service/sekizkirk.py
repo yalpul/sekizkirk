@@ -10,9 +10,17 @@ from argparse import ArgumentParser, ArgumentTypeError
 import urllib.request as req
 
 def notify_course_takers(courses):
-    url = 'http://web:8000/email/notify/'
-    courses_serial = bytes(json.dumps(courses), 'ascii')
-    response = req.urlopen(url, courses_serial)
+    try:
+        url = 'http://web:8000/email/notify/'
+        course_list = {
+            'courseList' : courses,
+            'apiKey' : os.environ['APIKEY']
+        }
+        courses_serial = bytes(json.dumps(course_list), 'ascii')
+        response = req.urlopen(url, courses_serial)
+        print('Status of notification: ', response.status)
+    except:
+        print('Notify takers failed.')
     
 
 def handle_reqs(sc):

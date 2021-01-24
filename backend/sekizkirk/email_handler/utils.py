@@ -31,7 +31,13 @@ def form_validator(data):
     return (mail_addr, schedule, notify)
 
 def notify_validator(data):
-    return data['courseList']
+    try:
+        if data['apiKey'] == os.environ['APIKEY']:
+            return data['courseList']
+        else:
+            raise ValueError('invalid api key')
+    except:
+        raise
 
 def create_people_course_map(changed_courses):
     student_map = {}
