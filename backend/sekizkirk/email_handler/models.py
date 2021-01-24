@@ -3,7 +3,7 @@ import uuid
 from django.db import models
 
 class Person(models.Model):
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     notify = models.BooleanField(default=False)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 

@@ -45,6 +45,8 @@ def create_people_course_map(changed_courses):
         course_id = Course.objects.get(course=course)
         students = Takes.objects.filter(course=course_id)
         for entry in students:
+            if entry.person.notify == False:
+                continue
             student_email = entry.person.email
             if student_email in student_map:
                 student_map[student_email].append(course)

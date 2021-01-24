@@ -18,6 +18,7 @@ services:
           - EMAIL_HOST=${EMAIL_HOST}
           - EMAIL_ADDR=${EMAIL_ADDR}
           - EMAIL_PASS=${EMAIL_PASS}
+          - API_KEY=${API_KEY}
       depends_on:
           - db
 
@@ -27,6 +28,8 @@ services:
       restart: always
       volumes:
           - /tmp/sk:/sekizkirk_cache
+      environment:
+          - API_KEY=${API_KEY}
       expose:
           - 8001
       depends_on:

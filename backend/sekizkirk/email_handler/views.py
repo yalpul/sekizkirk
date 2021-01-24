@@ -13,8 +13,14 @@ from .utils import notify_validator
 from .utils import create_people_course_map
 
 def unsubscribe(request, uuid):
-    print(uuid)
-    return HttpResponse(f'your id -> {uuid}')    
+    try:
+        student = Person.objects.get(uuid=uuid)
+        student.notify = False
+        student.save()
+        print(f'{uuid}({student.email}) unsubbed')
+        return HttpResponse(f'You have successfully unsubscribed. We will no longer send notification mails to {student.email}.')
+    except:
+        return HttpResponse(f'{uuid} does not match any record in our database')    
 
     
 
@@ -60,8 +66,12 @@ def index(request):
 
         try:
             person, created = Person.objects.get_or_create(email=mail_addr)
-            if created:
+            if created or person.notify != notify:
+                person.notify = notify
                 person.save()
+            if not created:
+                Takes.objects.filter(person=person).delete()
+
             for courseid in schedule:
                 course, created = Course.objects.get_or_create(course=courseid)
                 if created:
@@ -72,7 +82,6 @@ def index(request):
 
             sendmail(mail_addr, schedule)
         except:
-            raise 
             return HttpResponse(status=500)
 
         return HttpResponse(status=200)
@@ -130,7 +139,8 @@ def sendmail(mail_addr, schedule):
 
 def send_notify_mail(people_course_map):
     for student, courses in people_course_map.items():
-        text = 'Your changed courses: ' + ','.join(courses)
+        text = 'Your changed courses: ' + ','.join(courses) + \
+            f'\nTo unsubscribe, Follow this link: https://sekizkirk.io/email/unsubscribe/{Person.objects.get(email=student).uuid}'
         send_Mail(
             'Course Change Notification',
             text,
