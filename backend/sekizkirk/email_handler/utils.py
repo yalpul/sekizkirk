@@ -1,3 +1,5 @@
+import os
+
 from django.core.validators import validate_email
 
 from .models import Person, Course, Takes
@@ -32,7 +34,7 @@ def form_validator(data):
 
 def notify_validator(data):
     try:
-        if data['apiKey'] == os.environ['APIKEY']:
+        if data['apiKey'] == os.environ['API_KEY']:
             return data['courseList']
         else:
             raise ValueError('invalid api key')

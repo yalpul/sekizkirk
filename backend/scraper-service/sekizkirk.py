@@ -7,6 +7,7 @@ import time
 import threading
 from scraper.scraper import scraper
 from argparse import ArgumentParser, ArgumentTypeError
+from datetime import datetime
 import urllib.request as req
 
 def notify_course_takers(courses):
@@ -14,10 +15,11 @@ def notify_course_takers(courses):
         url = 'http://web:8000/email/notify/'
         course_list = {
             'courseList' : courses,
-            'apiKey' : os.environ['APIKEY']
+            'apiKey' : os.environ['API_KEY']
         }
         courses_serial = bytes(json.dumps(course_list), 'ascii')
-        response = req.urlopen(url, courses_serial)
+        request = req.Request(url, headers={'Content-Type':'application/json'})
+        response = req.urlopen(request, courses_serial)
         print('Status of notification: ', response.status)
     except:
         print('Notify takers failed.')
@@ -106,11 +108,14 @@ def sekizkirk_scrape(period : 'hour', path='sekizkirk_cache', silent=False):
     while True:
         time.sleep(period_sec)
         old_slots = sc.get_slots()
+        print(datetime.now().strftime('%x %X'), 'Scraping is beginning...')
         sc.scrape_slots()
         sc.update_data()
+        print(datetime.now().strftime('%x %X'), 'Scraping is finished.')
         new_slots = sc.get_slots()
         changed_courses = sc.changed_courses(old_slots, new_slots)
         if changed_courses:
+            print('Changed courses: ', changed_courses)
             notify_course_takers(changed_courses)
 
 

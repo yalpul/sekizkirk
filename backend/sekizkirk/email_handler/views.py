@@ -42,6 +42,7 @@ def notify(request):
         # and the courses are changed
         people_course_map = create_people_course_map(changed_courses)
         send_notify_mail(people_course_map)
+        return HttpResponse(status=200)
 
     except:
         return HttpResponse(status=400)
@@ -141,9 +142,10 @@ def send_notify_mail(people_course_map):
     for student, courses in people_course_map.items():
         text = 'Your changed courses: ' + ','.join(courses) + \
             f'\nTo unsubscribe, Follow this link: https://sekizkirk.io/email/unsubscribe/{Person.objects.get(email=student).uuid}'
-        send_Mail(
+        send_mail(
             'Course Change Notification',
             text,
+            None, # email address comes from settings.DEFAULT_FROM_EMAIL
             [student],
             fail_silently=False
         )
