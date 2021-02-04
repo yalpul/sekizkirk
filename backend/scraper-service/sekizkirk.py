@@ -21,8 +21,9 @@ def notify_course_takers(courses):
         request = req.Request(url, headers={'Content-Type':'application/json'})
         response = req.urlopen(request, courses_serial)
         print('Status of notification: ', response.status)
-    except:
+    except Exception as e:
         print('Notify takers failed.')
+        print(repr(e))
     
 
 def handle_reqs(sc):

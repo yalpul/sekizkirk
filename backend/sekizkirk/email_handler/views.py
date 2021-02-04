@@ -41,10 +41,14 @@ def notify(request):
         # a map of student and a list of courses that he takes
         # and the courses are changed
         people_course_map = create_people_course_map(changed_courses)
+        print('people - course map: ', people_course_map)
         send_notify_mail(people_course_map)
+        print('Notify mail sent successfully.')
         return HttpResponse(status=200)
 
-    except:
+    except Exception as e:
+        print('Notify mail send failed.')
+        print(repr(e))
         return HttpResponse(status=400)
         
 
