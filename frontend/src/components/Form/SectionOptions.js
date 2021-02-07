@@ -260,127 +260,117 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
                         </Grid>
 
                         <Grid item style={{ marginTop: "1em" }}>
-                             <FormControl>
-                                <FormLabel component="legend" focused={false}> 
-                                    <Grid container direction="column">
-                                        <Grid item>
-                                            <Grid
-                                                container
-                                                alignItems="center"
-                                                wrap="nowrap"
-                                            >
-                                                <Grid item xs={4} sm="auto">
-                                                    <Typography>
-                                                        Course Sections
-                                                    </Typography>
-                                                </Grid>
-
-                                                <Grid
-                                                    item
-                                                    style={{
-                                                        marginLeft: "0.5em",
-                                                        marginRight: "0.5em",
-                                                    }}
-                                                    xs={6}
-                                                    sm="auto"
-                                                >
-                                                    <Button
-                                                        variant="outlined"
-                                                        size="small"
-                                                        color="secondary"
-                                                        onClick={() =>
-                                                            handleSectionToggle(
-                                                                course
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            fixedSections[
-                                                                course.code
-                                                            ]
-                                                        }
-                                                    >
-                                                        {isSelectAll
-                                                            ? "Select All"
-                                                            : "Unselect All"}
-                                                    </Button>
-                                                </Grid>
-
-                                                <Grid item xs={2} sm="auto">
-                                                    {!fixedSections[
-                                                        course.code
-                                                    ] && (
-                                                        <Tooltip
-                                                            title="filter by instructor"
-                                                            arrow
-                                                            enterDelay={500}
-                                                        >
-                                                            <IconButton
-                                                                aria-label="filter"
-                                                                color="secondary"
-                                                                onClick={() =>
-                                                                    setShowInstructors(
-                                                                        !showInstructors
-                                                                    )
-                                                                }
-                                                            >
-                                                                <TuneIcon />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    )}
-                                                </Grid>
-
-                                                <Grid item>
-                                                    {fixedSections[
-                                                        course.code
-                                                    ] && (
-                                                        <Tooltip
-                                                            arrow
-                                                            title="Unfix section in the table to enable selection."
-                                                        >
-                                                            <HelpIcon color="primary" />
-                                                        </Tooltip>
-                                                    )}
-                                                </Grid>
-                                            </Grid>
-                                        </Grid>
-
+                            <FormControl component="fieldset">
+                                <Grid container direction="column">
+                                    <Grid item>
                                         <Grid
-                                            item
-                                            className={classes.chipContainer}
+                                            container
+                                            alignItems="center"
+                                            wrap="nowrap"
                                         >
-                                            {!fixedSections[course.code] &&
-                                                showInstructors &&
-                                                instructorsActive.map(
-                                                    (
-                                                        [name, isActive],
-                                                        index
-                                                    ) => (
-                                                        <Chip
-                                                            label={name}
-                                                            key={name}
-                                                            className={
-                                                                classes.chip
-                                                            }
-                                                            clickable
-                                                            style={{
-                                                                backgroundColor: isActive
-                                                                    ? theme
-                                                                          .palette
-                                                                          .primary
-                                                                          .light
-                                                                    : undefined,
-                                                            }}
+                                            <Grid item xs={4} sm="auto">
+                                                <Typography>
+                                                    Course Sections
+                                                </Typography>
+                                            </Grid>
+
+                                            <Grid
+                                                item
+                                                style={{
+                                                    marginLeft: "0.5em",
+                                                    marginRight: "0.5em",
+                                                }}
+                                                xs={6}
+                                                sm="auto"
+                                            >
+                                                <Button
+                                                    variant="outlined"
+                                                    size="small"
+                                                    color="secondary"
+                                                    onClick={() =>
+                                                        handleSectionToggle(
+                                                            course
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        fixedSections[
+                                                            course.code
+                                                        ]
+                                                    }
+                                                >
+                                                    {isSelectAll
+                                                        ? "Select All"
+                                                        : "Unselect All"}
+                                                </Button>
+                                            </Grid>
+
+                                            <Grid item xs={2} sm="auto">
+                                                {!fixedSections[
+                                                    course.code
+                                                ] && (
+                                                    <Tooltip
+                                                        title="filter by instructor"
+                                                        arrow
+                                                        enterDelay={500}
+                                                    >
+                                                        <IconButton
+                                                            aria-label="filter"
+                                                            color="secondary"
                                                             onClick={() =>
-                                                                handleInstructorClick(
-                                                                    index
+                                                                setShowInstructors(
+                                                                    !showInstructors
                                                                 )
                                                             }
-                                                        />
-                                                    )
+                                                        >
+                                                            <TuneIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
                                                 )}
+                                            </Grid>
+
+                                            <Grid item>
+                                                {fixedSections[course.code] && (
+                                                    <Tooltip
+                                                        arrow
+                                                        title="Unfix section in the table to enable selection."
+                                                    >
+                                                        <HelpIcon color="primary" />
+                                                    </Tooltip>
+                                                )}
+                                            </Grid>
                                         </Grid>
                                     </Grid>
-                                </FormLabel>
+
+                                    <Grid
+                                        item
+                                        className={classes.chipContainer}
+                                    >
+                                        {!fixedSections[course.code] &&
+                                            showInstructors &&
+                                            instructorsActive.map(
+                                                ([name, isActive], index) => (
+                                                    <Chip
+                                                        label={name}
+                                                        key={name}
+                                                        className={classes.chip}
+                                                        clickable
+                                                        style={{
+                                                            backgroundColor: isActive
+                                                                ? theme.palette
+                                                                      .primary
+                                                                      .light
+                                                                : undefined,
+                                                        }}
+                                                        onClick={() =>
+                                                            handleInstructorClick(
+                                                                index
+                                                            )
+                                                        }
+                                                    />
+                                                )
+                                            )}
+                                    </Grid>
+                                </Grid>
                                 <FormGroup aria-label="position" row>
                                     {sectionChecks[course.code].map(
                                         (checked, index) => {
