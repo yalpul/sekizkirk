@@ -44,7 +44,7 @@ class scraper:
 
         self.slots_scraper = slots(
             cache_path = self.slots_path,
-            cookie = self.depts_scraper.get_cookie(),
+            cookie_generator = self.depts_scraper.get_cookie(),
             silent = self.silent
         )
         

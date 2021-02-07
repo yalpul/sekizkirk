@@ -44,8 +44,8 @@ const SelectiveList = () => {
     const { coursesState, dispatch } = useContext(CoursesContext);
     const { selectiveCourses } = coursesState;
 
-    const handleSelectiveClick = (course) => {
-        dispatch({ type: ADD_SELECTIVE, payload: { course } });
+    const handleSelectiveClick = (course, listIndex) => {
+        dispatch({ type: ADD_SELECTIVE, payload: { course, listIndex } });
     };
 
     const handleCancelClick = () => {
@@ -53,34 +53,42 @@ const SelectiveList = () => {
     };
 
     return (
-        <Grid item className={classes.selectiveContainer}>
-            {selectiveCourses.length > 0 && (
-                <>
-                    <Grid container justify="space-between" wrap="nowrap">
-                        <Grid item>
-                            <Typography
-                                variant="subtitle1"
-                                className={classes.selectiveHeader}
-                                color="secondary"
-                            >
-                                Selectives for this semester
-                            </Typography>
-                        </Grid>
-
-                        <Grid item>
-                            <IconButton onClick={handleCancelClick}>
-                                <CancelIcon />
-                            </IconButton>
-                        </Grid>
+        selectiveCourses.length > 0 && (
+            <Grid item className={classes.selectiveContainer}>
+                <Grid container justify="space-between" wrap="nowrap">
+                    <Grid item>
+                        <Typography
+                            variant="subtitle1"
+                            className={classes.selectiveHeader}
+                            color="secondary"
+                        >
+                            Selectives for this semester
+                        </Typography>
                     </Grid>
-                    <Divider />
-                    <List dense>
-                        {selectiveCourses.map((course) => {
-                            return course ? (
+
+                    <Grid item>
+                        <IconButton onClick={handleCancelClick}>
+                            <CancelIcon />
+                        </IconButton>
+                    </Grid>
+                </Grid>
+                <Divider />
+                {selectiveCourses.map((selectiveList, listIndex) => {
+                    return (
+                        <List
+                            dense
+                            key={JSON.stringify(selectiveList)}
+                            style={{
+                                marginTop: listIndex !== 0 ? "1em" : undefined,
+                            }}
+                        >
+                            {selectiveList.map((course) => (
                                 <ListItem
                                     key={`${course.title}+${course.code}`}
                                     button
-                                    onClick={() => handleSelectiveClick(course)}
+                                    onClick={() =>
+                                        handleSelectiveClick(course, listIndex)
+                                    }
                                     className={classes.listItem}
                                 >
                                     <ListItemIcon>
@@ -88,12 +96,12 @@ const SelectiveList = () => {
                                     </ListItemIcon>
                                     <ListItemText primary={course.title} />
                                 </ListItem>
-                            ) : null;
-                        })}
-                    </List>
-                </>
-            )}
-        </Grid>
+                            ))}
+                        </List>
+                    );
+                })}
+            </Grid>
+        )
     );
 };
 

@@ -40,6 +40,7 @@ class musts:
     # parse must and elective courses from table rows
     def get_courses(self, rows):
         must = []
+        selectives = []
         selective = []
         elective = []
         current = must
@@ -50,11 +51,14 @@ class musts:
             elif row.find('Any 1 of the following set') != -1: continue
             elif row.count('td') == 1:
                 current = selective if current is must else must
+                if selective:
+                    selectives.append(selective)
+                    selective = []
             else:
                 elect_i = row.find('ELECTIVE')
                 s = row.rfind('>', 0, elect_i)
                 elective.append(row[s+1:elect_i+8])
-        return [must, selective, elective]
+        return [must, selectives, elective]
 
     # get catalog data for a given department (all 8 semesters)
     def get_dept_musts(self, dept):

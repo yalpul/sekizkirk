@@ -64,10 +64,12 @@ class depts:
 
     # Get cookie for the PHP session
     def get_cookie(self):
-        self.dept_form['select_dept'] = '571'
-        encoded_form = parse.urlencode(self.dept_form)
-        response = req.urlopen(self.url, bytes(encoded_form, 'ascii'))
-        return response.getheader('Set-Cookie')
+        def cookie_getter():
+            self.dept_form['select_dept'] = '571'
+            encoded_form = parse.urlencode(self.dept_form)
+            response = req.urlopen(self.url, bytes(encoded_form, 'ascii'))
+            return response.getheader('Set-Cookie')
+        return cookie_getter
 
     # Collect course data (code-name pairs) offered by all departments
     def collect_courses(self):

@@ -110,7 +110,10 @@ export const CoursesProvider = ({ children }) => {
                 uniqueCourses: [
                     ...new Set([...newMustCourses, ...manualCourses]),
                 ],
-                selectiveCourses: selectiveCodes.map((code) => courses[code]),
+                selectiveCourses: selectiveCodes.map((selectiveList) =>
+                    selectiveList.map((code) => courses[code])
+                ),
+
                 electiveCourses: [...electiveTypes],
                 sectionChecks: { ...sectionsForMusts, ...sectionChecks },
                 allowCollision: {
@@ -167,21 +170,26 @@ export const CoursesProvider = ({ children }) => {
                 allowCollision,
                 manualCourses,
                 globalCollision,
+                selectiveCourses,
             } = state;
-            const { course } = action.payload;
+            const { course, listIndex } = action.payload;
 
             const sections = courseSlots[course.code];
 
-            // add selected course to the musts,
-            // clear selectiveCourses
+            // delete the selective list where course is selected from.
+            const tempSelective = [...selectiveCourses];
+            tempSelective.splice(listIndex, 1);
+
+            // add selected course to the musts
             const newMustCourses = [...mustCourses, course];
+
             return {
                 ...state,
                 mustCourses: newMustCourses,
                 uniqueCourses: [
                     ...new Set([...newMustCourses, ...manualCourses]),
                 ],
-                selectiveCourses: [],
+                selectiveCourses: tempSelective,
                 sectionChecks: {
                     ...sectionChecks,
                     [course.code]: sections.map(() => true), // select by default all sections for this course

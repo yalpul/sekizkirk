@@ -6,7 +6,7 @@ import json
 from .dept_codes import dept_codes
 
 class slots:
-    def __init__(self, cache_path, cookie=None, course_codes=None, silent=True):
+    def __init__(self, cache_path, cookie_generator=None, course_codes=None, silent=True):
         self.url = \
             'https://oibs2.metu.edu.tr/View_Program_Course_Details_64/main.php'
 
@@ -20,7 +20,8 @@ class slots:
         self.cache_path = cache_path
         self.course_codes = course_codes
         self.course_slots = {}
-        self.cookie = cookie
+        self.generate_cookie = cookie_generator
+        self.cookie = self.generate_cookie()
 
     # set the course codes array. slots will scrape the data of this list
     def set_course_codes(self, course_codes):
@@ -199,8 +200,15 @@ class slots:
         course_slots = {}
         i = 1
         for course in self.course_codes:
-            course_page = self.request_course(course)
-            slots = self.get_timeslots(course_page)
+            success = False
+            while success == False:
+                try:
+                    course_page = self.request_course(course)
+                    slots = self.get_timeslots(course_page)
+                    success = True
+                except:
+                    print('\nError in course: ', course, '- Retrying with a new cookie...')
+                    self.cookie = self.generate_cookie()
             course_slots[course] = slots
             self.log(f'{i:4}/{len(self.course_codes):4}', progress=True)
             i += 1
