@@ -260,8 +260,8 @@ const SectionOptions = ({ index, course, openDialog, setOpenDialog }) => {
                         </Grid>
 
                         <Grid item style={{ marginTop: "1em" }}>
-                            <FormControl component="fieldset">
-                                <FormLabel component="legend" focused={false}>
+                             <FormControl>
+                                <FormLabel component="legend" focused={false}> 
                                     <Grid container direction="column">
                                         <Grid item>
                                             <Grid
