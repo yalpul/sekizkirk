@@ -116,8 +116,8 @@ def sekizkirk_scrape(period : 'hour', path='sekizkirk_cache', silent=False):
         new_slots = sc.get_slots()
         changed_courses = sc.changed_courses(old_slots, new_slots)
         if changed_courses:
-            print('Changed courses: ', changed_courses)
-            notify_course_takers(changed_courses)
+            print('Changed courses: ', changed_courses.keys())
+            notify_course_takers(changed_courses.keys())
 
 
 if __name__ == '__main__':
