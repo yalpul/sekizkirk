@@ -146,14 +146,71 @@ class scraper:
 
     # compare two slots data and determine the changed courses
     def changed_courses(self, old, new):
-        changed_courses = []
+        def add_reason(changes, course, reason):
+            if course in changes:
+                changes[course].append(reason)
+            else:
+                changes[course] = [reason]
+        changed_courses = {}
         for course in old.keys():
             if course not in new:
-                changed_courses.append(course)
+                add_reason(changed_courses, course, 'Course no longer exists')
                 continue
             old_slots = old[course]
             new_slots = new[course]
             if old_slots != new_slots:
-                changed_courses.append(course)
+                reasons = self.get_change_reasons(old_slots, new_slots)
+                if reasons:
+                    for reason in reasons:
+                        add_reason(changed_courses, course, reason)
+                else:
+                    add_reason(changed_courses, course, None)
         return changed_courses
+
+
+    def get_change_reasons(self, old, new):
+        reasons = []
+        only_in_old = []
+        only_in_new = []
+
+        i, j = 0, 0
+        len_old = len(old)
+        len_new = len(new)
+        
+        try:
+            while i < len_old and j < len_new:
+                e1, e2 = old[i][0], new[j][0]
+                if e1 < e2:
+                    only_in_old.append(e1)
+                    i += 1
+                elif e2 < e1:
+                    only_in_new.append(e2)
+                    j += 1
+                else:
+                    if old[i][1] != new[j][1]:
+                        reasons.append('Time slots have changed for section: ' + str(e1))
+                    if old[i][2] != new[j][2]:
+                        reasons.append('Constraints have changed for section: ' + str(e1))
+                    if old[i][3] != new[j][3]:
+                        reasons.append('Instructor has changed for section: ' + str(e1))
+                    i += 1
+                    j += 1
+            while i < len_old:
+                e1 = old[i][0]
+                only_in_old.append(e1)
+                i += 1
+            while j < len_new:
+                e2 = new[j][0]
+                only_in_new.append(e2)
+                j += 1
+
+            if only_in_old:
+                reasons.append('Section does not exist anymore: ' + ','.join([str(a) for a in only_in_old]))
+            if only_in_new:
+                reasons.append('New section opened: ' + ','.join([str(a) for a in only_in_new]))
+        except Exception as e:
+            print(repr(e))
+            print(old)
+            print(new)
+        return reasons
 
