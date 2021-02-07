@@ -110,14 +110,15 @@ def sekizkirk_scrape(period : 'hour', path='sekizkirk_cache', silent=False):
         time.sleep(period_sec)
         old_slots = sc.get_slots()
         print(datetime.now().strftime('%x %X'), 'Scraping is beginning...')
+        sc.scrape_courses()
         sc.scrape_slots()
         sc.update_data()
         print(datetime.now().strftime('%x %X'), 'Scraping is finished.')
         new_slots = sc.get_slots()
         changed_courses = sc.changed_courses(old_slots, new_slots)
         if changed_courses:
-            print('Changed courses: ', changed_courses.keys())
-            notify_course_takers(changed_courses.keys())
+            print('Changed courses: ', changed_courses)
+            notify_course_takers(list(changed_courses.keys()))
 
 
 if __name__ == '__main__':

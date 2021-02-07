@@ -1,6 +1,7 @@
 import os
 
 from django.core.validators import validate_email
+from django.core.exceptions import ObjectDoesNotExist
 
 from .models import Person, Course, Takes
 
@@ -44,7 +45,10 @@ def notify_validator(data):
 def create_people_course_map(changed_courses):
     student_map = {}
     for course in changed_courses:
-        course_id = Course.objects.get(course=course)
+        try:
+            course_id = Course.objects.get(course=course)
+        except ObjectDoesNotExist:
+            continue
         students = Takes.objects.filter(course=course_id)
         for entry in students:
             if entry.person.notify == False:
