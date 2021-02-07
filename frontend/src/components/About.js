@@ -99,13 +99,17 @@ const About = () => {
             </Grid>
 
             <Grid item className={classes.link}>
-                <Link href="https://robotdegilim.xyz" color="secondary">
+                <Link
+                    href="https://robotdegilim.xyz"
+                    color="secondary"
+                    rel="nofollow"
+                >
                     robotdegilim.xyz
                 </Link>
             </Grid>
 
             <Grid item className={classes.link}>
-                <Link href="http://tetick.xyz" color="secondary">
+                <Link href="http://tetick.xyz" color="secondary" rel="nofollow">
                     tetick.xyz
                 </Link>
             </Grid>
