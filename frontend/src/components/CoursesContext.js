@@ -147,7 +147,12 @@ export const CoursesProvider = ({ children }) => {
         }
 
         if (action.type === DELETE_ALL) {
-            return initialState;
+            const { globalCollision } = state;
+
+            return {
+                ...initialState,
+                globalCollision,
+            };
         }
 
         if (action.type === ELECTIVE_SELECT) {
