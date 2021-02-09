@@ -19,7 +19,9 @@ def unsubscribe(request, uuid):
         student.save()
         print(f'{uuid}({student.email}) unsubbed')
         return HttpResponse(f'You have successfully unsubscribed. We will no longer send notification mails to {student.email}.')
-    except:
+    except Exception as e:
+        print('Unsubscribe failed')
+        print(repr(e))
         return HttpResponse(status=404)    
 
     
@@ -86,7 +88,9 @@ def index(request):
                     takes.save()
 
             sendmail(mail_addr, schedule)
-        except:
+        except Exception as e:
+            print('Send mail failed.')
+            print(repr(e))
             return HttpResponse(status=500)
 
         return HttpResponse(status=200)
