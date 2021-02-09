@@ -1,5 +1,9 @@
-from django.core.validators import validate_email
+import os
 
+from django.core.validators import validate_email
+from django.core.exceptions import ObjectDoesNotExist
+
+from .models import Person, Course, Takes
 
 def form_validator(data):
     """
@@ -28,3 +32,31 @@ def form_validator(data):
             assert ch.isdigit() == True
 
     return (mail_addr, schedule, notify)
+
+def notify_validator(data):
+    try:
+        if data['apiKey'] == os.environ['API_KEY']:
+            return data['courseList']
+        else:
+            raise ValueError('invalid api key')
+    except:
+        raise
+
+def create_people_course_map(changed_courses):
+    student_map = {}
+    for course in changed_courses:
+        try:
+            course_id = Course.objects.get(course=course)
+        except ObjectDoesNotExist:
+            continue
+        students = Takes.objects.filter(course=course_id)
+        for entry in students:
+            if entry.person.notify == False:
+                continue
+            student_email = entry.person.email
+            if student_email in student_map:
+                student_map[student_email].append(course)
+            else:
+                student_map[student_email] = [course]
+    return student_map
+
