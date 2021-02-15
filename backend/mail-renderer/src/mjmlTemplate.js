@@ -9,7 +9,7 @@ export const template = compile(`
   <mjml>
   <mj-head>
     <mj-title>Sekizkirk.io - Here is your schedule.</mj-title>
-    <mj-font name="Agrandir" href="./css/font.css" />
+    <mj-font name="Agrandir" href="https://cash-f.squarecdn.com/static/fonts/agrandir/Agrandir-GrandHeavy.woff" />
     <mj-style>
       .table-container div { margin-top: 10px !important; } .day-cell { color:
       #000000de; padding: 10px !important; font-family: "Agrandir"; font-weight:
