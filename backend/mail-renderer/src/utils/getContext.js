@@ -1,6 +1,6 @@
 import { cellColors } from "./colors";
 
-export const getContext = (coursesData) => {
+export default (coursesData) => {
   const context = {};
 
   coursesData.forEach(
