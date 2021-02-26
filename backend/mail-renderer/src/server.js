@@ -9,7 +9,7 @@ app.use(express.json());
 
 const port = 3000;
 
-app.post("/", (req, res) => {
+app.post("/table", (req, res) => {
   const load = req.body;
 
   const context = getContext(load.data);

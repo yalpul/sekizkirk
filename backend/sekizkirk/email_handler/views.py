@@ -109,7 +109,7 @@ def get_course_info(course_list):
 
 
 def prepare_html(sched):
-    post_url = "http://renderer:3000/"
+    post_url = "http://renderer:3000/table"
     slots_data = []
     idx = 0
     course_info_list = get_course_info(sched.items())
