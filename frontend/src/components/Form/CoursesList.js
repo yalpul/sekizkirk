@@ -155,63 +155,68 @@ const CoursesList = ({
                     </Grid>
                     <Divider />
                     <List>
-                        {uniqueCourses.map((course, index) => {
-                            const dataNotAvaliable =
-                                courseSlots[course.code].length === 0;
+                        {uniqueCourses
+                            .filter((course) => course !== undefined)
+                            .map((course, index) => {
+                                const dataNotAvaliable =
+                                    courseSlots[course.code].length === 0;
 
-                            return course ? (
-                                <ListItem
-                                    key={`${course.title}+${course.code}`}
-                                    button={dataNotAvaliable ? false : true}
-                                    onClick={
-                                        dataNotAvaliable
-                                            ? null
-                                            : () => setOpenDialog(index)
-                                    }
-                                    ContainerProps={{
-                                        onMouseOver: () =>
-                                            setCoursesMouseOver(index),
-                                        onFocus: () =>
-                                            setCoursesMouseOver(index),
-                                        onMouseOut: () =>
-                                            setCoursesMouseOver(null),
-                                        onBlur: () => setCoursesMouseOver(null),
-                                    }}
-                                >
-                                    {dataNotAvaliable && (
-                                        <ListItemIcon>
-                                            <Tooltip
-                                                title="This course does not have any sections. It will not be included in schedule table."
-                                                arrow
-                                            >
-                                                <InfoIcon color="secondary" />
-                                            </Tooltip>
-                                        </ListItemIcon>
-                                    )}
-                                    <ListItemText
-                                        primary={course.title}
-                                        inset={dataNotAvaliable ? false : true}
-                                    />
-                                    <ListItemSecondaryAction
-                                        style={{
-                                            display:
-                                                coursesMouseOver === index
-                                                    ? undefined
-                                                    : "none",
+                                return course ? (
+                                    <ListItem
+                                        key={`${course.title}+${course.code}`}
+                                        button={dataNotAvaliable ? false : true}
+                                        onClick={
+                                            dataNotAvaliable
+                                                ? null
+                                                : () => setOpenDialog(index)
+                                        }
+                                        ContainerProps={{
+                                            onMouseOver: () =>
+                                                setCoursesMouseOver(index),
+                                            onFocus: () =>
+                                                setCoursesMouseOver(index),
+                                            onMouseOut: () =>
+                                                setCoursesMouseOver(null),
+                                            onBlur: () =>
+                                                setCoursesMouseOver(null),
                                         }}
                                     >
-                                        <IconButton
-                                            edge="end"
-                                            onClick={() =>
-                                                handleDeleteCourse(course)
+                                        {dataNotAvaliable && (
+                                            <ListItemIcon>
+                                                <Tooltip
+                                                    title="This course does not have any sections. It will not be included in schedule table."
+                                                    arrow
+                                                >
+                                                    <InfoIcon color="secondary" />
+                                                </Tooltip>
+                                            </ListItemIcon>
+                                        )}
+                                        <ListItemText
+                                            primary={course.title}
+                                            inset={
+                                                dataNotAvaliable ? false : true
                                             }
+                                        />
+                                        <ListItemSecondaryAction
+                                            style={{
+                                                display:
+                                                    coursesMouseOver === index
+                                                        ? undefined
+                                                        : "none",
+                                            }}
                                         >
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </ListItemSecondaryAction>
-                                </ListItem>
-                            ) : null;
-                        })}
+                                            <IconButton
+                                                edge="end"
+                                                onClick={() =>
+                                                    handleDeleteCourse(course)
+                                                }
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </ListItemSecondaryAction>
+                                    </ListItem>
+                                ) : null;
+                            })}
                         {electiveCourses.map((type, index) => (
                             <ListItem
                                 key={`${type}+${index}`}

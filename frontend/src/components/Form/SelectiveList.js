@@ -82,21 +82,28 @@ const SelectiveList = () => {
                                 marginTop: listIndex !== 0 ? "1em" : undefined,
                             }}
                         >
-                            {selectiveList.map((course) => (
-                                <ListItem
-                                    key={`${course.title}+${course.code}`}
-                                    button
-                                    onClick={() =>
-                                        handleSelectiveClick(course, listIndex)
-                                    }
-                                    className={classes.listItem}
-                                >
-                                    <ListItemIcon>
-                                        <CheckCircleIcon className="list-icon" />
-                                    </ListItemIcon>
-                                    <ListItemText primary={course.title} />
-                                </ListItem>
-                            ))}
+                            {selectiveList
+                                // some selective courses' data might not be included in OIBS,
+                                // although they are provided as must code. Filter them.
+                                .filter((course) => course !== undefined)
+                                .map((course) => (
+                                    <ListItem
+                                        key={`${course.title}+${course.code}`}
+                                        button
+                                        onClick={() =>
+                                            handleSelectiveClick(
+                                                course,
+                                                listIndex
+                                            )
+                                        }
+                                        className={classes.listItem}
+                                    >
+                                        <ListItemIcon>
+                                            <CheckCircleIcon className="list-icon" />
+                                        </ListItemIcon>
+                                        <ListItemText primary={course.title} />
+                                    </ListItem>
+                                ))}
                         </List>
                     );
                 })}
