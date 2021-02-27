@@ -2,7 +2,7 @@ import express from "express";
 import mjml2html from "mjml";
 
 import template from "./mjmlTemplates/tableTemplate";
-import getContext from "./utils/getContext";
+import getContextForTable from "./utils/getContextForTable";
 
 const app = express();
 app.use(express.json());
@@ -12,7 +12,7 @@ const port = 3000;
 app.post("/table", (req, res) => {
   const load = req.body;
 
-  const context = getContext(load.data);
+  const context = getContextForTable(load.data);
   const mjml = template(context);
 
   const html = mjml2html(mjml, { minify: true });
