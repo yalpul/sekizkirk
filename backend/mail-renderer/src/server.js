@@ -29,7 +29,7 @@ app.post("/notify", (req, res) => {
   const mjml = createNotify(load);
   const html = mjml2html(mjml, { minify: true });
 
-  res.json({ data: "success" });
+  res.json({ data: html.html });
 });
 
 export const start = () => {
