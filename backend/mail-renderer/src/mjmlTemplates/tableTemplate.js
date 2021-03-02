@@ -5,7 +5,7 @@ Handlebars.registerHelper("safeVal", function (value, safeValue) {
   return new Handlebars.SafeString(out);
 });
 
-export const template = compile(` 
+export default compile(` 
   <mjml>
   <mj-head>
     <mj-title>Sekizkirk.io - Here is your schedule.</mj-title>

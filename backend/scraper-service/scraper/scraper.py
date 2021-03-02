@@ -15,6 +15,7 @@ class scraper:
         self.dept_codes = []
         self.semester = None
         self.slots = []
+        self.prev_courses = []
         self.courses = []
         self.data = {}
         self.musts_path = os.path.join(self.path, 'musts.json')
@@ -79,6 +80,7 @@ class scraper:
     # runs the scraper to get the courses data
     def scrape_courses(self, force_update=True):
         self.depts_scraper.import_data(force_update=force_update)
+        self.prev_courses = self.courses
         self.courses = self.depts_scraper.get_courses()
         self.slots_scraper.set_course_codes(self.depts_scraper.get_codes())
 
@@ -150,7 +152,13 @@ class scraper:
             if course in changes:
                 changes[course].append(reason)
             else:
-                changes[course] = [reason]
+                if course in self.courses:
+                    changes[course] = [self.courses[course]['title'], reason]
+                elif course in self.prev_courses:
+                    changes[course] = [self.prev_courses[course]['title'], reason]
+                else:
+                    pass
+
         changed_courses = {}
         for course in old.keys():
             if course not in new:

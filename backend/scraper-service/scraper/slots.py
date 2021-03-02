@@ -69,6 +69,9 @@ class slots:
         slots = []
         idx = 0
         any_slots = False
+        expire_str = 'Your session has expired'
+        if expire_str in html:
+            raise ValueError("Session expired")
         while True:
             idx = html.find(section_str, idx)
             if idx == -1: break
@@ -206,7 +209,12 @@ class slots:
                     course_page = self.request_course(course)
                     slots = self.get_timeslots(course_page)
                     success = True
-                except:
+                except ValueError as v:
+                    print(repr(v))
+                    print('Refreshing cookie...')
+                    self.cookie = self.generate_cookie()
+                except Exception as e:
+                    print(repr(e))
                     print('\nError in course: ', course, '- Retrying with a new cookie...')
                     self.cookie = self.generate_cookie()
             course_slots[course] = slots
