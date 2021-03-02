@@ -1,16 +1,15 @@
 import json
 
-import urllib.request as req
-
 from django.http import HttpResponse
 from django.core.exceptions import ValidationError
 
-from django.core.mail import send_mail
 
 from .models import Person, Course, Takes
 from .utils import form_validator
 from .utils import notify_validator
 from .utils import create_people_course_map
+from .utils import sendmail
+from .utils import send_notify_mail
 
 def unsubscribe(request, uuid):
     try:
@@ -96,65 +95,4 @@ def index(request):
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=405)
-
-
-def get_course_info(course_list):
-    query = []
-    for course, section in course_list:
-        query.append(course + '=' + str(section))
-    query = '&'.join(query)
-    get_url = "http://scraper:8001/q?" + query
-    response = req.urlopen(get_url).read().decode("utf-8")
-    return json.loads(response)
-
-
-def prepare_html(sched):
-    post_url = "http://renderer:3000/table"
-    slots_data = []
-    idx = 0
-    course_info_list = get_course_info(sched.items())
-    for real_section, slots, title in course_info_list:
-        for slot in slots:
-            classroom = "" if len(slot) <= 2 else "\n" + slot[2]
-            name = title + "/" + str(real_section) + classroom
-            x, y = slot[:2]
-            slots_data.append(
-                {
-                    "name": name,
-                    "slot": {"hourIndex": y, "dayIndex": x},
-                    "courseIndex": idx,
-                }
-            )
-        idx += 1
-    data = {"data": slots_data}
-    data_encoded = bytes(json.dumps(data), "utf-8")
-    request = req.Request(post_url, headers={"Content-Type": "application/json"})
-    response = req.urlopen(request, data_encoded)
-    html_json = response.read().decode("utf-8")
-    html = json.loads(html_json)
-    return html["data"]
-
-
-def sendmail(mail_addr, schedule):
-    html_email = prepare_html(schedule)
-    send_mail(
-        "Your schedule",
-        "Please enable content to see the schedule",
-        None, # email address comes from settings.DEFAULT_FROM_EMAIL
-        [mail_addr],
-        fail_silently=False,
-        html_message=html_email,
-    )
-
-def send_notify_mail(people_course_map):
-    for student, courses in people_course_map.items():
-        text = 'Your changed courses: ' + ','.join(courses) + \
-            f'\nTo unsubscribe, Follow this link: https://sekizkirk.io/email/unsubscribe/{Person.objects.get(email=student).uuid}'
-        send_mail(
-            'Course Change Notification',
-            text,
-            None, # email address comes from settings.DEFAULT_FROM_EMAIL
-            [student],
-            fail_silently=False
-        )
 
