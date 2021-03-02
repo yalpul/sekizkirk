@@ -88,7 +88,7 @@ def sendmail(mail_addr, schedule):
 def send_notify_mail(people_course_map):
     for student, courses in people_course_map.items():
         p = Person.objects.get(email=student)
-        unsub = p.uuid
+        unsub = str(p.uuid)
         html_email = prepare_notify_email(courses, unsub)
         send_mail(
             'Course Change Notification',
