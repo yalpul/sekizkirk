@@ -49,7 +49,7 @@ def notify_validator(data):
 
 def create_people_course_map(changed_courses):
     student_map = {}
-    for course in changed_courses.keys():
+    for course, reasons in changed_courses.items():
         try:
             course_id = Course.objects.get(course=course)
         except ObjectDoesNotExist:
@@ -60,9 +60,9 @@ def create_people_course_map(changed_courses):
                 continue
             student_email = entry.person.email
             if student_email in student_map:
-                student_map[student_email].append(course)
+                student_map[student_email].append(reasons)
             else:
-                student_map[student_email] = [course]
+                student_map[student_email] = [reasons]
     return student_map
 
 def get_course_info(course_list):
@@ -127,12 +127,12 @@ def prepare_html(sched):
 
 def prepare_notify_email(courses, unsub):
     post_url = "http://renderer:3000/notify"
-    unsub_url = "https://sekizkirk.io/unsubscribe/"
+    unsub_url = "https://sekizkirk.io/email/unsubscribe/"
     changed_courses = [
             {
-                "courseName" : course[0],
-                "reasons" : course[1:],
-            } for course in courses]
+                "courseName" : reasons[0],
+                "reasons" : reasons[1:],
+            } for reasons in courses]
     payload = {
         "changedCourses" : changed_courses,
         "unsubLink" : unsub_url + unsub
