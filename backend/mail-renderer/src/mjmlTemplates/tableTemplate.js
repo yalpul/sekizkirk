@@ -130,7 +130,7 @@ export default compile(`
 
           <!-- 16:40 -->
           <tr>
-            <td class="day-cell">15:40</td>
+            <td class="day-cell">16:40</td>
             <td class="slot-cell" style="background-color: {{safeVal bg8-0 '#e5e5e5'}}">{{8-0}}</td>
             <td class="slot-cell" style="background-color: {{safeVal bg8-1 '#e5e5e5'}}">{{8-1}}</td>
             <td class="slot-cell" style="background-color: {{safeVal bg8-2 '#e5e5e5'}}">{{8-2}}</td>
