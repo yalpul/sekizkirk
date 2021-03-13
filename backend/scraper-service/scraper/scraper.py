@@ -197,8 +197,6 @@ class scraper:
                 else:
                     if old[i][1] != new[j][1]:
                         reasons.append('Time slots have changed for section: ' + str(e1))
-                    if old[i][2] != new[j][2]:
-                        reasons.append('Constraints have changed for section: ' + str(e1))
                     if old[i][3] != new[j][3]:
                         reasons.append('Instructor has changed for section: ' + str(e1))
                     i += 1
